@@ -4,6 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Heuristika – Osobista Biblioteka Projektanta</title>
+    <link rel="icon" type="image/svg+xml" href="assets/favicon.svg" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
@@ -234,13 +235,14 @@
             renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
             container.appendChild(renderer.domElement);
 
-            const CAMERA_FOV = 10; // mniejsza wartość = węższy kąt (dłuższa "ogniskowa"), spłaszcza perspektywę i model wygląda szczuplej
+            const CAMERA_FOV = 6; // mniejsza wartość = węższy kąt (dłuższa "ogniskowa"), spłaszcza perspektywę i model wygląda szczuplej
 
             // Canvas i FOV renderujemy WIĘKSZE niż samo pudełko 87x89 (i skalujemy oba tym samym
             // współczynnikiem), żeby dać modelowi fizyczny margines na obrót/przechył bez ucinania
             // krawędzi — ponieważ oba rosną razem, model na ekranie ma dokładnie ten sam rozmiar
             // w pikselach, zyskuje tylko dodatkową, niewidoczną przestrzeń dookoła.
-            const SAFETY_SCALE = 1.3;
+            const SIZE_BOOST = 1.75; // mnożnik wielkości modelu — musi rosnąć razem z SAFETY_SCALE poniżej
+            const SAFETY_SCALE = 1.3 * SIZE_BOOST;
 
             const scene = new THREE.Scene();
             const camera = new THREE.PerspectiveCamera(CAMERA_FOV * SAFETY_SCALE, 1, 1, 5000);
@@ -305,7 +307,7 @@
                 camera.position.set(0, dist * Math.sin(elevRad), dist * Math.cos(elevRad));
                 camera.lookAt(0, 0, 0);
 
-                keyGroup.scale.setScalar(1.3); // model wyraźnie większy
+                keyGroup.scale.setScalar(1.3 * SIZE_BOOST); // model wyraźnie większy
 
                 modelReady = true;
             });
