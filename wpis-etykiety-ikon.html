@@ -1,0 +1,542 @@
+<html lang="pl">
+
+<head>
+    <!-- Musi wykonać się PRZED wczytaniem styles.css (stąd na samym początku
+         <head>), żeby data-theme na <html> było ustawione zanim CSS zacznie się
+         stosować — inaczej byłby widoczny błysk złego motywu przy starcie. -->
+    <script>
+        (function () {
+            try {
+                var stored = localStorage.getItem('heuristika-theme');
+                var theme = stored || (window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark');
+                document.documentElement.setAttribute('data-theme', theme);
+            } catch (e) {
+                document.documentElement.setAttribute('data-theme', 'dark');
+            }
+        })();
+    </script>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Etykiety ikon w menu dashboardu – Heuristika</title>
+    <link rel="icon" type="image/svg+xml" href="assets/favicon.svg" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600&family=Geist+Mono:wght@400;500&family=Inter:wght@400;500;600;700&family=BBH+Bartle:wght@400&display=swap"
+        rel="stylesheet" />
+    <link rel="stylesheet" href="styles.css" />
+</head>
+
+<body>
+    <!-- Ten sam wzór z hover co na stronie głównej (patrz <script> niżej) — bez
+         .hero na tej podstronie skrypt sam gracefully przechodzi w tryb "poza
+         hero" (biały, przygaszony), więc wygląda spójnie z resztą strony. -->
+    <canvas id="dots"></canvas>
+    <div class="page">
+        <div class="shell">
+            <nav class="nav" aria-label="Top navigation">
+                <div class="nav-left">
+                    <a href="index.html" class="brand" aria-label="Heuristika home">
+                        <svg class="brand-icon" viewBox="0 0 20 17.32" fill="none" aria-hidden="true">
+                            <path d="M10 0L20 17.32H0L10 0Z" fill="currentColor" />
+                        </svg>
+                        <span class="brand-title">Heuristika</span>
+                    </a>
+                    <div class="nav-links" id="navLinks">
+                        <a href="index.html#horizontal" class="nav-link">Katalog</a>
+                        <a href="o-projekcie.html" class="nav-link nav-link--small">O projekcie</a>
+                    </div>
+                </div>
+
+                <div class="nav-right">
+                    <button type="button" class="icon-button theme-toggle" id="themeToggle"
+                        aria-label="Przełącz tryb jasny/ciemny" aria-pressed="false">
+                        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                            <path d="M8 2V4" stroke="currentColor" stroke-width="1.33333" stroke-linecap="round"
+                                stroke-linejoin="round" />
+                            <path d="M8 12V14" stroke="currentColor" stroke-width="1.33333" stroke-linecap="round"
+                                stroke-linejoin="round" />
+                            <path d="M2 8H4" stroke="currentColor" stroke-width="1.33333" stroke-linecap="round"
+                                stroke-linejoin="round" />
+                            <path d="M12 8H14" stroke="currentColor" stroke-width="1.33333" stroke-linecap="round"
+                                stroke-linejoin="round" />
+                            <path d="M3.73333 3.73333L5.2 5.2" stroke="currentColor" stroke-width="1.33333"
+                                stroke-linecap="round" stroke-linejoin="round" />
+                            <path d="M10.8 10.8L12.2667 12.2667" stroke="currentColor" stroke-width="1.33333"
+                                stroke-linecap="round" stroke-linejoin="round" />
+                            <path d="M3.73333 12.2667L5.2 10.8" stroke="currentColor" stroke-width="1.33333"
+                                stroke-linecap="round" stroke-linejoin="round" />
+                            <path d="M10.8 5.2L12.2667 3.73333" stroke="currentColor" stroke-width="1.33333"
+                                stroke-linecap="round" stroke-linejoin="round" />
+                            <circle cx="8" cy="8" r="1.66667" stroke="currentColor" stroke-width="1.33333" />
+                        </svg>
+                    </button>
+                    <button type="button" class="footer__subscribe">
+                        <svg class="footer__subscribe-icon" width="16" height="16" viewBox="0 0 16 16" fill="none"
+                            aria-hidden="true">
+                            <path d="M6.667 4.667V3.334H10.667V4.667L12.667 10.667H4.667L6.667 4.667Z" stroke="currentColor"
+                                stroke-width="1.333" stroke-linecap="round" stroke-linejoin="round" />
+                            <circle cx="8" cy="11.8" r="0.8" fill="currentColor" />
+                        </svg>
+                        Subskrybuj
+                    </button>
+                </div>
+
+                <button type="button" class="nav-toggle" aria-label="Otwórz menu" aria-expanded="false"
+                    aria-controls="navLinks">
+                    <svg class="nav-toggle-icon" viewBox="0 0 20 16" width="20" height="16" fill="none"
+                        aria-hidden="true">
+                        <path d="M1 1H19" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" />
+                        <path d="M1 8H19" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" />
+                        <path d="M1 15H19" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" />
+                    </svg>
+                </button>
+            </nav>
+            <div class="divider"></div>
+
+            <main class="entry">
+                <article class="entry-card">
+                    <p class="entry__eyebrow">wzorce / nawigacja</p>
+                    <h1 class="entry__title">Etykiety ikon w menu dashboardu</h1>
+                    <p class="entry__lead">Debata o tym, czy ikona w nawigacji dashboardu powinna mieć widoczną
+                        etykietę tekstową, czy wystarczy sam symbol – i dlaczego odpowiedź różni się między
+                        desktopem a mobile.</p>
+
+                    <div class="entry__taxonomy">
+                        <span class="about__badge about__badge--blue">
+                            <svg width="6" height="6" viewBox="0 0 6 6" aria-hidden="true">
+                                <circle cx="3" cy="3" r="3" fill="currentColor" />
+                            </svg>
+                            UI Design
+                        </span>
+                        <span class="about__badge about__badge--amber">
+                            <svg width="21" height="5" viewBox="0 0 21 5" aria-hidden="true">
+                                <circle cx="2.5" cy="2.5" r="2.5" fill="currentColor" />
+                                <circle cx="10.5" cy="2.5" r="2.5" fill="currentColor" />
+                                <circle cx="18.5" cy="2.5" r="2.5" fill="currentColor" fill-opacity="0.35" />
+                            </svg>
+                            Łatwy
+                        </span>
+                        <span class="about__badge about__badge--violet">
+                            <svg width="6" height="6" viewBox="0 0 6 6" aria-hidden="true">
+                                <circle cx="3" cy="3" r="3" fill="currentColor" />
+                            </svg>
+                            Wzorzec
+                        </span>
+                        <span class="about__badge about__badge--green">
+                            <svg width="6" height="6" viewBox="0 0 6 6" aria-hidden="true">
+                                <circle cx="3" cy="3" r="3" fill="currentColor" />
+                            </svg>
+                            Desktop + Mobile
+                        </span>
+                    </div>
+
+                    <div class="divider"></div>
+
+                    <div class="entry__tldr-wrap">
+                        <div class="entry__tldr-bar"></div>
+                        <div class="entry__tldr-col">
+                            <p class="entry__tldr-label">TL;DR</p>
+                            <p class="entry__tldr-text">Etykieta obok ikony to koszt (miejsce, szum wizualny) w
+                                zamian za pewność rozpoznania. Na desktopie, gdzie sidebar ma zwykle 200–280px,
+                                ten koszt jest niski i warto go ponieść. Na mobile decyzja zależy od tego, czy
+                                ikona jest jednoznaczna.</p>
+                        </div>
+                    </div>
+
+                    <h2 class="entry__heading">Kiedy stosować</h2>
+                    <p class="entry__copy">Stosuj etykiety, gdy ikona nie ma ugruntowanej konwencji, użytkownik
+                        jest nowy lub korzysta z sekcji rzadko, albo koszt błędnego kliknięcia jest wysoki
+                        (recognition over recall). Pomijaj je, gdy ikony są już wyuczone (lupa, koło zębate,
+                        dzwonek), użytkownik wraca codziennie, albo przestrzeń jest krytycznym zasobem – np.
+                        mobilny bottom nav, gdzie liczy się Fitts’s Law.</p>
+
+                    <h2 class="entry__heading">Best practices</h2>
+                    <div class="entry__dodont">
+                        <div class="entry__dodont-card">
+                            <div class="entry__dodont-row">
+                                <svg width="6" height="6" viewBox="0 0 6 6" aria-hidden="true"
+                                    style="color:var(--badge-green-fg)">
+                                    <circle cx="3" cy="3" r="3" fill="currentColor" />
+                                </svg>
+                                <p class="entry__dodont-label entry__dodont-label--do">Rób</p>
+                            </div>
+                            <p class="entry__dodont-text">Na desktopie w rozwiniętym sidebarze zawsze pokazuj
+                                label, nawet przy bardzo znanych ikonach.</p>
+                        </div>
+                        <div class="entry__dodont-card">
+                            <div class="entry__dodont-row">
+                                <svg width="6" height="6" viewBox="0 0 6 6" aria-hidden="true"
+                                    style="color:var(--danger-fg)">
+                                    <circle cx="3" cy="3" r="3" fill="currentColor" />
+                                </svg>
+                                <p class="entry__dodont-label entry__dodont-label--dont">Nie rób</p>
+                            </div>
+                            <p class="entry__dodont-text">Nie chowaj etykiet pod ikonami niestandardowymi bez
+                                alternatywy typu tooltip.</p>
+                        </div>
+                    </div>
+
+                    <h2 class="entry__heading">Ilustracja / przykład</h2>
+                    <div class="entry__illustration">
+                        <div class="entry__mock-grid">
+                            <div class="entry__mock-desktop">
+                                <p class="entry__mock-label">DESKTOP · SIDEBAR ROZWINIĘTY</p>
+                                <div class="entry__mock-row entry__mock-row--active">
+                                    <svg class="entry__mock-row-icon" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                                        <rect x="1.5" y="1.5" width="6" height="7" rx="1" stroke="currentColor" stroke-width="1.3" />
+                                        <rect x="8.5" y="1.5" width="6" height="4" rx="1" stroke="currentColor" stroke-width="1.3" />
+                                        <rect x="8.5" y="6.5" width="6" height="8" rx="1" stroke="currentColor" stroke-width="1.3" />
+                                        <rect x="1.5" y="9.5" width="6" height="5" rx="1" stroke="currentColor" stroke-width="1.3" />
+                                    </svg>
+                                    <p class="entry__mock-row-text">Overview</p>
+                                </div>
+                                <div class="entry__mock-row">
+                                    <svg class="entry__mock-row-icon" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                                        <rect x="2" y="9" width="3" height="5" rx="0.5" fill="currentColor" />
+                                        <rect x="6.5" y="5" width="3" height="9" rx="0.5" fill="currentColor" />
+                                        <rect x="11" y="2" width="3" height="12" rx="0.5" fill="currentColor" />
+                                    </svg>
+                                    <p class="entry__mock-row-text">Analytics</p>
+                                </div>
+                                <div class="entry__mock-row">
+                                    <svg class="entry__mock-row-icon" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                                        <rect x="1.5" y="2" width="13" height="5" rx="1" stroke="currentColor" stroke-width="1.3" />
+                                        <rect x="1.5" y="9" width="13" height="5" rx="1" stroke="currentColor" stroke-width="1.3" />
+                                        <circle cx="4" cy="4.5" r="0.7" fill="currentColor" />
+                                        <circle cx="4" cy="11.5" r="0.7" fill="currentColor" />
+                                    </svg>
+                                    <p class="entry__mock-row-text">Deployments</p>
+                                </div>
+                                <div class="entry__mock-row">
+                                    <svg class="entry__mock-row-icon" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                                        <circle cx="5.5" cy="5" r="2.3" stroke="currentColor" stroke-width="1.3" />
+                                        <path d="M1.5 14c0-2.4 1.8-4 4-4s4 1.6 4 4" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" />
+                                        <circle cx="11.5" cy="5.5" r="1.8" stroke="currentColor" stroke-width="1.2" />
+                                        <path d="M9.8 14c0-1.9 1.3-3.2 3-3.2s2.9 1.3 2.9 3.2" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" />
+                                    </svg>
+                                    <p class="entry__mock-row-text">Team</p>
+                                </div>
+                                <div class="entry__mock-row">
+                                    <svg class="entry__mock-row-icon" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                                        <circle cx="8" cy="8" r="2.3" stroke="currentColor" stroke-width="1.3" />
+                                        <path d="M8 1.5v1.6M8 12.9v1.6M14.5 8h-1.6M3.1 8H1.5M12.5 3.5l-1.1 1.1M4.6 11.4l-1.1 1.1M12.5 12.5l-1.1-1.1M4.6 4.6L3.5 3.5"
+                                            stroke="currentColor" stroke-width="1.3" stroke-linecap="round" />
+                                    </svg>
+                                    <p class="entry__mock-row-text">Settings</p>
+                                </div>
+                            </div>
+                            <div class="entry__mock-mobile">
+                                <p class="entry__mock-label">MOBILE · BOTTOM NAV</p>
+                                <div class="entry__mock-placeholder">
+                                    <p class="entry__mock-placeholder-text">obszar treści</p>
+                                </div>
+                                <div class="entry__mock-bottomnav">
+                                    <svg class="entry__mock-tab entry__mock-tab--active" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                                        <rect x="1.5" y="1.5" width="6" height="7" rx="1" stroke="currentColor" stroke-width="1.3" />
+                                        <rect x="8.5" y="1.5" width="6" height="4" rx="1" stroke="currentColor" stroke-width="1.3" />
+                                        <rect x="8.5" y="6.5" width="6" height="8" rx="1" stroke="currentColor" stroke-width="1.3" />
+                                        <rect x="1.5" y="9.5" width="6" height="5" rx="1" stroke="currentColor" stroke-width="1.3" />
+                                        <circle cx="8" cy="15.2" r="0.8" fill="currentColor" />
+                                    </svg>
+                                    <svg class="entry__mock-tab" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                                        <rect x="2" y="9" width="3" height="5" rx="0.5" fill="currentColor" />
+                                        <rect x="6.5" y="5" width="3" height="9" rx="0.5" fill="currentColor" />
+                                        <rect x="11" y="2" width="3" height="12" rx="0.5" fill="currentColor" />
+                                    </svg>
+                                    <svg class="entry__mock-tab" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                                        <rect x="1.5" y="2" width="13" height="5" rx="1" stroke="currentColor" stroke-width="1.3" />
+                                        <rect x="1.5" y="9" width="13" height="5" rx="1" stroke="currentColor" stroke-width="1.3" />
+                                        <circle cx="4" cy="4.5" r="0.7" fill="currentColor" />
+                                        <circle cx="4" cy="11.5" r="0.7" fill="currentColor" />
+                                    </svg>
+                                    <svg class="entry__mock-tab" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                                        <circle cx="5.5" cy="5" r="2.3" stroke="currentColor" stroke-width="1.3" />
+                                        <path d="M1.5 14c0-2.4 1.8-4 4-4s4 1.6 4 4" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" />
+                                        <circle cx="11.5" cy="5.5" r="1.8" stroke="currentColor" stroke-width="1.2" />
+                                        <path d="M9.8 14c0-1.9 1.3-3.2 3-3.2s2.9 1.3 2.9 3.2" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" />
+                                    </svg>
+                                    <svg class="entry__mock-tab" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                                        <circle cx="8" cy="8" r="2.3" stroke="currentColor" stroke-width="1.3" />
+                                        <path d="M8 1.5v1.6M8 12.9v1.6M14.5 8h-1.6M3.1 8H1.5M12.5 3.5l-1.1 1.1M4.6 11.4l-1.1 1.1M12.5 12.5l-1.1-1.1M4.6 4.6L3.5 3.5"
+                                            stroke="currentColor" stroke-width="1.3" stroke-linecap="round" />
+                                    </svg>
+                                </div>
+                            </div>
+                        </div>
+                        <p class="entry__fig-caption">FIG. 1 – SIDEBAR DESKTOP VS BOTTOM NAV MOBILE</p>
+                        <p class="entry__illustration-desc">Po lewej: rozwinięty sidebar z etykietą przy każdej
+                            ikonie. Po prawej: mobilny bottom nav – same ikony, stan aktywny oznaczony kropką.</p>
+                    </div>
+
+                    <div class="entry__note">
+                        <div class="entry__note-col">
+                            <p class="entry__note-label">MOJA NOTATKA</p>
+                            <p class="entry__note-text">W projekcie dla [klient] rezygnacja z labelek na
+                                desktopie przy collapsed sidebarze podniosła liczbę błędnych kliknięć o ok. 15%
+                                w pierwszym tygodniu – użytkownicy wracali do etykiet przez hover.</p>
+                        </div>
+                    </div>
+
+                    <h2 class="entry__heading">Powiązane hasła</h2>
+                    <div class="entry__related">
+                        <a href="#" class="entry__related-link">Recognition over recall</a>
+                        <a href="#" class="entry__related-link">Progressive disclosure</a>
+                        <a href="#" class="entry__related-link">Fitts’s Law</a>
+                    </div>
+
+                    <div class="divider"></div>
+
+                    <div class="entry__footer-meta">
+                        <p>Źródła: NN/g, Vercel Design, Luke Wroblewski</p>
+                        <p>Opublikowane · lip 2026</p>
+                    </div>
+                </article>
+            </main>
+
+            <div class="divider"></div>
+            <footer class="footer__bottom">
+                <p class="footer__copyright">© 2026 Heuristika – Osobista Biblioteka Projektanta</p>
+                <nav class="footer__links">
+                    <a href="index.html#horizontal" class="footer__link">Katalog</a>
+                    <a href="o-projekcie.html" class="footer__link">O projekcie</a>
+                </nav>
+            </footer>
+        </div>
+    </div>
+
+    <script>
+        (function () {
+            const canvas = document.getElementById('dots');
+            const ctx = canvas.getContext('2d');
+
+            let width, height, dpr;
+
+            // === USTAWIENIA SIATKI ZNAKÓW ===
+            const PATTERN_SCALE = window.matchMedia('(max-width: 760px)').matches ? 0.75 : 1;
+            const CELL_X = 72 * PATTERN_SCALE;
+            const CELL_Y = 72 * PATTERN_SCALE;
+            const FONT_SIZE = 60 * PATTERN_SCALE;
+            const PATTERN_CHARS = "△@=-+";
+
+            // === HOVER ===
+            const HOVER_RADIUS = 200 * PATTERN_SCALE;
+            const TRAIL_DECAY = 0.93;
+            const AMBIENT_ALPHA = 0;
+            const CASCADE_FREQ = 0.5;
+            const CASCADE_SPEED = 0.45;
+
+            let cols, rows;
+            let cells = [];
+
+            let mouse = { x: -9999, y: -9999 };
+            let targetMouse = { x: -9999, y: -9999 };
+
+            function resize() {
+                dpr = window.devicePixelRatio || 1;
+                width = window.innerWidth;
+                height = window.innerHeight;
+                canvas.width = width * dpr;
+                canvas.height = height * dpr;
+                ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+                buildGrid();
+            }
+
+            function buildGrid() {
+                cols = Math.ceil(width / CELL_X) + 1;
+                rows = Math.ceil(height / CELL_Y) + 1;
+                cells = [];
+                for (let i = 0; i < cols; i++) {
+                    for (let j = 0; j < rows; j++) {
+                        const ox = i * CELL_X;
+                        const oy = j * CELL_Y;
+
+                        cells.push({
+                            ox, oy,
+                            x: ox, y: oy,
+                            targetX: ox, targetY: oy,
+                            scale: 1,
+                            targetScale: 1,
+                            alpha: 0,
+                            targetAlpha: 0,
+                            heat: 0
+                        });
+                    }
+                }
+            }
+
+            function onMove(e) {
+                const rect = canvas.getBoundingClientRect();
+                targetMouse.x = e.clientX - rect.left;
+                targetMouse.y = e.clientY - rect.top;
+            }
+
+            function onLeave() {
+                targetMouse.x = -9999;
+                targetMouse.y = -9999;
+            }
+
+            window.addEventListener('resize', resize);
+            window.addEventListener('mousemove', onMove);
+            window.addEventListener('mouseleave', onLeave);
+            window.addEventListener('touchmove', (e) => {
+                const t = e.touches[0];
+                if (t) onMove(t);
+            }, { passive: true });
+            window.addEventListener('touchend', onLeave);
+
+            let t = 0;
+
+            // Bez .hero na tej podstronie heroEl jest null — pętla niżej gracefully
+            // liczy heroBottom jako -1, co daje heroBlend=0 (czyli zawsze tryb
+            // "poza hero"), spójnie z resztą strony poza samym hero.
+            const heroEl = document.querySelector('.hero');
+            const HERO_COLOR_RGB = [21, 81, 216];
+            const HERO_MAX_ALPHA = 0.5;
+            const OUTSIDE_COLOR_RGB_DARK = [255, 255, 255];
+            const OUTSIDE_COLOR_RGB_LIGHT = [10, 10, 10];
+            const OUTSIDE_MAX_ALPHA = 0.1;
+            const FADE_START_FRAC = 0.65;
+            const FADE_END_FRAC = 0.3;
+            const LIGHT_THEME_UNIFORM_HERO_COLOR = true;
+            const LIGHT_THEME_UNIFORM_COLOR_RGB = [10, 10, 10];
+            const LIGHT_THEME_UNIFORM_MAX_ALPHA = 0.2;
+
+            function lerp(a, b, t) { return a + (b - a) * t; }
+
+            function animate() {
+                t += 0.016;
+                mouse.x += (targetMouse.x - mouse.x) * 0.2;
+                mouse.y += (targetMouse.y - mouse.y) * 0.2;
+
+                const isLightTheme = document.documentElement.getAttribute('data-theme') === 'light';
+                const lightUniform = isLightTheme && LIGHT_THEME_UNIFORM_HERO_COLOR;
+                const OUTSIDE_COLOR_RGB = isLightTheme ? OUTSIDE_COLOR_RGB_LIGHT : OUTSIDE_COLOR_RGB_DARK;
+                const heroColorRGB = lightUniform ? LIGHT_THEME_UNIFORM_COLOR_RGB : HERO_COLOR_RGB;
+
+                const heroBottom = heroEl ? heroEl.getBoundingClientRect().bottom : -1;
+                const fadeStart = window.innerHeight * FADE_START_FRAC;
+                const fadeEnd = window.innerHeight * FADE_END_FRAC;
+                const rawProgress = (heroBottom - fadeEnd) / (fadeStart - fadeEnd);
+                const heroProgress = Math.min(1, Math.max(0, rawProgress));
+                const smoothProgress = heroProgress * heroProgress * (3 - 2 * heroProgress);
+                const heroBlend = lightUniform ? 1 : smoothProgress;
+
+                const colorRGB = [
+                    Math.round(lerp(OUTSIDE_COLOR_RGB[0], heroColorRGB[0], heroBlend)),
+                    Math.round(lerp(OUTSIDE_COLOR_RGB[1], heroColorRGB[1], heroBlend)),
+                    Math.round(lerp(OUTSIDE_COLOR_RGB[2], heroColorRGB[2], heroBlend)),
+                ].join(',');
+                const maxAlpha = lerp(OUTSIDE_MAX_ALPHA, lightUniform ? LIGHT_THEME_UNIFORM_MAX_ALPHA : HERO_MAX_ALPHA, heroBlend);
+
+                ctx.clearRect(0, 0, width, height);
+                ctx.font = `${FONT_SIZE}px 'SF Mono', 'Menlo', 'Consolas', monospace`;
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+
+                for (const c of cells) {
+                    const dx = c.ox - mouse.x;
+                    const dy = c.oy - mouse.y;
+                    const dist = Math.hypot(dx, dy);
+                    const instantStrength = dist < HOVER_RADIUS ? 1 - dist / HOVER_RADIUS : 0;
+                    const instantEased = instantStrength * instantStrength * (3 - 2 * instantStrength);
+
+                    c.heat = Math.max(c.heat * TRAIL_DECAY, instantEased);
+                    const eased = c.heat;
+                    const inHover = eased > 0.01;
+
+                    if (inHover) {
+                        c.targetAlpha = AMBIENT_ALPHA + (maxAlpha - AMBIENT_ALPHA) * eased;
+                        c.targetX = c.ox;
+                        c.targetY = c.oy;
+                        c.targetScale = 1.2;
+                    } else {
+                        c.targetAlpha = AMBIENT_ALPHA;
+                        c.targetX = c.ox;
+                        c.targetY = c.oy;
+                        c.targetScale = 1.2;
+                    }
+
+                    c.x += (c.targetX - c.x) * 0.15;
+                    c.y += (c.targetY - c.y) * 0.15;
+                    c.scale += (c.targetScale - c.scale) * 0.15;
+                    c.alpha += (c.targetAlpha - c.alpha) * 0.12;
+
+                    if (c.alpha <= 0.03) continue;
+
+                    const phase = (Math.sin(c.ox * CASCADE_FREQ + c.oy * CASCADE_FREQ - t * CASCADE_SPEED) + 1) / 2;
+                    const charIndex = Math.min(PATTERN_CHARS.length - 1, Math.floor(phase * PATTERN_CHARS.length));
+                    const ch = PATTERN_CHARS[charIndex];
+                    if (ch === ' ') continue;
+
+                    const renderAlpha = c.alpha;
+
+                    ctx.save();
+                    ctx.translate(c.x, c.y);
+                    ctx.scale(c.scale, c.scale);
+                    ctx.fillStyle = `rgba(${colorRGB},${renderAlpha})`;
+                    ctx.fillText(ch, 0, 0);
+                    ctx.restore();
+                }
+
+                requestAnimationFrame(animate);
+            }
+
+            resize();
+            animate();
+        })();
+    </script>
+
+    <script>
+        // Hamburger (mobile nav) — chowa/pokazuje .nav-links + .nav-right jako
+        // pełnoszerokie "wiersze" pod głównym paskiem (patrz .nav.is-open w CSS).
+        (function () {
+            const nav = document.querySelector('.nav');
+            const toggle = document.querySelector('.nav-toggle');
+            if (!nav || !toggle) return;
+
+            function closeMenu() {
+                nav.classList.remove('is-open');
+                toggle.setAttribute('aria-expanded', 'false');
+            }
+
+            toggle.addEventListener('click', () => {
+                const isOpen = nav.classList.toggle('is-open');
+                toggle.setAttribute('aria-expanded', String(isOpen));
+            });
+
+            nav.querySelectorAll('.nav-links a, .nav-right button').forEach((el) => {
+                el.addEventListener('click', closeMenu);
+            });
+
+            window.addEventListener('resize', () => {
+                if (window.innerWidth > 760) closeMenu();
+            });
+        })();
+    </script>
+
+    <script>
+        // Przełącznik jasny/ciemny — zapisuje wybór w localStorage (ten sam
+        // klucz co skrypt w <head>, który ustawia data-theme przed pierwszym
+        // malowaniem), więc wybór przenosi się między podstronami i wizytami.
+        (function () {
+            const btn = document.getElementById('themeToggle');
+            if (!btn) return;
+            const root = document.documentElement;
+
+            function sync() {
+                btn.setAttribute('aria-pressed', String(root.getAttribute('data-theme') === 'light'));
+            }
+            sync();
+
+            btn.addEventListener('click', () => {
+                const next = root.getAttribute('data-theme') === 'light' ? 'dark' : 'light';
+                root.setAttribute('data-theme', next);
+                try { localStorage.setItem('heuristika-theme', next); } catch (e) { }
+                sync();
+            });
+        })();
+    </script>
+</body>
+
+</html>

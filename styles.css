@@ -1,12 +1,134 @@
+/* === Motyw jasny/ciemny ===
+   Wartości domyślne (:root) to motyw ciemny — dokładnie te same kolory, które
+   strona miała zawsze (żeby nic nie "przeskoczyło" wizualnie). Blok
+   [data-theme="light"] nadpisuje je kolorami z tego samego pliku Figma (node
+   13:84 "row-theme" — porównanie entry-card w wersji jasnej/ciemnej), więc
+   oba motywy pochodzą z tego samego źródła prawdy co reszta stylów.
+   data-theme jest ustawiane na <html> przez skrypt w <head> (patrz index.html/
+   o-projekcie.html) PRZED pierwszym malowaniem, więc nie ma mignięcia złego
+   motywu przy starcie. */
 :root {
   --bg: #000000;
   --ink: #ffffff;
   --ink-secondary: #a1a1a1;
+  --ink-tertiary: #7d7d7d;
+  --ink-subtle: #b8b8b8;
   --border: #1f1f1f;
+  --surface: #0a0a0a;
+  --bg2: #1f1f1f;
+
+  /* "Szkło" (nav, karty w spoczynku) i jego stan hover/aktywny */
+  --glass-bg: rgba(7, 7, 10, 0.2);
+  --glass-hover-bg: rgba(31, 31, 31, 0.6);
+  --glass-border: rgba(255, 255, 255, 0.06);
+  --overlay-strong: rgba(7, 7, 10, 0.95);
+
+  /* Obwódki/tła "szklanych" elementów w hero (search, shortcut) — jasne
+     nakładki na ciemnym tle; w motywie jasnym stają się ciemnymi nakładkami. */
+  --overlay-border-soft: rgba(255, 255, 255, 0.12);
+  --overlay-bg-soft: rgba(255, 255, 255, 0.04);
+  --overlay-border-strong: rgba(255, 255, 255, 0.16);
+  --overlay-bg-strong: rgba(255, 255, 255, 0.06);
+
+  --badge-blue-bg: #0f1e33;
+  --badge-blue-border: #163b66;
+  --badge-blue-fg: #52a9ff;
+  --badge-amber-bg: #2b1d06;
+  --badge-amber-border: #4a3210;
+  --badge-amber-fg: #ffb224;
+  --badge-violet-bg: #211129;
+  --badge-violet-border: #3b1e52;
+  --badge-violet-fg: #b98cff;
+  --badge-green-bg: #0b2118;
+  --badge-green-border: #123625;
+  --badge-green-fg: #4cd98a;
+
+  /* "Nie rób" w parach Do/Don't (.entry__dodont) — czerwień, osobna od badge'y. */
+  --danger-fg: #ff6166;
+
+  /* Hover przycisków "pigułka" (tło = var(--ink)) — lekkie rozjaśnienie na
+     ciemnym motywie (baza już prawie biała), lekkie pociemnienie na jasnym
+     (baza prawie czarna), więc kierunek zmiany się odwraca między motywami. */
+  --pill-hover-bg: #fafafa;
+
+  /* Cień "elevation" kart (.taxonomy__card, .entries__card) — złagodzony na
+     życzenie (był 0 6px 24px / 0.14, czuł się za mocny, zwłaszcza na mobile,
+     gdzie jest dodatkowo przyciemniony przez --card-shadow-mobile niżej). */
+  --card-shadow: 0 4px 16px rgba(0, 0, 0, 0.10);
+  --card-shadow-mobile: 0 2px 10px rgba(0, 0, 0, 0.08);
+}
+
+:root[data-theme="light"] {
+  --bg: #ffffff;
+  --ink: #0a0a0a;
+  --ink-secondary: #666666;
+  --ink-tertiary: #8f8f8f;
+  /* Zgodnie z referencją (node 301:59629) — w jasnym motywie ten "lead" tekst
+     używa zwykłego --ink-secondary (#666), bez osobnego, ciemniejszego odcienia
+     jak w ciemnym motywie (tam #b8b8b8 jest celowo JAŚNIEJSZY niż #a1a1a1). */
+  --ink-subtle: #666666;
+  --border: #eaeaea;
+  --surface: #fafafa;
+  --bg2: #ececec;
+
+  /* Pełne, kryjące kolory (NIE półprzezroczyste jak w ciemnym motywie) —
+     zgodnie z referencją (node 301:59629): w jasnym motywie karty/nav mają
+     zwykłe białe tło, bez efektu szkła (który na jasnym tle i tak słabo
+     "czyta się" jako przezroczystość). Spójne z mobile, gdzie karty już
+     wcześniej dostały solidne --bg/--surface na życzenie. */
+  --glass-bg: #ffffff;
+  --glass-hover-bg: #fafafa;
+  --glass-border: rgba(0, 0, 0, 0.08);
+  --overlay-strong: rgba(255, 255, 255, 0.95);
+
+  --overlay-border-soft: rgba(0, 0, 0, 0.12);
+  --overlay-bg-soft: rgba(0, 0, 0, 0.04);
+  --overlay-border-strong: rgba(0, 0, 0, 0.16);
+  --overlay-bg-strong: rgba(0, 0, 0, 0.06);
+
+  --badge-blue-bg: #ebf3ff;
+  --badge-blue-border: #cde3ff;
+  --badge-blue-fg: #0060d1;
+  --badge-amber-bg: #fff3e0;
+  --badge-amber-border: #ffdfae;
+  --badge-amber-fg: #b45a00;
+  --badge-violet-bg: #f7edfe;
+  --badge-violet-border: #e6c9fa;
+  --badge-violet-fg: #7928ca;
+  --badge-green-bg: #e3f9ee;
+  --badge-green-border: #beeed7;
+  --badge-green-fg: #12805c;
+
+  --danger-fg: #c4351d;
+
+  --pill-hover-bg: #1a1a1a;
 }
 
 * {
   box-sizing: border-box;
+}
+
+/* .hero celowo POMINIĘTE — jego background-color/border-color są co klatkę
+   nadpisywane inline przez scroll-scrubowany tween GSAP (patrz
+   createHeroShrinkTween w index.html); CSS transition na tych samych
+   właściwościach "walczyłby" z tym tweenem, dając spóźnioną, gumową reakcję
+   zamiast 1:1 podążania za scrollem. */
+body,
+.nav {
+  transition: background-color 0.25s ease, border-color 0.25s ease, color 0.25s ease;
+}
+
+#preloader {
+  position: fixed;
+  inset: 0;
+  z-index: 999;
+  pointer-events: none;
+}
+
+#preloader-svg {
+  display: block;
+  width: 100%;
+  height: 100%;
 }
 
 body {
@@ -22,7 +144,6 @@ body {
 .page {
   min-height: 100svh;
   min-height: 100dvh;
-  background: var(--bg);
   display: flex;
   justify-content: center;
 }
@@ -32,7 +153,6 @@ body {
   min-height: 100svh;
   min-height: 100dvh;
   border: none;
-  background: var(--bg);
   position: relative;
   overflow-x: hidden;
 }
@@ -48,10 +168,10 @@ body {
   top: 0;
   left: 0;
   z-index: 3;
-  background: rgba(7, 7, 10, 0.2);
+  background: var(--glass-bg);
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  border-bottom: 1px solid var(--glass-border);
   box-shadow: 0 6px 24px rgba(0, 0, 0, 0.14);
 }
 
@@ -65,12 +185,39 @@ body {
   gap: 42px;
 }
 
+.nav-links {
+  display: flex;
+  align-items: center;
+  gap: 42px;
+}
+
+/* Hamburger — ukryty na desktopie, pokazywany dopiero w media query niżej. */
+.nav-toggle {
+  display: none;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border: none;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--ink);
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
 .brand {
   display: inline-flex;
   align-items: center;
   gap: 12px;
   text-decoration: none;
   color: var(--ink);
+  opacity: 1;
+  transition: opacity 0.15s ease;
+}
+
+.brand:hover {
+  opacity: 0.7;
 }
 
 .brand-icon {
@@ -96,6 +243,12 @@ body {
   line-height: 1.4;
   letter-spacing: 0.01em;
   white-space: nowrap;
+  opacity: 1;
+  transition: opacity 0.15s ease;
+}
+
+.nav-link:hover {
+  opacity: 0.7;
 }
 
 .nav-link--small {
@@ -134,6 +287,21 @@ body {
   text-transform: uppercase;
 }
 
+/* Przełącznik jasny/ciemny (Figma node 53:299 "theme-toggle") — ta sama
+   pigułka co .icon-button, ikona w kolorze --ink-secondary jak w referencji
+   (stroke #A1A1A1 na ciemnym / #666 na jasnym motywie, dokładnie ink-secondary). */
+.theme-toggle {
+  color: var(--ink-secondary);
+  cursor: pointer;
+  transition: color 0.15s ease, border-color 0.15s ease, background-color 0.15s ease;
+}
+
+.theme-toggle:hover {
+  color: var(--ink);
+  border-color: var(--ink-secondary);
+  background: var(--bg2);
+}
+
 .divider {
   height: 1px;
   background: var(--border);
@@ -145,18 +313,38 @@ body {
   min-height: 100dvh;
   overflow: hidden;
   display: flex;
+  /* bez tego .hero__marker (pusty div, drugie dziecko obok .hero__content) trafiał
+     jako sąsiad W WIERSZU (domyślny flex-direction:row) zamiast pod treścią —
+     align-items:center centrował go WEWNĄTRZ wysokości wiersza, więc lądował mniej
+     więcej w połowie hero zamiast na samym dole. To przesuwało punkt odniesienia
+     scrollTriggera dużo wyżej niż trzeba, więc animacja kurczenia startowała
+     przedwcześnie (zwłaszcza widoczne na mobile, patrz index.html). */
+  flex-direction: column;
   align-items: center;
   justify-content: center;
-  background: var(--bg);
+  /* celowo bez background: var(--bg) — dzięki temu #dots (stałe tło całej
+     strony) jest widoczne "przez" hero w spoczynku; GSAP animuje backgroundColor
+     (patrz index.html) od przezroczystego do #030303 w trakcie kurczenia w kartę */
+  border: 1px solid transparent;
+  /* gwarantuje, że wyśrodkowana treść (w tym powiększony canvas ikonki 3D, który
+     fizycznie wystaje poza swoje pudełko 87x89) nigdy nie wjedzie pod pasek nav
+     na niskich viewportach — flex centruje w obrębie content-box, więc padding-top
+     rezerwuje "strefę bezpieczną" niezależnie od wysokości okna */
+  padding-top: 160px;
 }
 
-.hero canvas {
-  position: absolute;
+/* Wzór z hover — teraz stałe tło całej strony (patrz komentarz w index.html przy
+   <canvas id="dots">), nie tylko sekcji hero. z-index:-1 trzyma go poniżej
+   wszystkich (nie-pozycjonowanych) sekcji, które muszą mieć usunięte własne
+   tło (var(--bg)), żeby ten wzór było przez nie widać — bazowy czarny kolor
+   i tak zapewnia sam <body>. */
+#dots {
+  position: fixed;
   inset: 0;
   width: 100%;
   height: 100%;
   display: block;
-  z-index: 0;
+  z-index: -1;
   pointer-events: none;
 }
 
@@ -184,9 +372,15 @@ body {
   padding: 24px;
 }
 
+/* Ukryte domyślnie w CSS (nie w JS), żeby nie mignęły widoczne zanim GSAP
+   zdąży się załadować i uruchomić intro — animate.js zdejmuje tę klasę. */
+.js-intro {
+  opacity: 0;
+}
+
 .hero__eyebrow {
   margin: 0;
-  color: #8f8f8f;
+  color: var(--ink-tertiary);
   font-family: "Geist Mono", monospace;
   font-size: 12.5px;
   font-weight: 500;
@@ -231,10 +425,10 @@ body {
 
 .hero__copy {
   margin: 0;
-  max-width: 640px;
-  color: #b8b8b8;
+  max-width: 780px;
+  color: var(--ink-subtle);
   font-family: "Geist", sans-serif;
-  font-size: 18px;
+  font-size: 24px;
   line-height: 1.8;
 }
 
@@ -244,11 +438,12 @@ body {
   gap: 10px;
   width: min(100%, 466px);
   padding: 12px 16px;
-  border: 1px solid rgba(255, 255, 255, 0.12);
+  border: 1px solid var(--overlay-border-soft);
   border-radius: 10px;
-  background: rgba(255, 255, 255, 0.04);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
+  background: var(--overlay-bg-soft);
+  /* blur ujednolicony z resztą "szklanych" elementów (.nav, .taxonomy__card) */
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
 }
 
 .hero__search-icon {
@@ -260,7 +455,7 @@ body {
 .hero__search-text {
   flex: 1;
   min-width: 0;
-  color: #8f8f8f;
+  color: var(--ink-tertiary);
   font-family: "Geist", sans-serif;
   font-size: 13.5px;
   line-height: 1.4;
@@ -272,14 +467,547 @@ body {
   align-items: center;
   justify-content: center;
   padding: 3px 7px;
-  border: 1px solid rgba(255, 255, 255, 0.16);
+  border: 1px solid var(--overlay-border-strong);
   border-radius: 5px;
-  background: rgba(255, 255, 255, 0.06);
-  color: #8f8f8f;
+  background: var(--overlay-bg-strong);
+  color: var(--ink-tertiary);
   font-family: "Geist Mono", monospace;
   font-size: 11px;
   letter-spacing: 0.1em;
   white-space: nowrap;
+}
+
+.hero__marker {
+  height: 100px;
+}
+
+/* === Sekcja pozioma (#horizontal) ===
+   JS (index.html) pina .taxonomy na miejscu; .taxonomy__heading nie jest
+   tłumaczony, więc zostaje nieruchomy. Tylko .taxonomy__grid (kafelki)
+   przesuwa się w poziomie wewnątrz .taxonomy__viewport, który je przycina. */
+.taxonomy {
+  width: 100vw;
+  height: 100svh;
+  height: 100dvh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* .taxonomy__inner NIE jest już ograniczony do 1400px/padding — to robi teraz
+   tylko .taxonomy__heading. Dzięki temu .taxonomy__viewport (kafelki) może
+   rozlewać się na pełną szerokość ekranu i tor kafelków ucina się na
+   prawdziwej krawędzi okna, a nie twardo w połowie karty na granicy
+   dopełnionego kontenera (stąd wrażenie "maski przycinającej"). */
+.taxonomy__inner {
+  display: flex;
+  flex-direction: column;
+  gap: 60px;
+  width: 100%;
+}
+
+.taxonomy__heading {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  width: 100%;
+  /* Wyrównane do tego samego 1600px kontenera i paddingu co .entries
+     ("Ostatnio dodane"), żeby oba nagłówki startowały z tej samej krawędzi
+     niezależnie od szerokości viewportu — sam tor kafelków niżej
+     (.taxonomy__grid) zostaje celowo pełnoszerokościowy (patrz komentarz
+     przy .taxonomy__inner), stąd widoczny "uskok" między nagłówkiem a
+     pierwszą kartą. */
+  max-width: 1600px;
+  margin: 0 auto;
+  padding-inline: 40px;
+}
+
+.taxonomy__viewport {
+  width: 100%;
+  /* "overflow-x:hidden; overflow-y:visible" NIE działa — CSS przelicza samo
+     "visible" na "auto" w tej kombinacji (bo jedna oś musi być inna niż
+     visible), a "auto" i tak PRZYCINA box-shadow (różni się od "hidden" tylko
+     tym, że nie dokłada niepotrzebnego paska przewijania). Prawdziwe
+     rozwiązanie: overflow:hidden na obu osiach (potrzebne dla przycinania
+     toru w poziomie), ale z paddingiem dającym cieniowi (.taxonomy__card ma
+     box-shadow blur 24px) zapas nim trafi na granicę przycinania, i ujemnym
+     marginesem o tej samej wartości, który znosi wpływ paddingu na layout
+     (gap między .taxonomy__heading a kafelkami zostaje bez zmian). */
+  overflow: hidden;
+  padding-block: 40px;
+  margin-block: -40px;
+}
+
+.taxonomy__title {
+  margin: 0;
+  color: var(--ink);
+  font-family: "Geist", sans-serif;
+  font-size: 64px;
+  font-weight: 600;
+  line-height: 1.16;
+  letter-spacing: -0.03em;
+}
+
+.taxonomy__subtitle {
+  margin: 0;
+  max-width: 640px;
+  color: var(--ink-subtle);
+  font-family: "Geist", sans-serif;
+  font-size: 24px;
+  line-height: 1.6;
+}
+
+.taxonomy__grid {
+  display: flex;
+  gap: 20px;
+  width: max-content;
+  /* .taxonomy__heading nie jest już ograniczony do 1400px (pełna szerokość,
+     tak jak nav/stopka) — więc pierwszy kafelek wyrównuje się z nim przez
+     zwykłe 60px, bez dodatkowej matematyki centrowania. Prawy padding daje
+     ostatniemu kafelkowi (w spoczynku po scrollu) zapas, żeby jego zaokrąglony
+     róg nie lądował dokładnie na granicy overflow:hidden. */
+  padding-inline: 60px;
+}
+
+.taxonomy__card {
+  display: flex;
+  flex-direction: column;
+  gap: 42px;
+  flex: 0 0 830px;
+  width: 830px;
+  /* bez stałej wysokości — karta hooguje się do treści (ikona + odstępy +
+     body); .taxonomy__grid to flex row z domyślnym align-items:stretch, więc
+     wszystkie karty i tak wyrównują się do wysokości najwyższej z nich. */
+  align-self: stretch;
+  padding: 32px;
+  border-radius: 24px;
+  /* szkło jak .nav: półprzezroczyste tło + rozmycie tego, co za kartą (teraz
+     jest tam widoczny wzór #dots, patrz index.html) — hover przełącza tło na
+     pełne --bg2, blur zostaje włączony cały czas. */
+  background: var(--glass-bg);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid var(--glass-border);
+  box-shadow: var(--card-shadow);
+  transition: background-color 0.2s ease;
+}
+
+.taxonomy__card:hover {
+  /* półprzezroczyste (nie pełne var(--bg2)) — inaczej tło jest w pełni kryjące
+     i blur (backdrop-filter, wciąż aktywny z bazowej reguły) nie miałby czego
+     rozmywać, znikałby wizualnie w trakcie hover */
+  background: var(--glass-hover-bg);
+}
+
+/* Owija ikonę i daje jej stały pionowy oddech (nie flex:1 — karta nie ma już
+   stałej wysokości do wypełnienia, więc wrapper po prostu hooguje się razem
+   z resztą karty). */
+.taxonomy__card-icon-wrap {
+  display: flex;
+  width: 100%;
+  align-items: center;
+  justify-content: center;
+  padding-block: 42px;
+}
+
+.taxonomy__card-icon {
+  height: 160px;
+  width: auto;
+  flex-shrink: 0;
+  object-fit: contain;
+}
+
+/* Ilustracje mają osobne warianty kolorystyczne wg motywu w Figmie (np. uśmiech
+   #52A9FF w ciemnym / #0060D1 w jasnym — dokładnie te same odcienie co
+   badge'e) — to statyczne pliki SVG (nie inline, nie currentColor), więc
+   przełączanie robimy przez dwa <img> i display:none zamiast jednej podmiany
+   koloru w CSS. */
+.taxonomy__card-icon--light {
+  display: none;
+}
+
+:root[data-theme="light"] .taxonomy__card-icon--dark {
+  display: none;
+}
+
+:root[data-theme="light"] .taxonomy__card-icon--light {
+  display: block;
+}
+
+.taxonomy__card-body {
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+}
+
+.taxonomy__card-top {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+}
+
+.taxonomy__badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 16px;
+  border: 2px solid;
+  border-radius: 6px;
+  font-family: "Geist", sans-serif;
+  font-size: 23px;
+  font-weight: 500;
+  line-height: 1.4;
+  white-space: nowrap;
+}
+
+.taxonomy__badge--blue {
+  background: var(--badge-blue-bg);
+  border-color: var(--badge-blue-border);
+  color: var(--badge-blue-fg);
+}
+
+.taxonomy__badge--amber {
+  background: var(--badge-amber-bg);
+  border-color: var(--badge-amber-border);
+  color: var(--badge-amber-fg);
+}
+
+.taxonomy__badge--violet {
+  background: var(--badge-violet-bg);
+  border-color: var(--badge-violet-border);
+  color: var(--badge-violet-fg);
+}
+
+.taxonomy__badge--green {
+  background: var(--badge-green-bg);
+  border-color: var(--badge-green-border);
+  color: var(--badge-green-fg);
+}
+
+.taxonomy__count {
+  color: var(--ink-tertiary);
+  font-family: "Geist Mono", monospace;
+  font-size: 24px;
+  font-weight: 400;
+  line-height: 1.4;
+  white-space: nowrap;
+}
+
+.taxonomy__desc {
+  margin: 0;
+  color: var(--ink-secondary);
+  font-family: "Geist", sans-serif;
+  font-size: 24px;
+  line-height: 1.6;
+}
+
+/* === Sekcja "Ostatnio dodane" (Figma node 286:50275) === */
+.entries {
+  width: 100%;
+  max-width: 1600px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+  padding: 160px 40px;
+}
+
+.entries__head {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+}
+
+.entries__all-row {
+  display: flex;
+  justify-content: flex-end;
+  width: 100%;
+}
+
+.entries__title {
+  margin: 0;
+  color: var(--ink);
+  font-family: "Geist", sans-serif;
+  font-size: 64px;
+  font-weight: 600;
+  line-height: 1.4;
+  letter-spacing: -0.03em;
+}
+
+.entries__all {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px;
+  color: var(--ink);
+  font-family: "Geist", sans-serif;
+  font-size: 13.5px;
+  font-weight: 500;
+  line-height: 1.4;
+  text-decoration: none;
+  opacity: 1;
+  transition: opacity 0.15s ease;
+}
+
+.entries__all:hover {
+  opacity: 0.7;
+}
+
+.entries__grid {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+  width: 100%;
+}
+
+.entries__card {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 32px;
+  flex: 1 0 0;
+  /* 1600px kontener, padding 40px/bok, gap 20px między 3 kartami =>
+     (1600-80-40)/3 = ~493px na kartę w pełni rozciągniętej — 490px to
+     w praktyce pełne wypełnienie bez przycinania na szerszych ekranach. */
+  max-width: 490px;
+  min-width: 0;
+  min-height: 320px;
+  padding: 28px;
+  border-radius: 24px;
+  /* szkło jak .taxonomy__card/.nav: półprzezroczyste tło + rozmycie tego, co
+     za kartą (wzór #dots) — hover przełącza tło na bardziej kryjące, blur
+     zostaje włączony cały czas. */
+  background: var(--glass-bg);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid var(--glass-border);
+  box-shadow: var(--card-shadow);
+  text-decoration: none;
+  transition: background-color 0.2s ease;
+}
+
+.entries__card:hover {
+  background: var(--glass-hover-bg);
+}
+
+.entries__card-content {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.entries__eyebrow {
+  margin: 0;
+  color: var(--ink-tertiary);
+  font-family: "Geist Mono", monospace;
+  font-size: 10px;
+  font-weight: 400;
+  line-height: 1.4;
+}
+
+.entries__card-title {
+  margin: 0;
+  color: var(--ink);
+  font-family: "Geist", sans-serif;
+  font-size: 24px;
+  font-weight: 600;
+  line-height: 1.4;
+}
+
+.entries__card-desc {
+  margin: 0;
+  color: var(--ink-secondary);
+  font-family: "Geist", sans-serif;
+  font-size: 16px;
+  line-height: 1.6;
+}
+
+.entries__tags {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 0 6px;
+}
+
+/* === Stopka (Footer-with-banner-CTA, Figma node 266:49973) ===
+   Zwykła, statyczna sekcja — bez efektów scrollowych, normalny scroll pionowy.
+   Baner CTA przejmuje typografię/odstępy z .hero__title i .hero__copy (patrz
+   niżej), a cała stopka (baner + dolny pasek) zajmuje pełną wysokość ekranu —
+   dolny pasek zostaje dociśnięty do samego dołu dzięki flex:1 na .footer__cta. */
+.footer {
+  width: 100%;
+  min-height: 100svh;
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+}
+
+.footer__inner {
+  width: 100%;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.footer__cta {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 32px;
+  padding: 64px 40px;
+  text-align: center;
+}
+
+.footer__cta-title {
+  margin: 0;
+  color: var(--ink);
+  font-family: "Geist", sans-serif;
+  font-size: 64px;
+  font-weight: 600;
+  line-height: 1.2;
+  letter-spacing: -0.01em;
+}
+
+.footer__cta-subtitle {
+  margin: 0;
+  max-width: 640px;
+  color: var(--ink-subtle);
+  font-family: "Geist", sans-serif;
+  font-size: 24px;
+  line-height: 1.8;
+}
+
+.footer__subscribe {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 12px 18px;
+  border: none;
+  border-radius: 9999px;
+  background: var(--ink);
+  color: var(--bg);
+  font-family: "Geist", sans-serif;
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 1.4;
+  cursor: pointer;
+  transition: background-color 0.15s ease, transform 0.1s ease;
+}
+
+/* Stany z design systemu (node 25:81, "Buttony – stany" — wariant secondary/jasny,
+   bo nasz przycisk to biała pigułka): hover #fafafa, focus ring rgba(0,112,242,.55).
+   Sam #fafafa na białym tle jest w praktyce prawie niewidoczny (różnica 3 jednostek
+   RGB), więc dokładamy jeszcze lekkie powiększenie — koloru trzymamy się wiernie,
+   ale feedback musi być faktycznie odczuwalny. Wciśnięcie (:active) to zmniejszenie
+   skali — tego stanu design system nie definiuje jako koloru, to czysto ruchowa
+   mikro-interakcja. */
+.footer__subscribe:hover {
+  background: var(--pill-hover-bg);
+  transform: scale(1.04);
+}
+
+.footer__subscribe:active {
+  transform: scale(0.96);
+}
+
+.footer__subscribe:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(0, 112, 242, 0.55);
+}
+
+/* 2x większy niż bazowy .footer__subscribe — tylko w stopce (ten sam przycisk
+   w .nav-right, na razie tymczasowy, zostaje w rozmiarze 1x). */
+.footer__cta .footer__subscribe {
+  gap: 12px;
+  padding: 24px 36px;
+  font-size: 20px;
+}
+
+/* Small button (Figma "Buttony – rozmiary", wariant SM, node 25:47 — 32px
+   wysokości po ostatniej zmianie w design systemie): w nav-right ten sam
+   przycisk co w stopce ma być 32px wysoki, żeby wyrównać się z .icon-button
+   (przełącznik motywu) obok — 8px padding-y + 16px ikona = 32px, zgodnie z
+   dokładnym paddingiem/font-size SM w Figmie. */
+.nav-right .footer__subscribe {
+  padding: 8px 12px;
+  font-size: 12.5px;
+  /* bazowe line-height:1.4 dawało 17.5px linii tekstu — 1.5px wyżej niż 16px
+     ikona obok, więc całość wychodziła 33.5px zamiast równych 32px. */
+  line-height: 1.2;
+}
+
+.footer__cta .footer__subscribe-icon {
+  width: 32px;
+  height: 32px;
+}
+
+.footer__subscribe-icon {
+  flex-shrink: 0;
+}
+
+/* Model 3D w stopce (ten sam "keycap" co w hero, patrz initKeycap3D w index.html)
+   tymczasowo wyłączony — zasady niżej zostają w kodzie gotowe do przywrócenia
+   (patrz komentarz przy .footer__subscribe w HTML). Grafika na ściance to
+   assets/footer-icon-texture.png, podmienialna bez dotykania kodu. */
+.footer__subscribe-icon-3d {
+  position: relative;
+  width: 87px;
+  height: 89px;
+  flex-shrink: 0;
+}
+
+.footer__subscribe-icon-3d canvas {
+  /* canvas jest celowo większy niż pudełko 87x89 (patrz SAFETY_SCALE w JS) —
+     lekko przesunięty w dół (bez podpisu pod spodem nie ma czego zasłaniać). */
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, calc(-50% + 20px));
+  width: auto;
+  height: auto;
+  display: block;
+  pointer-events: none;
+}
+
+.footer__divider {
+  height: 1px;
+  background: var(--border);
+}
+
+.footer__bottom {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  padding: 28px 40px;
+}
+
+.footer__copyright {
+  margin: 0;
+  color: var(--ink-tertiary);
+  font-family: "Geist Mono", monospace;
+  font-size: 11.5px;
+  line-height: 1.4;
+}
+
+.footer__links {
+  display: flex;
+  gap: 20px;
+}
+
+.footer__link {
+  color: var(--ink-secondary);
+  text-decoration: none;
+  font-family: "Geist", sans-serif;
+  font-size: 12.5px;
+  line-height: 1.4;
+  transition: color 0.15s ease;
+}
+
+.footer__link:hover {
+  color: var(--ink);
 }
 
 @keyframes heroAmbient {
@@ -292,28 +1020,788 @@ body {
   }
 }
 
+/* === Strona "O projekcie" (Figma node 53:290) ===
+   .about zajmuje miejsce hero/taxonomy/footer-cta na tej podstronie — .nav
+   jest fixed, więc padding-top odtwarza to samo obejście co .hero (rezerwuje
+   miejsce na pasek nav, żeby treść pod nim nie startowała zasłonięta). */
+.about {
+  display: flex;
+  justify-content: center;
+  width: 100%;
+  padding: 160px 40px 80px;
+}
+
+.about__col {
+  display: flex;
+  flex-direction: column;
+  gap: 56px;
+  width: 100%;
+  max-width: 720px;
+}
+
+.about__intro {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.about__eyebrow {
+  margin: 0;
+  color: var(--ink-tertiary);
+  font-family: "Geist Mono", monospace;
+  font-size: 12.5px;
+  font-weight: 500;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+}
+
+.about__title {
+  margin: 0;
+  color: var(--ink);
+  font-family: "Geist", sans-serif;
+  font-size: 34px;
+  font-weight: 600;
+  line-height: 1.22;
+}
+
+.about__lead {
+  margin: 0;
+  color: var(--ink-secondary);
+  font-family: "Geist", sans-serif;
+  font-size: 16px;
+  line-height: 1.5;
+}
+
+.about__section {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.about__heading {
+  margin: 0;
+  color: var(--ink);
+  font-family: "Geist", sans-serif;
+  font-size: 22px;
+  font-weight: 600;
+}
+
+.about__copy {
+  margin: 0;
+  color: var(--ink-secondary);
+  font-family: "Geist", sans-serif;
+  font-size: 15.5px;
+  line-height: 1.5;
+}
+
+.about__tax-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+/* Ten sam wzorzec kolorów co .taxonomy__badge (blue/amber/violet/green), ale
+   we własnej, mniejszej skali dopasowanej do zwykłego akapitu, nie do dużej
+   830x460 karty. */
+.about__badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 8px;
+  border: 1px solid;
+  border-radius: 6px;
+  font-family: "Geist", sans-serif;
+  font-size: 11.5px;
+  font-weight: 500;
+  line-height: 1.4;
+  white-space: nowrap;
+}
+
+.about__badge--blue {
+  background: var(--badge-blue-bg);
+  border-color: var(--badge-blue-border);
+  color: var(--badge-blue-fg);
+}
+
+.about__badge--amber {
+  background: var(--badge-amber-bg);
+  border-color: var(--badge-amber-border);
+  color: var(--badge-amber-fg);
+}
+
+.about__badge--violet {
+  background: var(--badge-violet-bg);
+  border-color: var(--badge-violet-border);
+  color: var(--badge-violet-fg);
+}
+
+.about__badge--green {
+  background: var(--badge-green-bg);
+  border-color: var(--badge-green-border);
+  color: var(--badge-green-fg);
+}
+
+.about__cta-button {
+  display: inline-flex;
+  align-items: center;
+  /* .about__section (rodzic) to flex-column bez align-items — domyślny stretch
+     rozciągałby ten link na pełną szerokość kolumny; jako <a> to i tak by nie
+     nastąpiło samo z siebie, ale wewnątrz flex-column dzieci domyślnie się
+     rozciągają, więc trzeba to jawnie wyłączyć. */
+  align-self: flex-start;
+  padding: 12px 18px;
+  border-radius: 9999px;
+  background: var(--ink);
+  color: var(--bg);
+  font-family: "Geist", sans-serif;
+  font-size: 14px;
+  font-weight: 500;
+  text-decoration: none;
+  transition: background-color 0.15s ease, transform 0.1s ease;
+}
+
+.about__cta-button:hover {
+  background: var(--pill-hover-bg);
+  transform: scale(1.02);
+}
+
+.about__cta-button:active {
+  transform: scale(0.97);
+}
+
+/* === Strona pojedynczego wpisu (Figma node 100:279) === */
+.entry {
+  display: flex;
+  justify-content: center;
+  width: 100%;
+  padding: 160px 40px 64px;
+}
+
+.entry-card {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  width: 100%;
+  max-width: 720px;
+  /* Bez obramowania/paddingu poziomego (usunięte na życzenie) — to już nie
+     wygląda jak osobny "box", tylko wyśrodkowana kolumna tekstu na stronie. */
+  padding: 32px 0;
+  background: var(--bg);
+}
+
+.entry__eyebrow {
+  margin: 0;
+  color: var(--ink-tertiary);
+  font-family: "Geist Mono", monospace;
+  font-size: 11px;
+  letter-spacing: 0.1em;
+}
+
+.entry__title {
+  margin: 0;
+  color: var(--ink);
+  font-family: "Geist", sans-serif;
+  font-size: 32px;
+  font-weight: 600;
+  letter-spacing: -0.03em;
+  line-height: 1.25;
+}
+
+.entry__lead {
+  margin: 0;
+  max-width: 640px;
+  color: var(--ink-secondary);
+  font-family: "Geist", sans-serif;
+  font-size: 14.5px;
+  line-height: 1.4;
+}
+
+.entry__taxonomy {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.entry__tldr-wrap {
+  display: flex;
+  gap: 16px;
+  width: 100%;
+}
+
+.entry__tldr-bar {
+  flex-shrink: 0;
+  width: 2px;
+  height: 50px;
+  background: var(--ink);
+}
+
+.entry__tldr-col {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.entry__tldr-label {
+  margin: 0;
+  color: var(--ink-tertiary);
+  font-family: "Geist Mono", monospace;
+  font-size: 11px;
+  font-weight: 500;
+}
+
+.entry__tldr-text {
+  margin: 0;
+  max-width: 640px;
+  color: var(--ink-secondary);
+  font-family: "Geist", sans-serif;
+  font-size: 14.5px;
+  line-height: 1.4;
+}
+
+.entry__heading {
+  margin: 0;
+  color: var(--ink);
+  font-family: "Geist", sans-serif;
+  font-size: 17px;
+  font-weight: 600;
+  line-height: 1.4;
+}
+
+.entry__copy {
+  margin: 0;
+  max-width: 640px;
+  color: var(--ink-secondary);
+  font-family: "Geist", sans-serif;
+  font-size: 14.5px;
+  line-height: 1.4;
+}
+
+.entry__dodont {
+  display: flex;
+  gap: 12px;
+  width: 100%;
+}
+
+.entry__dodont-card {
+  display: flex;
+  flex: 1 0 0;
+  flex-direction: column;
+  gap: 6px;
+  padding: 12px 14px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--surface);
+}
+
+.entry__dodont-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.entry__dodont-label {
+  margin: 0;
+  font-family: "Geist", sans-serif;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.entry__dodont-label--do {
+  color: var(--badge-green-fg);
+}
+
+.entry__dodont-label--dont {
+  color: var(--danger-fg);
+}
+
+.entry__dodont-text {
+  margin: 0;
+  color: var(--ink-secondary);
+  font-family: "Geist", sans-serif;
+  font-size: 13px;
+  line-height: 1.4;
+}
+
+.entry__illustration {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  width: 100%;
+  padding: 24px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--surface);
+}
+
+.entry__mock-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  justify-content: center;
+}
+
+.entry__mock-desktop,
+.entry__mock-mobile {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 14px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--bg);
+}
+
+.entry__mock-desktop {
+  gap: 2px;
+  width: 340px;
+}
+
+.entry__mock-mobile {
+  width: 240px;
+}
+
+.entry__mock-label {
+  margin: 0;
+  color: var(--ink-tertiary);
+  font-family: "Geist Mono", monospace;
+  font-size: 10px;
+  letter-spacing: 0.04em;
+}
+
+.entry__mock-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 7px 8px;
+  border-radius: 6px;
+}
+
+.entry__mock-row--active {
+  background: var(--bg2);
+}
+
+.entry__mock-row-icon {
+  flex-shrink: 0;
+  width: 16px;
+  height: 16px;
+  color: var(--ink-secondary);
+}
+
+.entry__mock-row--active .entry__mock-row-icon {
+  color: var(--ink);
+}
+
+.entry__mock-row-text {
+  margin: 0;
+  color: var(--ink-secondary);
+  font-family: "Geist", sans-serif;
+  font-size: 12.5px;
+}
+
+.entry__mock-row--active .entry__mock-row-text {
+  color: var(--ink);
+}
+
+.entry__mock-placeholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 70px;
+  border: 1px dashed var(--border);
+  border-radius: 8px;
+}
+
+.entry__mock-placeholder-text {
+  margin: 0;
+  color: var(--ink-tertiary);
+  font-family: "Geist", sans-serif;
+  font-size: 10px;
+}
+
+.entry__mock-bottomnav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 6px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--bg2);
+}
+
+.entry__mock-tab {
+  width: 24px;
+  height: 24px;
+  color: var(--ink-secondary);
+}
+
+.entry__mock-tab--active {
+  color: var(--badge-blue-fg);
+}
+
+.entry__fig-caption {
+  margin: 0;
+  color: var(--ink-tertiary);
+  font-family: "Geist Mono", monospace;
+  font-size: 10.5px;
+}
+
+.entry__illustration-desc {
+  margin: 0;
+  max-width: 560px;
+  color: var(--ink-secondary);
+  font-family: "Geist", sans-serif;
+  font-size: 12.5px;
+  line-height: 1.4;
+  text-align: center;
+}
+
+.entry__note {
+  display: flex;
+  width: 100%;
+  padding: 12px 14px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--surface);
+}
+
+.entry__note-label {
+  margin: 0;
+  color: var(--ink-tertiary);
+  font-family: "Geist Mono", monospace;
+  font-size: 10.5px;
+  font-weight: 500;
+}
+
+.entry__note-text {
+  margin: 0;
+  max-width: 620px;
+  color: var(--ink-secondary);
+  font-family: "Geist", sans-serif;
+  font-size: 14.5px;
+  line-height: 1.4;
+}
+
+.entry__note-col {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.entry__related {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0 20px;
+}
+
+.entry__related-link {
+  color: var(--badge-blue-fg);
+  font-family: "Geist", sans-serif;
+  font-size: 13.5px;
+  font-weight: 500;
+  text-decoration: none;
+  opacity: 1;
+  transition: opacity 0.15s ease;
+}
+
+.entry__related-link:hover {
+  opacity: 0.7;
+}
+
+.entry__footer-meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  width: 100%;
+  color: var(--ink-tertiary);
+  font-family: "Geist Mono", monospace;
+  font-size: 11px;
+  letter-spacing: 0.1em;
+}
+
 @media (max-width: 760px) {
   .page {
     padding: 0;
   }
 
+  /* === Nav: hamburger zamiast rozjeżdżających się linków ===
+     Zamknięty: jeden zwarty wiersz (brand ... hamburger), tak jak na desktopie
+     dzięki tej samej .nav{justify-content:space-between} — .nav-links/.nav-right
+     są schowane (display:none), więc nie ma czego zawijać.
+     Otwarty (.nav.is-open): .nav-links i .nav-right stają się pełnoszerokimi
+     "wierszami" pod spodem (width:100% wymusza zawinięcie we flex-wrap), sam
+     <nav> po prostu rośnie wysokością w normalnym flow — bez position:absolute
+     i zgadywania wysokości paneli. */
   .nav {
-    flex-direction: column;
-    align-items: flex-start;
-    padding: 20px 20px 16px;
+    flex-wrap: wrap;
+    row-gap: 20px;
+    padding: 16px 20px;
   }
 
+  /* .nav-links jest w HTML zagnieżdżone WEWNĄTRZ .nav-left (żeby na desktopie
+     dzielić z brandem ten sam rządek/gap) — ale wtedy jego width:100%/order
+     liczyłyby się tylko w obrębie .nav-left, nie całego <nav>. display:contents
+     "usuwa" pudełko .nav-left z drzewa layoutu, więc jego dzieci (brand,
+     .nav-links) stają się bezpośrednimi elementami flex w .nav i mogą się
+     swobodnie zawijać/przestawiać razem z .nav-toggle i .nav-right. */
   .nav-left {
-    flex-wrap: wrap;
-    gap: 16px 20px;
+    display: contents;
+  }
+
+  .brand {
+    order: 1;
+  }
+
+  .nav-toggle {
+    display: inline-flex;
+    order: 2;
+  }
+
+  .nav-links {
+    display: none;
   }
 
   .nav-right {
+    display: none;
+  }
+
+  .nav.is-open {
+    background: var(--overlay-strong);
+    row-gap: 32px;
+  }
+
+  .nav.is-open .nav-links {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 28px;
     width: 100%;
-    justify-content: flex-start;
+    order: 3;
+  }
+
+  .nav.is-open .nav-right {
+    display: flex;
+    width: 100%;
+    order: 4;
+  }
+
+  .nav.is-open .nav-right .footer__subscribe {
+    width: 100%;
+    justify-content: center;
   }
 
   .hero {
     min-height: 420px;
+  }
+
+  /* Na desktopie wymuszony podział na dwie linie ("...UI/UX," / "zebrane...")
+     jest celowy — na mobile, przy węższym kontenerze i mniejszym foncie, tekst
+     i tak się łamie gdzieś indziej, więc ten sztywny <br> tylko psuł układ
+     (osierocał "UI/UX," na własnej linii zamiast pozwolić "zebrane" dołączyć).
+     Usunięcie go pozwala przeglądarce zawinąć całość naturalnie. */
+  .hero__title-break {
+    display: none;
+  }
+
+  /* Ten sam problem co .hero__title-break: sztywny <br> myślany pod
+     desktopowe 640px w tak wąskim kontenerze łamie tekst PRZED nim,
+     osierocając "raz," na własnej linii, po czym <br> dokłada kolejną. */
+  .taxonomy__subtitle-break {
+    display: none;
+  }
+
+  /* === Typografia na wąskich ekranach ===
+     .taxonomy__title i .footer__cta-title mają na desktopie stałe 64px (bez
+     clamp — celowo, na życzenie) — na 375-400px to nie do utrzymania w jednej,
+     sensownej linii, więc dostają tu mniejszy, też stały rozmiar. Podtytuł
+     taksonomii ma na desktopie white-space:nowrap (żeby zmieścić się w jednej
+     linii) — na mobile zdanie jest za długie na jedną linię przy węższym
+     kontenerze, więc pozwalamy mu się normalnie zawijać. */
+  .taxonomy__title,
+  .footer__cta-title {
+    font-size: 36px;
+  }
+
+  /* Ten sam przypadek co .hero__copy niżej — .taxonomy__subtitle urósł na
+     desktopie do 24px i bez tej reguły dziedziczyłby to na mobile. */
+  .taxonomy__subtitle {
+    white-space: normal;
+    font-size: 18px;
+  }
+
+  /* .hero__copy urósł na desktopie do 24px, ale bez tej reguły dziedziczyłby
+     tę samą wartość na mobile — na wąskim ekranie 24px wygląda nieproporcjonalnie
+     duże względem reszty tekstu, więc wraca do wcześniejszego, sprawdzonego
+     rozmiaru. */
+  .hero__copy {
+    font-size: 18px;
+  }
+
+  .footer__cta-subtitle {
+    font-size: 15px;
+  }
+
+  .footer__cta .footer__subscribe {
+    padding: 16px 24px;
+    font-size: 16px;
+  }
+
+  /* Poniżej 760px kafelki nie mieszczą się w mechanizmie pin+scroll poziomy
+     (kafelki mają stałą szerokość 830px na desktopie) — JS wyłącza pin
+     w tym breakpoincie (patrz matchMedia w index.html), a tu po prostu
+     układamy nagłówek i kafelki normalnie, w kolumnie. */
+  .taxonomy {
+    height: auto;
+    padding: 48px 0;
+  }
+
+  /* .taxonomy__heading i .taxonomy__grid mają na desktopie po 60px paddingu —
+     na wąskim ekranie to bardzo dużo "martwej" przestrzeni po bokach, stąd
+     wrażenie wielkiego marginesu; .taxonomy__inner też miało za duży odstęp
+     (60px) między nagłówkiem a kafelkami. */
+  .taxonomy__inner {
+    gap: 32px;
+  }
+
+  .taxonomy__heading {
+    padding-inline: 20px;
+  }
+
+  .taxonomy__viewport {
+    overflow: visible;
+  }
+
+  .taxonomy__grid {
+    flex-direction: column;
+    width: 100%;
+    padding-left: 0;
+    padding-inline: 20px;
+    gap: 16px;
+  }
+
+  .taxonomy__card {
+    width: 100%;
+    flex: 0 0 auto;
+    height: auto;
+    padding: 24px;
+    /* na mobile odbite: stan spoczynku wygląda jak desktopowy hover (szkło),
+       a stan hover/active wygląda jak dawny spoczynek (pełne --bg2) */
+    background: var(--glass-hover-bg);
+    box-shadow: var(--card-shadow-mobile);
+  }
+
+  .taxonomy__card:hover,
+  .taxonomy__card:active {
+    background: var(--bg2);
+  }
+
+  /* Na życzenie: w motywie jasnym karty na mobile mają zwykłe białe tło (nie
+     szklane "odbicie" jak w ciemnym) — hover/active to najjaśniejszy z
+     niebiałych tokenów (--surface, #fafafa), bo --bg2 (#ececec) i --border
+     (#eaeaea) są ciemniejsze. */
+  :root[data-theme="light"] .taxonomy__card {
+    background: var(--bg);
+  }
+
+  :root[data-theme="light"] .taxonomy__card:hover,
+  :root[data-theme="light"] .taxonomy__card:active {
+    background: var(--surface);
+  }
+
+  .taxonomy__card-icon {
+    height: 120px;
+  }
+
+  .taxonomy__card-body {
+    gap: 24px;
+  }
+
+  /* Rozmiary tekstu w kafelku dobrane na desktopie do dużej, 830x460 karty —
+     na mobile (kafelek szeroki na 100% wąskiego ekranu) badge/count/desc były
+     nieproporcjonalnie duże względem siebie (desc 20px był WIĘKSZY niż
+     etykieta badge'a 16px, co odwraca hierarchię). */
+  .taxonomy__badge {
+    padding: 6px 12px;
+    font-size: 13px;
+  }
+
+  .taxonomy__count {
+    font-size: 12px;
+  }
+
+  .taxonomy__desc {
+    font-size: 15px;
+  }
+
+  .entries {
+    padding: 48px 20px;
+    gap: 24px;
+  }
+
+  .entries__title {
+    font-size: 36px;
+  }
+
+  .entries__grid {
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .entries__card {
+    /* .entries__grid staje się flex-direction:column na mobile, więc
+       flex:1 0 0 z reguły bazowej (myślane pod szerokość w układzie rzędu)
+       zaczyna dotyczyć WYSOKOŚCI — flex-basis:0 + grow:1 rozciągałoby karty
+       na równe, oderwane od treści wysokości. flex:0 0 auto przywraca
+       naturalną wysokość dopasowaną do zawartości. */
+    flex: 0 0 auto;
+    max-width: none;
+    padding: 24px;
+    /* na mobile odbite, jak .taxonomy__card: stan spoczynku wygląda jak
+       desktopowy hover (szkło), a stan hover/active jak dawny spoczynek
+       (pełne --bg2) — inaczej karta byłaby domyślnie prawie niewidoczna. */
+    background: var(--glass-hover-bg);
+    box-shadow: var(--card-shadow-mobile);
+  }
+
+  .entries__card:hover,
+  .entries__card:active {
+    background: var(--bg2);
+  }
+
+  /* Na życzenie: w motywie jasnym karty na mobile mają zwykłe białe tło (nie
+     szklane "odbicie" jak w ciemnym) — hover/active to najjaśniejszy z
+     niebiałych tokenów (--surface, #fafafa). */
+  :root[data-theme="light"] .entries__card {
+    background: var(--bg);
+  }
+
+  :root[data-theme="light"] .entries__card:hover,
+  :root[data-theme="light"] .entries__card:active {
+    background: var(--surface);
+  }
+
+  .footer__cta {
+    padding: 48px 20px;
+  }
+
+  .footer__bottom {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 16px;
+    padding: 24px 20px;
+  }
+
+  .about {
+    padding: 140px 20px 56px;
+  }
+
+  .about__col {
+    gap: 40px;
+  }
+
+  .about__title {
+    font-size: 26px;
   }
 }

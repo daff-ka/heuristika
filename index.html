@@ -1,6 +1,20 @@
 <html lang="pl">
 
 <head>
+    <!-- Musi wykonać się PRZED wczytaniem styles.css (stąd na samym początku
+         <head>), żeby data-theme na <html> było ustawione zanim CSS zacznie się
+         stosować — inaczej byłby widoczny błysk złego motywu przy starcie. -->
+    <script>
+        (function () {
+            try {
+                var stored = localStorage.getItem('heuristika-theme');
+                var theme = stored || (window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark');
+                document.documentElement.setAttribute('data-theme', theme);
+            } catch (e) {
+                document.documentElement.setAttribute('data-theme', 'dark');
+            }
+        })();
+    </script>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Heuristika – Osobista Biblioteka Projektanta</title>
@@ -8,239 +22,967 @@
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
-        href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500&family=Geist+Mono:wght@500&family=Inter:wght@400;500;600;700&family=BBH+Bartle:wght@400&display=swap"
+        href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600&family=Geist+Mono:wght@400;500&family=Inter:wght@400;500;600;700&family=BBH+Bartle:wght@400&display=swap"
         rel="stylesheet" />
     <link rel="stylesheet" href="styles.css" />
 </head>
 
 <body>
+    <!-- Wzór z hover (patrz <script> niżej) — teraz jako stałe (position:fixed) tło
+         całej strony, a nie tylko sekcji hero, żeby reagował na kursor wszędzie
+         podczas scrollowania. Sekcje nad nim (.page/.shell/.hero/.taxonomy/.footer)
+         mają celowo usunięte własne tło, żeby ten wzór było przez nie widać. -->
+    <canvas id="dots"></canvas>
+    <div id="preloader" aria-hidden="true">
+        <svg id="preloader-svg" width="100%" height="100%">
+            <!-- Kolory przez var(--border)/var(--bg) (nie sztywne hexy) — w motywie
+                 jasnym tło #eaeaea (--border) i biały trójkąt, rosnący aż zleje się
+                 z właściwym tłem strony pod spodem. data-theme jest ustawione na
+                 <html> jeszcze przed tym <script> (patrz skrypt w <head>), więc nie
+                 ma mignięcia złego motywu. -->
+            <rect x="0" y="0" width="100%" height="100%" style="fill: var(--border)" />
+            <polygon id="preloader-triangle" style="fill: var(--bg)" />
+        </svg>
+    </div>
     <div class="page">
         <div class="shell">
-            <nav class="nav" aria-label="Top navigation">
+            <nav class="nav js-intro" aria-label="Top navigation">
                 <div class="nav-left">
                     <a href="#" class="brand" aria-label="Heuristika home">
                         <svg class="brand-icon" viewBox="0 0 20 17.32" fill="none" aria-hidden="true">
-                            <path d="M10 0L20 17.32H0L10 0Z" fill="white" />
+                            <path d="M10 0L20 17.32H0L10 0Z" fill="currentColor" />
                         </svg>
                         <span class="brand-title">Heuristika</span>
                     </a>
-                    <a href="#" class="nav-link">Glosariusz</a>
-                    <a href="#" class="nav-link nav-link--small">Metody</a>
-                    <a href="#" class="nav-link nav-link--small">Wzorce</a>
-                    <a href="#" class="nav-link nav-link--small">O projekcie</a>
+                    <!-- .nav-links osobno od brandu, żeby na mobile dało się schować/pokazać
+                         same linki (przez hamburgera) bez ruszania loga w tym samym wierszu. -->
+                    <div class="nav-links" id="navLinks">
+                        <a href="#" class="nav-link">Katalog</a>
+                        <a href="o-projekcie.html" class="nav-link nav-link--small">O projekcie</a>
+                    </div>
                 </div>
 
                 <div class="nav-right">
-                    <button class="icon-button" type="button" aria-label="Toggle theme">
-                        <svg viewBox="0 0 16 16" width="16" height="16" fill="none" aria-hidden="true">
-                            <path d="M8 1.5V14.5" stroke="white" stroke-width="1.2" stroke-linecap="round" />
-                            <path d="M1.5 8H14.5" stroke="white" stroke-width="1.2" stroke-linecap="round" />
-                            <circle cx="8" cy="8" r="3.25" stroke="white" stroke-width="1.2" />
+                    <button type="button" class="icon-button theme-toggle" id="themeToggle"
+                        aria-label="Przełącz tryb jasny/ciemny" aria-pressed="false">
+                        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                            <path d="M8 2V4" stroke="currentColor" stroke-width="1.33333" stroke-linecap="round"
+                                stroke-linejoin="round" />
+                            <path d="M8 12V14" stroke="currentColor" stroke-width="1.33333" stroke-linecap="round"
+                                stroke-linejoin="round" />
+                            <path d="M2 8H4" stroke="currentColor" stroke-width="1.33333" stroke-linecap="round"
+                                stroke-linejoin="round" />
+                            <path d="M12 8H14" stroke="currentColor" stroke-width="1.33333" stroke-linecap="round"
+                                stroke-linejoin="round" />
+                            <path d="M3.73333 3.73333L5.2 5.2" stroke="currentColor" stroke-width="1.33333"
+                                stroke-linecap="round" stroke-linejoin="round" />
+                            <path d="M10.8 10.8L12.2667 12.2667" stroke="currentColor" stroke-width="1.33333"
+                                stroke-linecap="round" stroke-linejoin="round" />
+                            <path d="M3.73333 12.2667L5.2 10.8" stroke="currentColor" stroke-width="1.33333"
+                                stroke-linecap="round" stroke-linejoin="round" />
+                            <path d="M10.8 5.2L12.2667 3.73333" stroke="currentColor" stroke-width="1.33333"
+                                stroke-linecap="round" stroke-linejoin="round" />
+                            <circle cx="8" cy="8" r="1.66667" stroke="currentColor" stroke-width="1.33333" />
                         </svg>
                     </button>
-                    <button class="lang-select" type="button" aria-label="Choose language">
-                        <span>PL</span>
-                        <svg viewBox="0 0 16 16" width="16" height="16" fill="none" aria-hidden="true">
-                            <path d="M4 6L8 10L12 6" stroke="white" stroke-width="1.2" stroke-linecap="round"
-                                stroke-linejoin="round" />
+                    <!-- Tymczasowo (na razie) zamiast przełącznika języka —
+                         ten sam przycisk co .footer__subscribe w stopce. -->
+                    <button type="button" class="footer__subscribe">
+                        <svg class="footer__subscribe-icon" width="16" height="16" viewBox="0 0 16 16" fill="none"
+                            aria-hidden="true">
+                            <path d="M6.667 4.667V3.334H10.667V4.667L12.667 10.667H4.667L6.667 4.667Z" stroke="currentColor"
+                                stroke-width="1.333" stroke-linecap="round" stroke-linejoin="round" />
+                            <circle cx="8" cy="11.8" r="0.8" fill="currentColor" />
                         </svg>
+                        Subskrybuj
                     </button>
                 </div>
+
+                <button type="button" class="nav-toggle" aria-label="Otwórz menu" aria-expanded="false"
+                    aria-controls="navLinks">
+                    <svg class="nav-toggle-icon" viewBox="0 0 20 16" width="20" height="16" fill="none"
+                        aria-hidden="true">
+                        <path d="M1 1H19" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" />
+                        <path d="M1 8H19" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" />
+                        <path d="M1 15H19" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" />
+                    </svg>
+                </button>
             </nav>
             <div class="divider"></div>
 
             <section class="hero" aria-label="Hero section">
-                <canvas id="dots"></canvas>
                 <video class="hero__video" autoplay muted loop playsinline>
                     <source src="assets/animation-heuristic-2.mp4" type="video/mp4">
                 </video>
                 <div class="hero__content">
-                    <div class="hero__icon hero__icon--3d" id="heroIcon3d" aria-hidden="true"></div>
-                    <p class="hero__eyebrow">OSOBISTA BIBLIOTEKA PROJEKTANTA</p>
-                    <h1 class="hero__title">
-                        Terminologia i wzorce UI/UX,
-                        <br />
+                    <div class="hero__icon hero__icon--3d js-intro" id="heroIcon3d" aria-hidden="true"></div>
+                    <p class="hero__eyebrow js-intro">OSOBISTA BIBLIOTEKA PROJEKTANTA</p>
+                    <h1 class="hero__title js-intro">
+                        Terminologia i wzorce <span style="white-space: nowrap;">UI/UX,</span>
+                        <br class="hero__title-break" />
                         zebrane w jednym miejscu
                     </h1>
-                    <p class="hero__copy">
+                    <p class="hero__copy js-intro">
                         Słownik, best practices i przykłady zastosowań – pisane przez projektanta,
                         dla projektantów. Z notatkami z realnych wdrożeń.
                     </p>
-                    <div class="hero__search" role="search">
+                    <div class="hero__search js-intro" role="search">
                         <img class="hero__search-icon"
                             src="https://www.figma.com/api/mcp/asset/e41ca232-1671-43aa-ba79-8963d391f596" alt="" />
                         <span class="hero__search-text">Szukaj hasła, np. &quot;card sorting&quot;...</span>
                         <div class="hero__shortcut">⌘K</div>
                     </div>
                 </div>
+                <div class="hero__marker" aria-hidden="true"></div>
             </section>
+
+            <section id="horizontal" aria-label="Przeglądaj bibliotekę">
+                <article class="taxonomy">
+                    <div class="taxonomy__inner">
+                        <div class="taxonomy__heading">
+                            <h2 class="taxonomy__title">Przeglądaj wg taksonomii</h2>
+                            <p class="taxonomy__subtitle">Każdy wymiar ma stały kolor – uczysz się mapowania raz,<br
+                                    class="taxonomy__subtitle-break" />
+                                rozpoznajesz wszędzie.</p>
+                        </div>
+                        <div class="taxonomy__viewport">
+                            <div class="taxonomy__grid">
+                                <div class="taxonomy__card">
+                                    <div class="taxonomy__card-icon-wrap">
+                                        <img class="taxonomy__card-icon taxonomy__card-icon--dark"
+                                            src="assets/icons/taxonomy-dyscyplina-test.svg" alt="" aria-hidden="true" />
+                                        <img class="taxonomy__card-icon taxonomy__card-icon--light"
+                                            src="assets/icons/taxonomy-dyscyplina-test-light.svg" alt="" aria-hidden="true" />
+                                    </div>
+                                    <div class="taxonomy__card-body">
+                                        <div class="taxonomy__card-top">
+                                            <span class="taxonomy__badge taxonomy__badge--blue">
+                                                <svg width="12" height="12" viewBox="0 0 6 6" aria-hidden="true">
+                                                    <circle cx="3" cy="3" r="3" fill="currentColor" />
+                                                </svg>
+                                                Dyscyplina
+                                            </span>
+                                            <span class="taxonomy__count">4 kategorie</span>
+                                        </div>
+                                        <p class="taxonomy__desc">UX research, UI design, dostępność, psychologia</p>
+                                    </div>
+                                </div>
+                                <div class="taxonomy__card">
+                                    <div class="taxonomy__card-icon-wrap">
+                                        <img class="taxonomy__card-icon taxonomy__card-icon--dark"
+                                            src="assets/icons/taxonomy-poziom-test.svg" alt="" aria-hidden="true" />
+                                        <img class="taxonomy__card-icon taxonomy__card-icon--light"
+                                            src="assets/icons/taxonomy-poziom-test-light.svg" alt="" aria-hidden="true" />
+                                    </div>
+                                    <div class="taxonomy__card-body">
+                                        <div class="taxonomy__card-top">
+                                            <span class="taxonomy__badge taxonomy__badge--amber">
+                                                <svg width="42" height="10" viewBox="0 0 21 5" aria-hidden="true">
+                                                    <circle cx="2.5" cy="2.5" r="2.5" fill="currentColor" />
+                                                    <circle cx="10.5" cy="2.5" r="2.5" fill="currentColor" />
+                                                    <circle cx="18.5" cy="2.5" r="2.5" fill="currentColor" fill-opacity="0.35" />
+                                                </svg>
+                                                Poziom
+                                            </span>
+                                            <span class="taxonomy__count">3 stopnie</span>
+                                        </div>
+                                        <p class="taxonomy__desc">Podstawowy, średni, zaawansowany.</p>
+                                    </div>
+                                </div>
+                                <div class="taxonomy__card">
+                                    <div class="taxonomy__card-icon-wrap">
+                                        <img class="taxonomy__card-icon taxonomy__card-icon--dark"
+                                            src="assets/icons/taxonomy-typ-test.svg" alt="" aria-hidden="true" />
+                                        <img class="taxonomy__card-icon taxonomy__card-icon--light"
+                                            src="assets/icons/taxonomy-typ-test-light.svg" alt="" aria-hidden="true" />
+                                    </div>
+                                    <div class="taxonomy__card-body">
+                                        <div class="taxonomy__card-top">
+                                            <span class="taxonomy__badge taxonomy__badge--violet">
+                                                <svg width="12" height="12" viewBox="0 0 6 6" aria-hidden="true">
+                                                    <circle cx="3" cy="3" r="3" fill="currentColor" />
+                                                </svg>
+                                                Typ wpisu
+                                            </span>
+                                            <span class="taxonomy__count">4 typy</span>
+                                        </div>
+                                        <p class="taxonomy__desc">Termin, prawo, metoda, wzorzec.</p>
+                                    </div>
+                                </div>
+                                <div class="taxonomy__card">
+                                    <div class="taxonomy__card-icon-wrap">
+                                        <img class="taxonomy__card-icon taxonomy__card-icon--dark"
+                                            src="assets/icons/taxonomy-platforma-test.svg" alt="" aria-hidden="true" />
+                                        <img class="taxonomy__card-icon taxonomy__card-icon--light"
+                                            src="assets/icons/taxonomy-platforma-test-light.svg" alt="" aria-hidden="true" />
+                                    </div>
+                                    <div class="taxonomy__card-body">
+                                        <div class="taxonomy__card-top">
+                                            <span class="taxonomy__badge taxonomy__badge--green">
+                                                <svg width="12" height="12" viewBox="0 0 6 6" aria-hidden="true">
+                                                    <circle cx="3" cy="3" r="3" fill="currentColor" />
+                                                </svg>
+                                                Platforma
+                                            </span>
+                                            <span class="taxonomy__count">4 zastosowań</span>
+                                        </div>
+                                        <p class="taxonomy__desc">Web, mobile, dashboard, e-commerce.</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </article>
+                <!-- .taxonomy__heading zostaje nieruchomy — przypięty razem z całą sekcją
+                     #horizontal (pin w skrypcie niżej). Tylko .taxonomy__grid (kafelki
+                     wewnątrz .taxonomy__viewport, który je przycina) przesuwa się w
+                     poziomie; kolejne kafelki można dopisywać do .taxonomy__grid, a
+                     dystans scrolla przelicza się automatycznie z ich łącznej szerokości. -->
+            </section>
+
+            <section class="entries" aria-label="Ostatnio dodane wpisy">
+                <div class="entries__head">
+                    <h2 class="entries__title">Ostatnio dodane</h2>
+                </div>
+                <div class="entries__all-row">
+                    <a href="#" class="entries__all">Zobacz wszystkie →</a>
+                </div>
+                <div class="entries__grid">
+                    <a href="#" class="entries__card">
+                        <div class="entries__card-content">
+                            <p class="entries__eyebrow">ux-research</p>
+                            <h3 class="entries__card-title">Card sorting</h3>
+                            <p class="entries__card-desc">Grupowanie treści wg mentalnych modeli użytkowników.</p>
+                        </div>
+                        <div class="entries__tags">
+                            <span class="about__badge about__badge--blue">
+                                <svg width="6" height="6" viewBox="0 0 6 6" aria-hidden="true">
+                                    <circle cx="3" cy="3" r="3" fill="currentColor" />
+                                </svg>
+                                UX Research
+                            </span>
+                            <span class="about__badge about__badge--violet">
+                                <svg width="6" height="6" viewBox="0 0 6 6" aria-hidden="true">
+                                    <circle cx="3" cy="3" r="3" fill="currentColor" />
+                                </svg>
+                                Metoda
+                            </span>
+                        </div>
+                    </a>
+                    <a href="#" class="entries__card">
+                        <div class="entries__card-content">
+                            <p class="entries__eyebrow">psychologia-poznawcza</p>
+                            <h3 class="entries__card-title">Efekt von Restorff</h3>
+                            <p class="entries__card-desc">Wyróżniający się element jest łatwiej zapamiętywany.</p>
+                        </div>
+                        <div class="entries__tags">
+                            <span class="about__badge about__badge--blue">
+                                <svg width="6" height="6" viewBox="0 0 6 6" aria-hidden="true">
+                                    <circle cx="3" cy="3" r="3" fill="currentColor" />
+                                </svg>
+                                Psychologia
+                            </span>
+                            <span class="about__badge about__badge--violet">
+                                <svg width="6" height="6" viewBox="0 0 6 6" aria-hidden="true">
+                                    <circle cx="3" cy="3" r="3" fill="currentColor" />
+                                </svg>
+                                Prawo
+                            </span>
+                        </div>
+                    </a>
+                    <a href="#" class="entries__card">
+                        <div class="entries__card-content">
+                            <p class="entries__eyebrow">interaction-design</p>
+                            <h3 class="entries__card-title">Progressive disclosure</h3>
+                            <p class="entries__card-desc">Stopniowe ujawnianie złożoności interfejsu.</p>
+                        </div>
+                        <div class="entries__tags">
+                            <span class="about__badge about__badge--blue">
+                                <svg width="6" height="6" viewBox="0 0 6 6" aria-hidden="true">
+                                    <circle cx="3" cy="3" r="3" fill="currentColor" />
+                                </svg>
+                                Interaction
+                            </span>
+                            <span class="about__badge about__badge--violet">
+                                <svg width="6" height="6" viewBox="0 0 6 6" aria-hidden="true">
+                                    <circle cx="3" cy="3" r="3" fill="currentColor" />
+                                </svg>
+                                Wzorzec
+                            </span>
+                        </div>
+                    </a>
+                </div>
+                <div class="entries__grid">
+                    <a href="#" class="entries__card">
+                        <div class="entries__card-content">
+                            <p class="entries__eyebrow">ux-research</p>
+                            <h3 class="entries__card-title">Card sorting</h3>
+                            <p class="entries__card-desc">Grupowanie treści wg mentalnych modeli użytkowników.</p>
+                        </div>
+                        <div class="entries__tags">
+                            <span class="about__badge about__badge--blue">
+                                <svg width="6" height="6" viewBox="0 0 6 6" aria-hidden="true">
+                                    <circle cx="3" cy="3" r="3" fill="currentColor" />
+                                </svg>
+                                UX Research
+                            </span>
+                            <span class="about__badge about__badge--violet">
+                                <svg width="6" height="6" viewBox="0 0 6 6" aria-hidden="true">
+                                    <circle cx="3" cy="3" r="3" fill="currentColor" />
+                                </svg>
+                                Metoda
+                            </span>
+                        </div>
+                    </a>
+                    <a href="#" class="entries__card">
+                        <div class="entries__card-content">
+                            <p class="entries__eyebrow">psychologia-poznawcza</p>
+                            <h3 class="entries__card-title">Efekt von Restorff</h3>
+                            <p class="entries__card-desc">Wyróżniający się element jest łatwiej zapamiętywany.</p>
+                        </div>
+                        <div class="entries__tags">
+                            <span class="about__badge about__badge--blue">
+                                <svg width="6" height="6" viewBox="0 0 6 6" aria-hidden="true">
+                                    <circle cx="3" cy="3" r="3" fill="currentColor" />
+                                </svg>
+                                Psychologia
+                            </span>
+                            <span class="about__badge about__badge--violet">
+                                <svg width="6" height="6" viewBox="0 0 6 6" aria-hidden="true">
+                                    <circle cx="3" cy="3" r="3" fill="currentColor" />
+                                </svg>
+                                Prawo
+                            </span>
+                        </div>
+                    </a>
+                    <a href="wpis-etykiety-ikon.html" class="entries__card">
+                        <div class="entries__card-content">
+                            <p class="entries__eyebrow">wzorce / nawigacja</p>
+                            <h3 class="entries__card-title">Etykiety ikon w menu dashboardu</h3>
+                            <p class="entries__card-desc">Debata o tym, czy ikona w nawigacji powinna mieć widoczną
+                                etykietę, czy wystarczy sam symbol.</p>
+                        </div>
+                        <div class="entries__tags">
+                            <span class="about__badge about__badge--blue">
+                                <svg width="6" height="6" viewBox="0 0 6 6" aria-hidden="true">
+                                    <circle cx="3" cy="3" r="3" fill="currentColor" />
+                                </svg>
+                                UI Design
+                            </span>
+                            <span class="about__badge about__badge--violet">
+                                <svg width="6" height="6" viewBox="0 0 6 6" aria-hidden="true">
+                                    <circle cx="3" cy="3" r="3" fill="currentColor" />
+                                </svg>
+                                Wzorzec
+                            </span>
+                        </div>
+                    </a>
+                </div>
+            </section>
+
+            <footer class="footer">
+                <div class="footer__inner">
+                    <div class="footer__cta">
+                        <h2 class="footer__cta-title">Nowe hasła pojawiają<br>się regularnie</h2>
+                        <p class="footer__cta-subtitle">Zero szumu, zero newslettera z reklamami – tylko<br>
+                            powiadomienie, gdy coś nowego się pojawi.</p>
+                        <!-- Model 3D (footerIcon3d) tymczasowo ukryty — przywrócony poprzedni,
+                             płaski przycisk. Żeby wrócić do wersji z modelem 3D: przywróć markup
+                             z <div class="footer__subscribe-icon-3d" id="footerIcon3d">
+                             i odkomentuj initKeycap3D('footerIcon3d', ...) w skrypcie niżej. -->
+                        <button type="button" class="footer__subscribe">
+                            <svg class="footer__subscribe-icon" width="16" height="16" viewBox="0 0 16 16" fill="none"
+                                aria-hidden="true">
+                                <path d="M6.667 4.667V3.334H10.667V4.667L12.667 10.667H4.667L6.667 4.667Z"
+                                    stroke="currentColor" stroke-width="1.333" stroke-linecap="round"
+                                    stroke-linejoin="round" />
+                                <circle cx="8" cy="11.8" r="0.8" fill="currentColor" />
+                            </svg>
+                            Subskrybuj
+                        </button>
+                    </div>
+                    <div class="footer__divider"></div>
+                    <div class="footer__bottom">
+                        <p class="footer__copyright">© 2026 Heuristika – Osobista Biblioteka Projektanta</p>
+                        <nav class="footer__links">
+                            <a href="#" class="footer__link">Katalog</a>
+                            <a href="o-projekcie.html" class="footer__link">O projekcie</a>
+                        </nav>
+                    </div>
+                </div>
+            </footer>
         </div>
     </div>
 
     <script>
-        const canvas = document.getElementById('dots');
-        const ctx = canvas.getContext('2d');
+        (function () {
+            const canvas = document.getElementById('dots');
+            const ctx = canvas.getContext('2d');
 
-        let width, height, dpr;
+            let width, height, dpr;
 
-        // === USTAWIENIA SIATKI ZNAKÓW ===
-        const CELL_X = 72;
-        const CELL_Y = 72;
-        const FONT_SIZE = 60;
-        // const PATTERN_CHARS = "△▲-=+*#%@"; // dokładny zestaw znaków z referencji (7 poziomów, rzadkie -> gęste)
-        const PATTERN_CHARS = "△@=-+"; // dokładny zestaw znaków z referencji (7 poziomów, rzadkie -> gęste)
+            // === USTAWIENIA SIATKI ZNAKÓW ===
+            // Na mobile wzór jest o 25% mniejszy (siatka, font, promień hovera) —
+            // te same wartości bezwzględne co na desktopie na wąskim ekranie
+            // wyglądały nieproporcjonalnie grubo/rzadko.
+            const PATTERN_SCALE = window.matchMedia('(max-width: 760px)').matches ? 0.75 : 1;
+            const CELL_X = 72 * PATTERN_SCALE;
+            const CELL_Y = 72 * PATTERN_SCALE;
+            const FONT_SIZE = 60 * PATTERN_SCALE;
+            // const PATTERN_CHARS = "△▲-=+*#%@"; // dokładny zestaw znaków z referencji (7 poziomów, rzadkie -> gęste)
+            const PATTERN_CHARS = "△@=-+"; // dokładny zestaw znaków z referencji (7 poziomów, rzadkie -> gęste)
 
-        // === HOVER ===
-        const HOVER_RADIUS = 200;
-        const TRAIL_DECAY = 0.93;     // im bliżej 1, tym dłużej "dogasa" ślad po kursorze
-        const AMBIENT_ALPHA = 0;      // poza hoverem pattern jest całkowicie niewidoczny
-        const CASCADE_FREQ = 0.5;    // gęstość diagonalnych "pasm" pętli
-        const CASCADE_SPEED = 0.45;   // prędkość przesuwania się pętli
+            // === HOVER ===
+            const HOVER_RADIUS = 200 * PATTERN_SCALE;
+            const TRAIL_DECAY = 0.93;     // im bliżej 1, tym dłużej "dogasa" ślad po kursorze
+            const AMBIENT_ALPHA = 0;      // poza hoverem pattern jest całkowicie niewidoczny
+            const CASCADE_FREQ = 0.5;    // gęstość diagonalnych "pasm" pętli
+            const CASCADE_SPEED = 0.45;   // prędkość przesuwania się pętli
 
-        let cols, rows;
-        let cells = [];
+            let cols, rows;
+            let cells = [];
 
-        let mouse = { x: -9999, y: -9999 };
-        let targetMouse = { x: -9999, y: -9999 };
+            let mouse = { x: -9999, y: -9999 };
+            let targetMouse = { x: -9999, y: -9999 };
 
-        function resize() {
-            dpr = window.devicePixelRatio || 1;
-            width = window.innerWidth;
-            height = window.innerHeight;
-            canvas.width = width * dpr;
-            canvas.height = height * dpr;
-            ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-            buildGrid();
+            function resize() {
+                dpr = window.devicePixelRatio || 1;
+                width = window.innerWidth;
+                height = window.innerHeight;
+                canvas.width = width * dpr;
+                canvas.height = height * dpr;
+                ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+                buildGrid();
+            }
+
+            function buildGrid() {
+                cols = Math.ceil(width / CELL_X) + 1;
+                rows = Math.ceil(height / CELL_Y) + 1;
+                cells = [];
+                for (let i = 0; i < cols; i++) {
+                    for (let j = 0; j < rows; j++) {
+                        const ox = i * CELL_X;
+                        const oy = j * CELL_Y;
+
+                        cells.push({
+                            ox, oy,
+                            x: ox, y: oy,
+                            targetX: ox, targetY: oy,
+                            scale: 1,
+                            targetScale: 1,
+                            alpha: 0,
+                            targetAlpha: 0,
+                            heat: 0
+                        });
+                    }
+                }
+            }
+
+            function onMove(e) {
+                const rect = canvas.getBoundingClientRect();
+                targetMouse.x = e.clientX - rect.left;
+                targetMouse.y = e.clientY - rect.top;
+            }
+
+            function onLeave() {
+                targetMouse.x = -9999;
+                targetMouse.y = -9999;
+            }
+
+            window.addEventListener('resize', resize);
+            window.addEventListener('mousemove', onMove);
+            window.addEventListener('mouseleave', onLeave);
+            window.addEventListener('touchmove', (e) => {
+                const t = e.touches[0];
+                if (t) onMove(t);
+            }, { passive: true });
+            window.addEventListener('touchend', onLeave);
+
+            let t = 0;
+
+            // Poza sekcją hero wzór zmienia kolor/intensywność: niebieski (do 50%
+            // krycia) w hero -> biały, przygaszony do max 10% krycia gdziekolwiek
+            // indziej na stronie. Przejście jest PŁYNNE (smoothstep) i kończy się
+            // JESZCZE ZANIM sekcja hero całkiem zniknie z ekranu (jeszcze nad
+            // nagłówkiem taksonomii) — stąd progi liczone jako ułamek wysokości okna,
+            // nie proste "hero.bottom <= 0".
+            const heroEl = document.querySelector('.hero');
+            const HERO_COLOR_RGB = [21, 81, 216];
+            const HERO_MAX_ALPHA = 0.5;
+            // Poza hero wzór jest albo biały (motyw ciemny), albo prawie czarny
+            // (motyw jasny) — inaczej na jasnym tle byłby niewidoczny. Sprawdzane
+            // co klatkę (patrz animate() niżej), więc przełączenie motywu w locie
+            // od razu zmienia kolor wzoru bez przeładowania strony.
+            const OUTSIDE_COLOR_RGB_DARK = [255, 255, 255];
+            // Zachowane na wypadek powrotu do zanikania w motywie jasnym (patrz flaga
+            // LIGHT_THEME_UNIFORM_HERO_COLOR niżej) — obecnie nieużywane, bo na życzenie
+            // w jasnym motywie wzór ma wszędzie ten sam (niebieski, "jak pod hero") kolor.
+            const OUTSIDE_COLOR_RGB_LIGHT = [10, 10, 10];
+            const OUTSIDE_MAX_ALPHA = 0.1;
+            const FADE_START_FRAC = 0.65; // hero.bottom powyżej tego ułamka wysokości okna -> w pełni "hero"
+            const FADE_END_FRAC = 0.3;    // hero.bottom poniżej tego ułamka -> w pełni "poza hero" (płynne przejście między)
+            // W motywie jasnym wzór ma być wszędzie w tym samym kolorze/intensywności
+            // (bez zanikania do OUTSIDE_COLOR_RGB_LIGHT). Ustaw na false, żeby
+            // przywrócić zanikanie identyczne jak w motywie ciemnym.
+            const LIGHT_THEME_UNIFORM_HERO_COLOR = true;
+            // Kolor tego jednolitego trybu w motywie jasnym — celowo czarny (NIE
+            // niebieski HERO_COLOR_RGB, mimo że heroBlend niżej jest wymuszane na 1
+            // "jakby pod hero"): na życzenie odwrotnie niż w motywie ciemnym.
+            const LIGHT_THEME_UNIFORM_COLOR_RGB = [10, 10, 10];
+            // Własna, niższa intensywność tej czerni (NIE HERO_MAX_ALPHA=0.5, który
+            // zostaje nietknięty dla niebieskiego "pod hero" w motywie ciemnym).
+            const LIGHT_THEME_UNIFORM_MAX_ALPHA = 0.2;
+
+            function lerp(a, b, t) { return a + (b - a) * t; }
+
+            function animate() {
+                t += 0.016;
+                mouse.x += (targetMouse.x - mouse.x) * 0.2;
+                mouse.y += (targetMouse.y - mouse.y) * 0.2;
+
+                const isLightTheme = document.documentElement.getAttribute('data-theme') === 'light';
+                const lightUniform = isLightTheme && LIGHT_THEME_UNIFORM_HERO_COLOR;
+                const OUTSIDE_COLOR_RGB = isLightTheme ? OUTSIDE_COLOR_RGB_LIGHT : OUTSIDE_COLOR_RGB_DARK;
+                const heroColorRGB = lightUniform ? LIGHT_THEME_UNIFORM_COLOR_RGB : HERO_COLOR_RGB;
+
+                const heroBottom = heroEl ? heroEl.getBoundingClientRect().bottom : -1;
+                const fadeStart = window.innerHeight * FADE_START_FRAC;
+                const fadeEnd = window.innerHeight * FADE_END_FRAC;
+                const rawProgress = (heroBottom - fadeEnd) / (fadeStart - fadeEnd); // 1 = w pełni hero, 0 = w pełni poza
+                const heroProgress = Math.min(1, Math.max(0, rawProgress));
+                const smoothProgress = heroProgress * heroProgress * (3 - 2 * heroProgress); // smoothstep
+                const heroBlend = lightUniform ? 1 : smoothProgress;
+
+                const colorRGB = [
+                    Math.round(lerp(OUTSIDE_COLOR_RGB[0], heroColorRGB[0], heroBlend)),
+                    Math.round(lerp(OUTSIDE_COLOR_RGB[1], heroColorRGB[1], heroBlend)),
+                    Math.round(lerp(OUTSIDE_COLOR_RGB[2], heroColorRGB[2], heroBlend)),
+                ].join(',');
+                const maxAlpha = lerp(OUTSIDE_MAX_ALPHA, lightUniform ? LIGHT_THEME_UNIFORM_MAX_ALPHA : HERO_MAX_ALPHA, heroBlend);
+
+                ctx.clearRect(0, 0, width, height);
+                ctx.font = `${FONT_SIZE}px 'SF Mono', 'Menlo', 'Consolas', monospace`;
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+
+                for (const c of cells) {
+                    const dx = c.ox - mouse.x;
+                    const dy = c.oy - mouse.y;
+                    const dist = Math.hypot(dx, dy);
+                    const instantStrength = dist < HOVER_RADIUS ? 1 - dist / HOVER_RADIUS : 0;
+                    const instantEased = instantStrength * instantStrength * (3 - 2 * instantStrength); // smoothstep
+
+                    // "ciepło" narasta natychmiast pod kursorem, ale gaśnie powoli — stąd ślad ciągnący się za ruchem
+                    c.heat = Math.max(c.heat * TRAIL_DECAY, instantEased);
+                    const eased = c.heat;
+                    const inHover = eased > 0.01;
+
+                    if (inHover) {
+                        // płynne przejście OD stałego tła (AMBIENT_ALPHA) DO pełnej jasności — nigdy poniżej bazowego poziomu
+                        c.targetAlpha = AMBIENT_ALPHA + (maxAlpha - AMBIENT_ALPHA) * eased;
+                        c.targetX = c.ox;
+                        c.targetY = c.oy;
+                        c.targetScale = 1.2;
+                    } else {
+                        c.targetAlpha = AMBIENT_ALPHA;
+                        c.targetX = c.ox;
+                        c.targetY = c.oy;
+                        c.targetScale = 1.2;
+                    }
+
+                    c.x += (c.targetX - c.x) * 0.15;
+                    c.y += (c.targetY - c.y) * 0.15;
+                    c.scale += (c.targetScale - c.scale) * 0.15;
+                    c.alpha += (c.targetAlpha - c.alpha) * 0.12;
+
+                    if (c.alpha <= 0.03) continue;
+
+                    // JEDEN spójny, W PEŁNI POWTARZALNY wzór: żadnego losowego przesunięcia per-komórka —
+                    // sama diagonalna fala w czasie decyduje o symbolu (pasma -/=/+/*/#/%/@)
+                    const phase = (Math.sin(c.ox * CASCADE_FREQ + c.oy * CASCADE_FREQ - t * CASCADE_SPEED) + 1) / 2; // 0..1
+                    const charIndex = Math.min(PATTERN_CHARS.length - 1, Math.floor(phase * PATTERN_CHARS.length));
+                    const ch = PATTERN_CHARS[charIndex];
+                    if (ch === ' ') continue;
+
+                    const renderAlpha = c.alpha;
+
+                    ctx.save();
+                    ctx.translate(c.x, c.y);
+                    ctx.scale(c.scale, c.scale);
+                    ctx.fillStyle = `rgba(${colorRGB},${renderAlpha})`;
+                    ctx.fillText(ch, 0, 0);
+                    ctx.restore();
+                }
+
+                requestAnimationFrame(animate);
+            }
+
+            resize();
+            animate();
+        })();
+    </script>
+
+    <script>
+        // Hamburger (mobile nav) — chowa/pokazuje .nav-links + .nav-right jako
+        // pełnoszerokie "wiersze" pod głównym paskiem (patrz .nav.is-open w CSS).
+        (function () {
+            const nav = document.querySelector('.nav');
+            const toggle = document.querySelector('.nav-toggle');
+            if (!nav || !toggle) return;
+
+            function closeMenu() {
+                nav.classList.remove('is-open');
+                toggle.setAttribute('aria-expanded', 'false');
+            }
+
+            toggle.addEventListener('click', () => {
+                const isOpen = nav.classList.toggle('is-open');
+                toggle.setAttribute('aria-expanded', String(isOpen));
+            });
+
+            nav.querySelectorAll('.nav-links a, .nav-right button').forEach((el) => {
+                el.addEventListener('click', closeMenu);
+            });
+
+            window.addEventListener('resize', () => {
+                if (window.innerWidth > 760) closeMenu();
+            });
+        })();
+    </script>
+
+    <script>
+        // Przełącznik jasny/ciemny — zapisuje wybór w localStorage (ten sam
+        // klucz co skrypt w <head>, który ustawia data-theme przed pierwszym
+        // malowaniem) i emituje 'heuristika:themechange', na które reaguje
+        // scroll-triggerowana animacja hero (patrz createHeroShrinkTween wyżej).
+        (function () {
+            const btn = document.getElementById('themeToggle');
+            if (!btn) return;
+            const root = document.documentElement;
+
+            function sync() {
+                btn.setAttribute('aria-pressed', String(root.getAttribute('data-theme') === 'light'));
+            }
+            sync();
+
+            btn.addEventListener('click', () => {
+                const next = root.getAttribute('data-theme') === 'light' ? 'dark' : 'light';
+                root.setAttribute('data-theme', next);
+                try { localStorage.setItem('heuristika-theme', next); } catch (e) { }
+                sync();
+                window.dispatchEvent(new CustomEvent('heuristika:themechange', { detail: { theme: next } }));
+            });
+        })();
+    </script>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+    <script src="https://unpkg.com/lenis@1.3.18/dist/lenis.min.js"></script>
+    <script>
+        // Płynny, bezwładny scroll (Lenis) zsynchronizowany z tickerem GSAP —
+        // wymagane, żeby scrub/pin ze ScrollTrigger (niżej) trzymały się realnej
+        // pozycji scrolla zamiast natywnego (skokowego) scrollowania przeglądarki.
+        if (typeof Lenis !== 'undefined' && typeof gsap !== 'undefined') {
+            const lenis = new Lenis();
+            window.lenis = lenis; // dostępne z późniejszego <script> (scroll snap)
+            lenis.on('scroll', () => { if (typeof ScrollTrigger !== 'undefined') ScrollTrigger.update(); });
+            gsap.ticker.add((time) => { lenis.raf(time * 1000); });
+            gsap.ticker.lagSmoothing(0);
         }
+    </script>
+    <script>
+        (function () {
+            const introItems = document.querySelectorAll('.js-intro');
+            const preloader = document.getElementById('preloader');
 
-        function buildGrid() {
-            cols = Math.ceil(width / CELL_X) + 1;
-            rows = Math.ceil(height / CELL_Y) + 1;
-            cells = [];
-            for (let i = 0; i < cols; i++) {
-                for (let j = 0; j < rows; j++) {
-                    const ox = i * CELL_X;
-                    const oy = j * CELL_Y;
+            function revealHeroIntro() {
+                // === LOADING SEQUENCE: odpala się raz przy wejściu na stronę ===
+                // fromTo (nie from!) — .js-intro ma w CSS opacity:0, więc "from" złapałoby
+                // bieżący (ukryty) stan jako cel i animacja kończyłaby się na niewidocznym elemencie.
+                gsap.timeline({ defaults: { ease: 'power3.out', duration: 0.8 } })
+                    .fromTo('.nav.js-intro', { opacity: 0, y: -16 }, { opacity: 1, y: 0 })
+                    .fromTo('.hero__icon.js-intro', { opacity: 0, y: 16, scale: 0.85 }, { opacity: 1, y: 0, scale: 1, duration: 0.9 }, '-=0.5')
+                    .fromTo('.hero__eyebrow.js-intro', { opacity: 0, y: 16 }, { opacity: 1, y: 0 }, '-=0.55')
+                    .fromTo('.hero__title.js-intro', { opacity: 0, y: 24 }, { opacity: 1, y: 0 }, '-=0.5')
+                    .fromTo('.hero__copy.js-intro', { opacity: 0, y: 24 }, { opacity: 1, y: 0 }, '-=0.55')
+                    .fromTo('.hero__search.js-intro', { opacity: 0, y: 16 }, { opacity: 1, y: 0 }, '-=0.5');
+            }
 
-                    cells.push({
-                        ox, oy,
-                        x: ox, y: oy,
-                        targetX: ox, targetY: oy,
-                        scale: 1,
-                        targetScale: 1,
-                        alpha: 0,
-                        targetAlpha: 0,
-                        heat: 0
+            // Jeśli GSAP z jakiegoś powodu się nie załadował (np. CDN padł), po prostu
+            // odsłoń wszystko od razu — brak animacji jest lepszy niż trwale niewidoczna strona.
+            if (typeof gsap === 'undefined') {
+                introItems.forEach(el => el.style.opacity = 1);
+                if (preloader) preloader.remove();
+            } else {
+                // === PRELOADER: pełny czarny trójkąt rośnie 0 -> pełne pokrycie ekranu ===
+                // (nie maska/dziura — zwykły wypełniony wielokąt na białym tle, rosnący
+                // aż zleje się z czarnym tłem właściwej strony pod spodem).
+                const triangle = document.getElementById('preloader-triangle');
+                const vw = window.innerWidth;
+                const vh = window.innerHeight;
+                const cx = vw / 2;
+                const cy = vh / 2;
+                // Dokładny minimalny promień okręgu opisanego na trójkącie (wierzchołek w
+                // górze, kąty -90°/30°/150°), żeby przy skali 1 trójkąt w pełni pokrył
+                // prostokąt vw×vh wyśrodkowany w tym samym punkcie, + 5% zapasu.
+                const R = 1.05 * Math.max(vh, vh / 2 + (Math.sqrt(3) / 2) * vw);
+                const angles = [-90, 30, 150].map((deg) => deg * Math.PI / 180);
+
+                // Uwaga: CELOWO nie używamy CSS transform:scale() + transform-origin na tym
+                // <polygon> — w tym środowisku (SVG + duże współrzędne) renderowało się to
+                // błędnie (trójkąt "uciekał" w róg zamiast skalować się od środka). Zamiast
+                // tego GSAP przelicza i podstawia surowe współrzędne "points" co klatkę —
+                // to omija transform-origin całkowicie i jest w 100% przewidywalne.
+                function setTriangleAt(rNow) {
+                    const points = angles.map((rad) => `${cx + rNow * Math.cos(rad)},${cy + rNow * Math.sin(rad)}`).join(' ');
+                    triangle.setAttribute('points', points);
+                }
+                setTriangleAt(0);
+
+                // R ma wbudowany 5% zapas ponad promień faktycznie potrzebny do pełnego
+                // pokrycia ekranu — więc "widocznie gotowe" (cały viewport już czarny)
+                // następuje trochę PRZED matematycznym końcem tweenu. Odsłaniamy sekwencję
+                // hero dokładnie w tym momencie (nie czekając na onComplete), żeby nie było
+                // martwego czasu na już-w-pełni-czarnym ekranie.
+                const fullCoverageR = R / 1.05;
+                let revealed = false;
+                function revealOnce() {
+                    if (revealed) return;
+                    revealed = true;
+                    preloader.remove();
+                    revealHeroIntro();
+                }
+
+                const state = { r: 0 };
+                gsap.to(state, {
+                    r: R,
+                    duration: 0.8,
+                    ease: 'power2.inOut',
+                    onUpdate: () => {
+                        setTriangleAt(state.r);
+                        if (state.r >= fullCoverageR) revealOnce();
+                    },
+                    onComplete: revealOnce
+                });
+            }
+
+            // === SCROLL REVEAL: uniwersalny mechanizm dla przyszłych sekcji ===
+            // Dodaj atrybut data-reveal do dowolnego elementu (np. nowej sekcji pod hero),
+            // a pojawi się z fade+slide-up w momencie wjechania w widok podczas scrollowania.
+            // Przykład: <section data-reveal>...</section>
+            if (typeof ScrollTrigger !== 'undefined') {
+                gsap.registerPlugin(ScrollTrigger);
+                document.querySelectorAll('[data-reveal]').forEach((el) => {
+                    gsap.from(el, {
+                        opacity: 0,
+                        y: 40,
+                        duration: 0.8,
+                        ease: 'power3.out',
+                        scrollTrigger: {
+                            trigger: el,
+                            start: 'top 85%',
+                        }
+                    });
+                });
+
+                // === HERO: kurczy się, obraca w "kartę", dostaje ramkę i efekt szkła
+                // (półprzezroczyste tło + blur, dokładnie jak .nav/.taxonomy__card) w
+                // miarę scrollowania w nią (hero.js-intro ma już swój intro-fade — to
+                // osobny, późniejszy tween, uruchamiany scrollem, nie czasem). Tło
+                // startuje W PEŁNI PRZEZROCZYSTE (w spoczynku hero nie ma własnego tła,
+                // patrz .hero w CSS, więc widać przez nie #dots bez blura) i dopiero
+                // "karta" dostaje półprzezroczyste tło + blur — więc wzór #dots pod spodem
+                // jest wtedy widoczny rozmyty, przez szkło, zamiast całkiem zasłonięty.
+                // Na mobile hero (z markerem poprawnie pod treścią, patrz flex-direction:
+                // column w .hero) jest proporcjonalnie wyższe względem viewportu niż na
+                // desktopie, więc ten sam próg "-35% 45%" wymagał zauważalnie więcej
+                // scrolla, zanim cokolwiek się zaczynało dziać — stąd wyższy (= wcześniejszy
+                // start) procent viewportu tylko na wąskich ekranach.
+                const heroStartViewportPct = window.matchMedia('(max-width: 760px)').matches ? 60 : 45;
+
+                // Kolory docelowe tego tweenu zależą od motywu (jasny/ciemny) — nie
+                // da się ich wyrazić jako var(--...) wewnątrz GSAP (animuje realne
+                // wartości rgba, nie CSS custom properties), więc funkcja buduje
+                // tween na nowo z odczytanym na bieżąco motywem. Wywoływana raz przy
+                // starcie i ponownie po każdym przełączeniu motywu (patrz listener
+                // na 'heuristika:themechange' niżej), żeby przełącznik w nav faktycznie
+                // zmieniał też ten scroll-triggerowany efekt w locie.
+                let heroShrinkTween = null;
+                function createHeroShrinkTween() {
+                    if (heroShrinkTween) {
+                        if (heroShrinkTween.scrollTrigger) heroShrinkTween.scrollTrigger.kill();
+                        heroShrinkTween.kill();
+                    }
+                    const isLight = document.documentElement.getAttribute('data-theme') === 'light';
+                    const borderFrom = isLight ? 'rgba(234,234,234,0)' : 'rgba(31,31,31,0)';
+                    const borderTo = isLight ? 'rgba(234,234,234,1)' : 'rgba(31,31,31,1)';
+                    const bgFrom = isLight ? 'rgba(255,255,255,0)' : 'rgba(0,0,0,0)';
+                    const bgTo = isLight ? 'rgba(255,255,255,0.55)' : 'rgba(7,7,10,0.2)';
+                    heroShrinkTween = gsap.fromTo('.hero',
+                        { rotation: 0, scale: 1, borderRadius: '0rem', borderColor: borderFrom, backgroundColor: bgFrom, backdropFilter: 'blur(0px)' },
+                        {
+                            rotation: -5,
+                            scale: 0.75,
+                            borderRadius: '4rem',
+                            borderColor: borderTo,
+                            backgroundColor: bgTo,
+                            backdropFilter: 'blur(16px)',
+                            ease: 'power3.out',
+                            scrollTrigger: {
+                                trigger: '.hero__marker',
+                                // "-35% 50%" dawało start = -4px (technicznie PRZED górą strony),
+                                // więc na scrollY=0 tween był już ~1% rozpoczęty — niezauważalne
+                                // przy samym skalowaniu/obrocie, ale bardzo widoczne odkąd doszedł
+                                // blur (nawet 1% postępu = ok. 0.7px rozmycia, czyli "hero już
+                                // rozmazane" bez scrollowania). 45% zamiast 50% przesuwa start
+                                // bezpiecznie na dodatni scrollY (patrz heroStartViewportPct
+                                // wyżej dla mobile).
+                                start: `-35% ${heroStartViewportPct}%`,
+                                end: '90% 20%',
+                                scrub: 0.5,
+                            }
+                        });
+                }
+                createHeroShrinkTween();
+                window.addEventListener('heuristika:themechange', createHeroShrinkTween);
+
+                // === HORIZONTAL SCROLL: piny #horizontal. .taxonomy__heading zostaje na
+                // miejscu (jest częścią przypiętej sekcji, nie jest tłumaczony) — przesuwa
+                // się tylko zawartość .taxonomy__viewport, o dystans równy jej realnemu
+                // nadmiarowi szerokości względem widocznego okna.
+                // Świadomie animujemy scrollLeft na .taxonomy__viewport, NIE transform/x na
+                // .taxonomy__grid: transform na przodku (nawet tożsamościowy, x=0) blokuje
+                // zasięg backdrop-filter potomków (patrz .taxonomy__card — szkło/blur nie
+                // sięgało wtedy do #dots, wyglądało płasko/brzydko zamiast rozmyto). Element
+                // z overflow:hidden nadal przyjmuje scrollLeft ustawiany programowo (użytkownik
+                // i tak nie może go przewinąć ręcznie), więc wizualny efekt jest identyczny.
+                // Działa z dowolną liczbą kafelków — gdy się mieszczą bez nadmiaru,
+                // dystans wychodzi 0 i sekcja po prostu przewija się dalej w pionie.
+                // Poniżej 760px kafelki mają stałą szerokość większą niż ekran (CSS
+                // ustawia je wtedy w kolumnę) — pin/scroll byłby tam bez sensu, więc
+                // mechanizm w ogóle się nie uruchamia (matchMedia poniżej). ===
+                const taxonomyGrid = document.querySelector('.taxonomy__grid');
+                const taxonomyViewport = document.querySelector('.taxonomy__viewport');
+                const isDesktop = window.matchMedia('(min-width: 761px)').matches;
+                let horizontalScrollTrigger = null;
+                if (taxonomyGrid && taxonomyViewport && isDesktop) {
+                    const horizontalTween = gsap.to(taxonomyViewport, {
+                        scrollLeft: () => Math.max(0, taxonomyGrid.scrollWidth - taxonomyViewport.clientWidth),
+                        ease: 'none',
+                        scrollTrigger: {
+                            trigger: '#horizontal',
+                            start: 'top top',
+                            end: () => '+=' + Math.max(0, taxonomyGrid.scrollWidth - taxonomyViewport.clientWidth),
+                            scrub: true,
+                            pin: true,
+                            invalidateOnRefresh: true,
+                        }
+                    });
+                    horizontalScrollTrigger = horizontalTween.scrollTrigger;
+                }
+
+                // === SCROLL SNAP (fullpager) ===
+                // Stacje: góra strony, początek przypięcia taksonomii (hero w pełni
+                // schowany), koniec przypięcia, początek stopki, sam dół strony.
+                // Scroll WEWNĄTRZ przypięcia (przeciąganie kafelków) nigdy się nie snapuje
+                // — dociąga dopiero, gdy użytkownik się zatrzyma POZA tym zakresem.
+                // Lenis, nie GSAP, wykonuje faktyczny scrollTo — GSAP tylko dostarcza
+                // timing/easing (patrz komentarz przy tweenie `obj.y` niżej), bo Lenis
+                // sam nadpisuje window.scrollTo() co klatkę i "walczyłby" z natywnym
+                // scrollowaniem sterowanym bezpośrednio przez ScrollTrigger.
+                //
+                // SNAP_MAX_DISTANCE: bez tego progu `nearestSnapPoint` zawsze zwraca
+                // NAJBLIŻSZĄ stację, niezależnie jak daleko użytkownik się zatrzymał —
+                // więc każda pauza w zwykłej, przewijalnej treści (np. w środku sekcji
+                // .entries "Ostatnio dodane") była wciągana do najbliższej stacji
+                // (siłą, nawet z dużej odległości), co czuło się jak niekontrolowane
+                // "ciągnięcie" w dół do stopki. Próg zamienia to z teleportującego
+                // "slideshow po całej stronie" w zwykłe magnetyczne domykanie się do
+                // krawędzi TYLKO gdy użytkownik już się zatrzymał blisko niej.
+                const SNAP_MAX_DISTANCE = 160;
+
+                if (isDesktop && window.lenis) {
+                    const lenis = window.lenis;
+                    let isSnapping = false;
+                    let snapTimer = null;
+
+                    function snapPoints() {
+                        const maxScroll = document.documentElement.scrollHeight - window.innerHeight;
+                        const points = [0, maxScroll];
+                        if (horizontalScrollTrigger) {
+                            points.push(horizontalScrollTrigger.start, horizontalScrollTrigger.end);
+                        }
+                        // Sekcja .entries ("Ostatnio dodane") rozdziela teraz koniec
+                        // przypięcia taksonomii od stopki, więc bez tej stacji
+                        // zatrzymanie się w środku .entries snapowałoby albo z
+                        // powrotem do końca taksonomii, albo od razu na sam dół strony.
+                        const footerEl = document.querySelector('.footer');
+                        if (footerEl) {
+                            points.push(window.scrollY + footerEl.getBoundingClientRect().top);
+                        }
+                        return points;
+                    }
+
+                    function nearestSnapPoint(y) {
+                        return snapPoints().reduce(
+                            (closest, p) => (Math.abs(p - y) < Math.abs(closest - y) ? p : closest),
+                            0
+                        );
+                    }
+
+                    function snapTo(target) {
+                        isSnapping = true;
+                        const obj = { y: window.scrollY };
+                        gsap.to(obj, {
+                            y: target,
+                            duration: 0.7,
+                            ease: 'power2.out',
+                            onUpdate: () => lenis.scrollTo(obj.y, { immediate: true }),
+                            onComplete: () => { isSnapping = false; },
+                        });
+                    }
+
+                    lenis.on('scroll', () => {
+                        if (isSnapping) return;
+                        clearTimeout(snapTimer);
+                        snapTimer = setTimeout(() => {
+                            const target = nearestSnapPoint(window.scrollY);
+                            const distance = Math.abs(target - window.scrollY);
+                            if (distance > 2 && distance < SNAP_MAX_DISTANCE) snapTo(target);
+                        }, 150);
                     });
                 }
             }
-        }
-
-        function onMove(e) {
-            const rect = canvas.getBoundingClientRect();
-            targetMouse.x = e.clientX - rect.left;
-            targetMouse.y = e.clientY - rect.top;
-        }
-
-        function onLeave() {
-            targetMouse.x = -9999;
-            targetMouse.y = -9999;
-        }
-
-        window.addEventListener('resize', resize);
-        window.addEventListener('mousemove', onMove);
-        window.addEventListener('mouseleave', onLeave);
-        window.addEventListener('touchmove', (e) => {
-            const t = e.touches[0];
-            if (t) onMove(t);
-        }, { passive: true });
-        window.addEventListener('touchend', onLeave);
-
-        let t = 0;
-
-        function animate() {
-            t += 0.016;
-            mouse.x += (targetMouse.x - mouse.x) * 0.2;
-            mouse.y += (targetMouse.y - mouse.y) * 0.2;
-
-            ctx.clearRect(0, 0, width, height);
-            ctx.font = `${FONT_SIZE}px 'SF Mono', 'Menlo', 'Consolas', monospace`;
-            ctx.textAlign = 'center';
-            ctx.textBaseline = 'middle';
-
-            for (const c of cells) {
-                const dx = c.ox - mouse.x;
-                const dy = c.oy - mouse.y;
-                const dist = Math.hypot(dx, dy);
-                const instantStrength = dist < HOVER_RADIUS ? 1 - dist / HOVER_RADIUS : 0;
-                const instantEased = instantStrength * instantStrength * (3 - 2 * instantStrength); // smoothstep
-
-                // "ciepło" narasta natychmiast pod kursorem, ale gaśnie powoli — stąd ślad ciągnący się za ruchem
-                c.heat = Math.max(c.heat * TRAIL_DECAY, instantEased);
-                const eased = c.heat;
-                const inHover = eased > 0.01;
-
-                if (inHover) {
-                    // płynne przejście OD stałego tła (AMBIENT_ALPHA) DO pełnej jasności — nigdy poniżej bazowego poziomu
-                    c.targetAlpha = AMBIENT_ALPHA + (0.5 - AMBIENT_ALPHA) * eased;
-                    c.targetX = c.ox;
-                    c.targetY = c.oy;
-                    c.targetScale = 1.2;
-                } else {
-                    c.targetAlpha = AMBIENT_ALPHA;
-                    c.targetX = c.ox;
-                    c.targetY = c.oy;
-                    c.targetScale = 1.2;
-                }
-
-                c.x += (c.targetX - c.x) * 0.15;
-                c.y += (c.targetY - c.y) * 0.15;
-                c.scale += (c.targetScale - c.scale) * 0.15;
-                c.alpha += (c.targetAlpha - c.alpha) * 0.12;
-
-                if (c.alpha <= 0.03) continue;
-
-                // JEDEN spójny, W PEŁNI POWTARZALNY wzór: żadnego losowego przesunięcia per-komórka —
-                // sama diagonalna fala w czasie decyduje o symbolu (pasma -/=/+/*/#/%/@)
-                const phase = (Math.sin(c.ox * CASCADE_FREQ + c.oy * CASCADE_FREQ - t * CASCADE_SPEED) + 1) / 2; // 0..1
-                const charIndex = Math.min(PATTERN_CHARS.length - 1, Math.floor(phase * PATTERN_CHARS.length));
-                const ch = PATTERN_CHARS[charIndex];
-                if (ch === ' ') continue;
-
-                const renderAlpha = c.alpha;
-
-                ctx.save();
-                ctx.translate(c.x, c.y);
-                ctx.scale(c.scale, c.scale);
-                ctx.fillStyle = `rgba(21,81,216,${renderAlpha})`;
-                ctx.fillText(ch, 0, 0);
-                ctx.restore();
-            }
-
-            requestAnimationFrame(animate);
-        }
-
-        resize();
-        animate();
+        })();
     </script>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js"></script>
     <script>
-        (function () {
-            const container = document.getElementById('heroIcon3d');
+        // Fabryka klawisza 3D — parametryzowana wersja oryginalnego hero-only kodu, żeby
+        // móc osadzić ten sam "keycap" (ten sam model .glb, materiał, oświetlenie, fizyka
+        // przechyłu/wciśnięcia) w wielu miejscach strony, różniących się tylko kontenerem
+        // i grafiką na górnej ściance.
+        function initKeycap3D(containerId, textureUrl, bodyColor) {
+            const container = document.getElementById(containerId);
             if (!container || typeof THREE === 'undefined') return;
 
             const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
             renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-            container.appendChild(renderer.domElement);
+            renderer.setClearColor(0x000000, 0);
+            // Canvas NIE jest jeszcze dołączony do DOM tutaj celowo — w Chromium świeżo
+            // utworzony <canvas> z kontekstem WebGL potrafi na pierwszej klatce (zwłaszcza
+            // po twardym odświeżeniu strony, "zimny" GPU-proces) na moment wyrenderować się
+            // jako wypełniony na biało, zanim faktyczna (przezroczysta) zawartość zdąży się
+            // skomponować. Dołączamy go do drzewa DOM dopiero niżej, PO pierwszym
+            // renderer.render() — wtedy w buforze jest już właściwa, przezroczysta klatka.
 
             const CAMERA_FOV = 6; // mniejsza wartość = węższy kąt (dłuższa "ogniskowa"), spłaszcza perspektywę i model wygląda szczuplej
 
-            // Canvas i FOV renderujemy WIĘKSZE niż samo pudełko 87x89 (i skalujemy oba tym samym
-            // współczynnikiem), żeby dać modelowi fizyczny margines na obrót/przechył bez ucinania
-            // krawędzi — ponieważ oba rosną razem, model na ekranie ma dokładnie ten sam rozmiar
-            // w pikselach, zyskuje tylko dodatkową, niewidoczną przestrzeń dookoła.
+            // Canvas i FOV renderujemy WIĘKSZE niż samo pudełko kontenera (i skalujemy oba
+            // tym samym współczynnikiem), żeby dać modelowi fizyczny margines na obrót/przechył
+            // bez ucinania krawędzi — ponieważ oba rosną razem, model na ekranie ma dokładnie
+            // ten sam rozmiar w pikselach, zyskuje tylko dodatkową, niewidoczną przestrzeń dookoła.
             const SIZE_BOOST = 1.5; // mnożnik wielkości modelu — musi rosnąć razem z SAFETY_SCALE poniżej
             const SAFETY_SCALE = 1.3 * SIZE_BOOST;
 
@@ -264,22 +1006,28 @@
             let footprint = 200;
 
             const bodyMat = new THREE.MeshPhysicalMaterial({
-                color: 0x2247e6,
+                color: bodyColor,
                 roughness: 0.28,
                 metalness: 0.03,
                 clearcoat: 1,
                 clearcoatRoughness: 0.1
             });
 
-            const HAND_ICON_B64 = "iVBORw0KGgoAAAANSUhEUgAAAA8AAAAWCAYAAAAfD8YZAAAAhUlEQVR4nM1SQQ6AMAgDsv9/18QLXoSY2jHUi02WZRulHaDb7lIgHpU9GgQ6nPVcVMG6gSvlx/g32WFPDBIcRVO4wwRqQOgguzKzHcmmlkW4bTZVLTL+tUSQZ6SyDmNBvFY5zpmQ/Zk5oW0zzFY4uYG1qkN0eTkkpfIrclc9a/JJuRrPJQ6uoyYkwOV5gAAAAABJRU5ErkJggg==";
-
+            // Grafika na ściance klawisza — podmień plik pod textureUrl (assets/*.png),
+            // żeby zmienić ikonkę (bez dotykania kodu). PNG 200x200 (kwadrat) z przezroczystym
+            // tłem — wyższa rozdzielczość pliku niż rozmiar renderowany na stronie, żeby
+            // uniknąć widocznego rozmycia/aliasingu przy powiększeniu (NearestFilter poniżej
+            // zachowuje przy tym ostre piksele, jeśli grafika jest pixel-art).
             function addIcon(topY, footprint) {
-                const texture = new THREE.TextureLoader().load('data:image/png;base64,' + HAND_ICON_B64);
+                const texture = new THREE.TextureLoader().load(textureUrl);
                 texture.magFilter = THREE.NearestFilter;
                 texture.minFilter = THREE.NearestFilter;
                 const iconMat = new THREE.MeshBasicMaterial({ map: texture, transparent: true, depthWrite: false });
                 const iconSize = footprint * 0.45;
-                const iconGeo = new THREE.PlaneGeometry(iconSize * 0.7, iconSize); // grafika dłoni zwężona do 90% własnej szerokości
+                // Kwadratowa płaszczyzna, bo tekstura też jest kwadratowa — sama grafika
+                // wewnątrz ma już zachowane proporcje (przezroczyste marginesy), więc nie ma
+                // tu żadnego dodatkowego rozciągania.
+                const iconGeo = new THREE.PlaneGeometry(iconSize, iconSize);
                 iconGeo.rotateX(-Math.PI / 2);
                 const iconMesh = new THREE.Mesh(iconGeo, iconMat);
                 iconMesh.position.y = topY + 1.2;
@@ -322,7 +1070,13 @@
             window.addEventListener('resize', resize);
             resize();
 
-            const MAX_TILT = 0.16;
+            // Pierwsza klatka renderuje się TERAZ, do canvasu, który wciąż jest poza DOM —
+            // dopiero po niej wstawiamy go na stronę, więc przeglądarka nigdy nie ma okazji
+            // skomponować "pustego"/białego stanu (patrz komentarz przy tworzeniu renderera).
+            renderer.render(scene, camera);
+            container.appendChild(renderer.domElement);
+
+            const MAX_TILT = 0.25;
             const FACE_TILT_X = Math.PI / 2; // obraca górną ściankę (z ikonką) tak, by była frontalnie do kamery
             let mouseX = 0, mouseY = 0;
             let curTiltX = 0, curTiltY = 0;
@@ -359,8 +1113,8 @@
                 if (modelReady) {
                     const t = clock.getElapsedTime();
 
-                    curTiltX += (mouseY * MAX_TILT - curTiltX) * 0.08;
-                    curTiltY += (mouseX * MAX_TILT - curTiltY) * 0.08;
+                    curTiltX += (mouseY * MAX_TILT - curTiltX) * 0.11;
+                    curTiltY += (mouseX * MAX_TILT - curTiltY) * 0.11;
 
                     keyGroup.rotation.x = FACE_TILT_X - curTiltX;
                     keyGroup.rotation.y = curTiltY;
@@ -386,7 +1140,12 @@
                 renderer.render(scene, camera);
             }
             animate();
-        })();
+        }
+
+        initKeycap3D('heroIcon3d', 'assets/hero-icon-texture.png', '#2247e6');
+        // Model 3D w stopce tymczasowo wyłączony (patrz komentarz przy .footer__subscribe
+        // w HTML) — odkomentuj, żeby go przywrócić:
+        // initKeycap3D('footerIcon3d', 'assets/footer-icon-texture.png', '#4bd788');
     </script>
 </body>
 
