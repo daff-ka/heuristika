@@ -1,9 +1,6 @@
 <html lang="pl">
 
 <head>
-    <!-- Musi wykonać się PRZED wczytaniem styles.css (stąd na samym początku
-         <head>), żeby data-theme na <html> było ustawione zanim CSS zacznie się
-         stosować — inaczej byłby widoczny błysk złego motywu przy starcie. -->
     <script>
         (function () {
             try {
@@ -28,9 +25,6 @@
 </head>
 
 <body>
-    <!-- Ten sam wzór z hover co na stronie głównej (patrz <script> niżej) — bez
-         .hero na tej podstronie skrypt sam gracefully przechodzi w tryb "poza
-         hero" (biały, przygaszony), więc wygląda spójnie z resztą strony. -->
     <canvas id="dots"></canvas>
     <div class="page">
         <div class="shell">
@@ -74,8 +68,9 @@
                     <button type="button" class="footer__subscribe">
                         <svg class="footer__subscribe-icon" width="16" height="16" viewBox="0 0 16 16" fill="none"
                             aria-hidden="true">
-                            <path d="M6.667 4.667V3.334H10.667V4.667L12.667 10.667H4.667L6.667 4.667Z" stroke="currentColor"
-                                stroke-width="1.333" stroke-linecap="round" stroke-linejoin="round" />
+                            <path d="M6.667 4.667V3.334H10.667V4.667L12.667 10.667H4.667L6.667 4.667Z"
+                                stroke="currentColor" stroke-width="1.333" stroke-linecap="round"
+                                stroke-linejoin="round" />
                             <circle cx="8" cy="11.8" r="0.8" fill="currentColor" />
                         </svg>
                         Subskrybuj
@@ -98,7 +93,7 @@
                 <div class="about__col">
                     <div class="about__intro">
                         <p class="about__eyebrow">O projekcie</p>
-                        <h1 class="about__title">Osobista biblioteka wiedzy, którą postanowiłem zrobić publiczną.</h1>
+                        <h1 class="about__title">Zdecydowałem się udostępnić moją osobistą bibliotekę wiedzy</h1>
                         <p class="about__lead">To nie jest firmowy design system ani kurs. To mój prywatny słownik
                             terminów, praw i wzorców UI/UX – prowadzony w notatkach, teraz uporządkowany i
                             otwarty dla innych projektantów.</p>
@@ -107,7 +102,7 @@
                     <div class="divider"></div>
 
                     <div class="about__section">
-                        <h2 class="about__heading">Po co to istnieje</h2>
+                        <h2 class="about__heading">Skąd się wzięło i po co?</h2>
                         <p class="about__copy">Ukryty cel jest prosty: chcę mieć miejsce, do którego sam wracam.
                             Każde hasło to decyzja projektowa, którą kiedyś podjąłem na realnym projekcie – z notatką
                             o tym, co zadziałało, a co nie. Publikuję to, bo ten sam problem, z którym się zmagam,
@@ -115,23 +110,15 @@
                     </div>
 
                     <div class="about__section">
-                        <h2 class="about__heading">Jak to jest zorganizowane</h2>
-                        <p class="about__copy">Każde hasło opisuję w czterech wymiarach, zawsze w tych samych
-                            kolorach – dzięki temu rozpoznajesz kategorię z daleka, bez czytania etykiety.</p>
+                        <h2 class="about__heading">Jak to działa?</h2>
+                        <p class="about__copy">Każde hasło analizuję w czterech aspektach i zawsze oznaczam je tymi
+                            samymi kolorami — dzięki temu rozpoznajesz kategorię z daleka, bez czytania etykiety.</p>
                         <div class="about__tax-row">
                             <span class="about__badge about__badge--blue">
                                 <svg width="6" height="6" viewBox="0 0 6 6" aria-hidden="true">
                                     <circle cx="3" cy="3" r="3" fill="currentColor" />
                                 </svg>
                                 Dyscyplina
-                            </span>
-                            <span class="about__badge about__badge--amber">
-                                <svg width="21" height="5" viewBox="0 0 21 5" aria-hidden="true">
-                                    <circle cx="2.5" cy="2.5" r="2.5" fill="currentColor" />
-                                    <circle cx="10.5" cy="2.5" r="2.5" fill="currentColor" />
-                                    <circle cx="18.5" cy="2.5" r="2.5" fill="currentColor" fill-opacity="0.35" />
-                                </svg>
-                                Poziom
                             </span>
                             <span class="about__badge about__badge--violet">
                                 <svg width="6" height="6" viewBox="0 0 6 6" aria-hidden="true">
@@ -145,11 +132,19 @@
                                 </svg>
                                 Platforma
                             </span>
+                            <span class="about__badge about__badge--amber">
+                                <svg width="21" height="5" viewBox="0 0 21 5" aria-hidden="true">
+                                    <circle cx="2.5" cy="2.5" r="2.5" fill="currentColor" />
+                                    <circle cx="10.5" cy="2.5" r="2.5" fill="currentColor" />
+                                    <circle cx="18.5" cy="2.5" r="2.5" fill="var(--badge-amber-border)" />
+                                </svg>
+                                Poziom
+                            </span>
                         </div>
                     </div>
 
                     <div class="about__section">
-                        <h2 class="about__heading">Jak to powstaje</h2>
+                        <h2 class="about__heading">Skąd biorą się wpisy?</h2>
                         <p class="about__copy">Treść piszę i edytuję sam, bezpośrednio w plikach – to nie jest
                             otwarta wiki, więc nikt inny nie dodaje tu haseł. Nowe wpisy pojawiają się regularnie,
                             zwykle po zamknięciu kolejnego projektu, gdy mam o czym napisać notatkę.</p>
@@ -158,10 +153,20 @@
                     <div class="divider"></div>
 
                     <div class="about__section">
-                        <h2 class="about__heading">Kontakt i aktualizacje</h2>
-                        <p class="about__copy">Kod źródłowy i treść tego projektu są jawne – możesz zobaczyć, jak to
-                            zbudowane, albo zgłosić literówkę.</p>
-                        <a href="#" class="about__cta-button">Zgłoś poprawkę</a>
+                        <h2 class="about__heading">Kontakt</h2>
+                        <p class="about__copy">Kod źródłowy i treść projektu są publiczne — możesz sprawdzić, jak jest
+                            zbudowany, albo zgłosić literówkę.</p>
+                        <a href="#" class="about__cta-button">
+                            Zgłoś poprawkę
+                            <svg class="about__cta-button-icon" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                                <path d="M6.667 4.667H4V13.333H13.333V10" stroke="currentColor" stroke-width="1.333"
+                                    stroke-linecap="round" stroke-linejoin="round" />
+                                <path d="M7.333 10L14 3.333" stroke="currentColor" stroke-width="1.333"
+                                    stroke-linecap="round" stroke-linejoin="round" />
+                                <path d="M9.333 3.333H14V8" stroke="currentColor" stroke-width="1.333"
+                                    stroke-linecap="round" stroke-linejoin="round" />
+                            </svg>
+                        </a>
                     </div>
                 </div>
             </main>
@@ -177,210 +182,9 @@
         </div>
     </div>
 
-    <script>
-        (function () {
-            const canvas = document.getElementById('dots');
-            const ctx = canvas.getContext('2d');
-
-            let width, height, dpr;
-
-            // === USTAWIENIA SIATKI ZNAKÓW ===
-            // Na mobile wzór jest o 25% mniejszy (siatka, font, promień hovera) —
-            // te same wartości bezwzględne co na desktopie na wąskim ekranie
-            // wyglądały nieproporcjonalnie grubo/rzadko.
-            const PATTERN_SCALE = window.matchMedia('(max-width: 760px)').matches ? 0.75 : 1;
-            const CELL_X = 72 * PATTERN_SCALE;
-            const CELL_Y = 72 * PATTERN_SCALE;
-            const FONT_SIZE = 60 * PATTERN_SCALE;
-            const PATTERN_CHARS = "△@=-+"; // dokładny zestaw znaków z referencji (7 poziomów, rzadkie -> gęste)
-
-            // === HOVER ===
-            const HOVER_RADIUS = 200 * PATTERN_SCALE;
-            const TRAIL_DECAY = 0.93;     // im bliżej 1, tym dłużej "dogasa" ślad po kursorze
-            const AMBIENT_ALPHA = 0;      // poza hoverem pattern jest całkowicie niewidoczny
-            const CASCADE_FREQ = 0.5;    // gęstość diagonalnych "pasm" pętli
-            const CASCADE_SPEED = 0.45;   // prędkość przesuwania się pętli
-
-            let cols, rows;
-            let cells = [];
-
-            let mouse = { x: -9999, y: -9999 };
-            let targetMouse = { x: -9999, y: -9999 };
-
-            function resize() {
-                dpr = window.devicePixelRatio || 1;
-                width = window.innerWidth;
-                height = window.innerHeight;
-                canvas.width = width * dpr;
-                canvas.height = height * dpr;
-                ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-                buildGrid();
-            }
-
-            function buildGrid() {
-                cols = Math.ceil(width / CELL_X) + 1;
-                rows = Math.ceil(height / CELL_Y) + 1;
-                cells = [];
-                for (let i = 0; i < cols; i++) {
-                    for (let j = 0; j < rows; j++) {
-                        const ox = i * CELL_X;
-                        const oy = j * CELL_Y;
-
-                        cells.push({
-                            ox, oy,
-                            x: ox, y: oy,
-                            targetX: ox, targetY: oy,
-                            scale: 1,
-                            targetScale: 1,
-                            alpha: 0,
-                            targetAlpha: 0,
-                            heat: 0
-                        });
-                    }
-                }
-            }
-
-            function onMove(e) {
-                const rect = canvas.getBoundingClientRect();
-                targetMouse.x = e.clientX - rect.left;
-                targetMouse.y = e.clientY - rect.top;
-            }
-
-            function onLeave() {
-                targetMouse.x = -9999;
-                targetMouse.y = -9999;
-            }
-
-            window.addEventListener('resize', resize);
-            window.addEventListener('mousemove', onMove);
-            window.addEventListener('mouseleave', onLeave);
-            window.addEventListener('touchmove', (e) => {
-                const t = e.touches[0];
-                if (t) onMove(t);
-            }, { passive: true });
-            window.addEventListener('touchend', onLeave);
-
-            let t = 0;
-
-            // Bez .hero na tej podstronie heroEl jest null — pętla niżej gracefully
-            // liczy heroBottom jako -1, co daje heroBlend=0 (czyli zawsze tryb
-            // "poza hero": biały, przygaszony do max 10% krycia), spójnie z resztą
-            // strony poza samym hero.
-            const heroEl = document.querySelector('.hero');
-            const HERO_COLOR_RGB = [21, 81, 216];
-            const HERO_MAX_ALPHA = 0.5;
-            // Poza hero wzór jest albo biały (motyw ciemny), albo prawie czarny
-            // (motyw jasny) — inaczej na jasnym tle byłby niewidoczny. Sprawdzane
-            // co klatkę (patrz animate() niżej), więc przełączenie motywu w locie
-            // od razu zmienia kolor wzoru bez przeładowania strony.
-            const OUTSIDE_COLOR_RGB_DARK = [255, 255, 255];
-            // Zachowane na wypadek powrotu do zanikania w motywie jasnym (patrz flaga
-            // LIGHT_THEME_UNIFORM_HERO_COLOR niżej) — obecnie nieużywane, bo na życzenie
-            // w jasnym motywie wzór ma wszędzie ten sam (niebieski, "jak pod hero") kolor.
-            const OUTSIDE_COLOR_RGB_LIGHT = [10, 10, 10];
-            const OUTSIDE_MAX_ALPHA = 0.1;
-            const FADE_START_FRAC = 0.65;
-            const FADE_END_FRAC = 0.3;
-            // W motywie jasnym wzór ma być wszędzie w tym samym kolorze/intensywności
-            // (bez zanikania do OUTSIDE_COLOR_RGB_LIGHT). Ustaw na false, żeby
-            // przywrócić zanikanie identyczne jak w motywie ciemnym.
-            const LIGHT_THEME_UNIFORM_HERO_COLOR = true;
-            // Kolor tego jednolitego trybu w motywie jasnym — celowo czarny (NIE
-            // niebieski HERO_COLOR_RGB, mimo że heroBlend niżej jest wymuszane na 1
-            // "jakby pod hero"): na życzenie odwrotnie niż w motywie ciemnym.
-            const LIGHT_THEME_UNIFORM_COLOR_RGB = [10, 10, 10];
-            // Własna, niższa intensywność tej czerni (NIE HERO_MAX_ALPHA=0.5, który
-            // zostaje nietknięty dla niebieskiego "pod hero" w motywie ciemnym).
-            const LIGHT_THEME_UNIFORM_MAX_ALPHA = 0.2;
-
-            function lerp(a, b, t) { return a + (b - a) * t; }
-
-            function animate() {
-                t += 0.016;
-                mouse.x += (targetMouse.x - mouse.x) * 0.2;
-                mouse.y += (targetMouse.y - mouse.y) * 0.2;
-
-                const isLightTheme = document.documentElement.getAttribute('data-theme') === 'light';
-                const lightUniform = isLightTheme && LIGHT_THEME_UNIFORM_HERO_COLOR;
-                const OUTSIDE_COLOR_RGB = isLightTheme ? OUTSIDE_COLOR_RGB_LIGHT : OUTSIDE_COLOR_RGB_DARK;
-                const heroColorRGB = lightUniform ? LIGHT_THEME_UNIFORM_COLOR_RGB : HERO_COLOR_RGB;
-
-                const heroBottom = heroEl ? heroEl.getBoundingClientRect().bottom : -1;
-                const fadeStart = window.innerHeight * FADE_START_FRAC;
-                const fadeEnd = window.innerHeight * FADE_END_FRAC;
-                const rawProgress = (heroBottom - fadeEnd) / (fadeStart - fadeEnd);
-                const heroProgress = Math.min(1, Math.max(0, rawProgress));
-                const smoothProgress = heroProgress * heroProgress * (3 - 2 * heroProgress);
-                const heroBlend = lightUniform ? 1 : smoothProgress;
-
-                const colorRGB = [
-                    Math.round(lerp(OUTSIDE_COLOR_RGB[0], heroColorRGB[0], heroBlend)),
-                    Math.round(lerp(OUTSIDE_COLOR_RGB[1], heroColorRGB[1], heroBlend)),
-                    Math.round(lerp(OUTSIDE_COLOR_RGB[2], heroColorRGB[2], heroBlend)),
-                ].join(',');
-                const maxAlpha = lerp(OUTSIDE_MAX_ALPHA, lightUniform ? LIGHT_THEME_UNIFORM_MAX_ALPHA : HERO_MAX_ALPHA, heroBlend);
-
-                ctx.clearRect(0, 0, width, height);
-                ctx.font = `${FONT_SIZE}px 'SF Mono', 'Menlo', 'Consolas', monospace`;
-                ctx.textAlign = 'center';
-                ctx.textBaseline = 'middle';
-
-                for (const c of cells) {
-                    const dx = c.ox - mouse.x;
-                    const dy = c.oy - mouse.y;
-                    const dist = Math.hypot(dx, dy);
-                    const instantStrength = dist < HOVER_RADIUS ? 1 - dist / HOVER_RADIUS : 0;
-                    const instantEased = instantStrength * instantStrength * (3 - 2 * instantStrength);
-
-                    c.heat = Math.max(c.heat * TRAIL_DECAY, instantEased);
-                    const eased = c.heat;
-                    const inHover = eased > 0.01;
-
-                    if (inHover) {
-                        c.targetAlpha = AMBIENT_ALPHA + (maxAlpha - AMBIENT_ALPHA) * eased;
-                        c.targetX = c.ox;
-                        c.targetY = c.oy;
-                        c.targetScale = 1.2;
-                    } else {
-                        c.targetAlpha = AMBIENT_ALPHA;
-                        c.targetX = c.ox;
-                        c.targetY = c.oy;
-                        c.targetScale = 1.2;
-                    }
-
-                    c.x += (c.targetX - c.x) * 0.15;
-                    c.y += (c.targetY - c.y) * 0.15;
-                    c.scale += (c.targetScale - c.scale) * 0.15;
-                    c.alpha += (c.targetAlpha - c.alpha) * 0.12;
-
-                    if (c.alpha <= 0.03) continue;
-
-                    const phase = (Math.sin(c.ox * CASCADE_FREQ + c.oy * CASCADE_FREQ - t * CASCADE_SPEED) + 1) / 2;
-                    const charIndex = Math.min(PATTERN_CHARS.length - 1, Math.floor(phase * PATTERN_CHARS.length));
-                    const ch = PATTERN_CHARS[charIndex];
-                    if (ch === ' ') continue;
-
-                    const renderAlpha = c.alpha;
-
-                    ctx.save();
-                    ctx.translate(c.x, c.y);
-                    ctx.scale(c.scale, c.scale);
-                    ctx.fillStyle = `rgba(${colorRGB},${renderAlpha})`;
-                    ctx.fillText(ch, 0, 0);
-                    ctx.restore();
-                }
-
-                requestAnimationFrame(animate);
-            }
-
-            resize();
-            animate();
-        })();
-    </script>
+    <script src="dots-pattern.js"></script>
 
     <script>
-        // Hamburger (mobile nav) — chowa/pokazuje .nav-links + .nav-right jako
-        // pełnoszerokie "wiersze" pod głównym paskiem (patrz .nav.is-open w CSS).
         (function () {
             const nav = document.querySelector('.nav');
             const toggle = document.querySelector('.nav-toggle');
@@ -407,9 +211,6 @@
     </script>
 
     <script>
-        // Przełącznik jasny/ciemny — zapisuje wybór w localStorage (ten sam
-        // klucz co skrypt w <head>, który ustawia data-theme przed pierwszym
-        // malowaniem), więc wybór przenosi się między podstronami i wizytami.
         (function () {
             const btn = document.getElementById('themeToggle');
             if (!btn) return;
@@ -429,5 +230,4 @@
         })();
     </script>
 </body>
-
 </html>
