@@ -422,6 +422,14 @@ body {
   filter: blur(0.6px) drop-shadow(0 0 3px var(--badge-blue-fg));
 }
 
+/* Hover — ten sam glow co w stanie "typing", ale słabszy; napisany PRZED
+   :focus-within, żeby przy najechaniu na już wpisujące pole silniejszy
+   glow focusu wygrywał (ta sama specyficzność, więc decyduje kolejność). */
+.hero__search:hover {
+  box-shadow: 0 0 0 1px color-mix(in srgb, var(--badge-blue-fg) 45%, transparent),
+    0 0 16px color-mix(in srgb, var(--badge-blue-fg) 30%, transparent);
+}
+
 /* Stan "typing" (input w środku ma focus) — bez animacji pulsowania, tylko
    statyczny glow zamrożony w najmocniejszym momencie dawnego pulsu. */
 .hero__search:focus-within {
