@@ -112,8 +112,21 @@
                         dla projektantów. Z notatkami z realnych wdrożeń.
                     </p>
                     <div class="hero__search js-intro" role="search">
-                        <img class="hero__search-icon"
-                            src="https://www.figma.com/api/mcp/asset/e41ca232-1671-43aa-ba79-8963d391f596" alt="" />
+                        <svg class="hero__search-trace" aria-hidden="true">
+                            <defs>
+                                <linearGradient id="hero-search-trace-gradient" gradientUnits="userSpaceOnUse">
+                                    <stop offset="0" style="stop-color: var(--badge-blue-fg); stop-opacity: 0;" />
+                                    <stop offset="1" style="stop-color: var(--badge-blue-fg); stop-opacity: 1;" />
+                                </linearGradient>
+                            </defs>
+                            <rect class="hero__search-trace-rect" rx="10" ry="10" />
+                        </svg>
+                        <svg class="hero__search-icon" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                            <path d="M14 14L11.1 11.1" stroke="currentColor" stroke-width="1.33333"
+                                stroke-linecap="round" stroke-linejoin="round" />
+                            <circle cx="7.33333" cy="7.33333" r="4.66667" stroke="currentColor"
+                                stroke-width="1.33333" />
+                        </svg>
                         <span class="hero__search-text">Szukaj hasła, np. &quot;card sorting&quot;...</span>
                         <div class="hero__shortcut">⌘K</div>
                     </div>
@@ -223,10 +236,99 @@
                 <div class="featured__grid">
                     <a href="wpis-etykiety-ikon.html" class="featured__card">
                         <div class="featured__card-icon">
-                            <img class="featured__card-icon-img featured__card-icon-img--dark"
-                                src="assets/icons/entries/entry-e.svg" alt="" />
-                            <img class="featured__card-icon-img featured__card-icon-img--light"
-                                src="assets/icons/entries/entry-e-light.svg" alt="" />
+                            <div class="featured__card-illustration" aria-hidden="true">
+                                <p class="featured__card-illustration-label">DESKTOP · SIDEBAR</p>
+                                <div class="featured__card-illustration-rows">
+                                    <div class="featured__card-illustration-row featured__card-illustration-row--active">
+                                        <svg class="featured__card-illustration-row-icon" viewBox="0 0 16 16"
+                                            fill="none" aria-hidden="true">
+                                            <path
+                                                d="M6 2H2.66667C2.29848 2 2 2.29848 2 2.66667V7.33333C2 7.70152 2.29848 8 2.66667 8H6C6.36819 8 6.66667 7.70152 6.66667 7.33333V2.66667C6.66667 2.29848 6.36819 2 6 2Z"
+                                                stroke="currentColor" stroke-width="1.33333" stroke-linecap="round"
+                                                stroke-linejoin="round" />
+                                            <path
+                                                d="M13.3333 2H10C9.63181 2 9.33333 2.29848 9.33333 2.66667V4.66667C9.33333 5.03486 9.63181 5.33333 10 5.33333H13.3333C13.7015 5.33333 14 5.03486 14 4.66667V2.66667C14 2.29848 13.7015 2 13.3333 2Z"
+                                                stroke="currentColor" stroke-width="1.33333" stroke-linecap="round"
+                                                stroke-linejoin="round" />
+                                            <path
+                                                d="M13.3333 8H10C9.63181 8 9.33333 8.29848 9.33333 8.66667V13.3333C9.33333 13.7015 9.63181 14 10 14H13.3333C13.7015 14 14 13.7015 14 13.3333V8.66667C14 8.29848 13.7015 8 13.3333 8Z"
+                                                stroke="currentColor" stroke-width="1.33333" stroke-linecap="round"
+                                                stroke-linejoin="round" />
+                                            <path
+                                                d="M6 10.6667H2.66667C2.29848 10.6667 2 10.9651 2 11.3333V13.3333C2 13.7015 2.29848 14 2.66667 14H6C6.36819 14 6.66667 13.7015 6.66667 13.3333V11.3333C6.66667 10.9651 6.36819 10.6667 6 10.6667Z"
+                                                stroke="currentColor" stroke-width="1.33333" stroke-linecap="round"
+                                                stroke-linejoin="round" />
+                                        </svg>
+                                        <p class="featured__card-illustration-row-text">Overview</p>
+                                    </div>
+                                    <div class="featured__card-illustration-row">
+                                        <svg class="featured__card-illustration-row-icon" viewBox="0 0 16 16"
+                                            fill="none" aria-hidden="true">
+                                            <path d="M4 13.3333V9.33333" stroke="currentColor" stroke-width="1.33333"
+                                                stroke-linecap="round" stroke-linejoin="round" />
+                                            <path d="M8 13.3333V5.33333" stroke="currentColor" stroke-width="1.33333"
+                                                stroke-linecap="round" stroke-linejoin="round" />
+                                            <path d="M12 13.3333V2.66667" stroke="currentColor" stroke-width="1.33333"
+                                                stroke-linecap="round" stroke-linejoin="round" />
+                                        </svg>
+                                        <p class="featured__card-illustration-row-text">Analytics</p>
+                                    </div>
+                                    <div class="featured__card-illustration-row">
+                                        <svg class="featured__card-illustration-row-icon" viewBox="0 0 16 16"
+                                            fill="none" aria-hidden="true">
+                                            <path
+                                                d="M13.3333 2H2.66667C1.93029 2 1.33333 2.59695 1.33333 3.33333V6C1.33333 6.73638 1.93029 7.33333 2.66667 7.33333H13.3333C14.0697 7.33333 14.6667 6.73638 14.6667 6V3.33333C14.6667 2.59695 14.0697 2 13.3333 2Z"
+                                                stroke="currentColor" stroke-width="1.33333" stroke-linecap="round"
+                                                stroke-linejoin="round" />
+                                            <path
+                                                d="M13.3333 8.66667H2.66667C1.93029 8.66667 1.33333 9.26362 1.33333 10V12.6667C1.33333 13.403 1.93029 14 2.66667 14H13.3333C14.0697 14 14.6667 13.403 14.6667 12.6667V10C14.6667 9.26362 14.0697 8.66667 13.3333 8.66667Z"
+                                                stroke="currentColor" stroke-width="1.33333" stroke-linecap="round"
+                                                stroke-linejoin="round" />
+                                            <path d="M4 4.66667H4.00667" stroke="currentColor" stroke-width="1.33333"
+                                                stroke-linecap="round" stroke-linejoin="round" />
+                                            <path d="M4 11.3333H4.00667" stroke="currentColor" stroke-width="1.33333"
+                                                stroke-linecap="round" stroke-linejoin="round" />
+                                        </svg>
+                                        <p class="featured__card-illustration-row-text">Deployments</p>
+                                    </div>
+                                    <div class="featured__card-illustration-row">
+                                        <svg class="featured__card-illustration-row-icon" viewBox="0 0 16 16"
+                                            fill="none" aria-hidden="true">
+                                            <path
+                                                d="M11.3333 14V12.6667C11.3333 11.9594 11.0524 11.2811 10.5523 10.781C10.0522 10.281 9.37391 10 8.66667 10H3.33333C2.62609 10 1.94781 10.281 1.44772 10.781C0.947618 11.2811 0.666667 11.9594 0.666667 12.6667V14"
+                                                stroke="currentColor" stroke-width="1.33333" stroke-linecap="round"
+                                                stroke-linejoin="round" />
+                                            <path
+                                                d="M6 7.33333C7.47276 7.33333 8.66667 6.13943 8.66667 4.66667C8.66667 3.19391 7.47276 2 6 2C4.52724 2 3.33333 3.19391 3.33333 4.66667C3.33333 6.13943 4.52724 7.33333 6 7.33333Z"
+                                                stroke="currentColor" stroke-width="1.33333" stroke-linecap="round"
+                                                stroke-linejoin="round" />
+                                            <path
+                                                d="M15.3333 14V12.6667C15.3329 12.0758 15.1362 11.5019 14.7742 11.0349C14.4122 10.5679 13.9054 10.2344 13.3333 10.0867"
+                                                stroke="currentColor" stroke-width="1.33333" stroke-linecap="round"
+                                                stroke-linejoin="round" />
+                                            <path
+                                                d="M10.6667 2.08667C11.2403 2.23354 11.7487 2.56714 12.1118 3.03488C12.4748 3.50262 12.6719 4.07789 12.6719 4.67C12.6719 5.26212 12.4748 5.83739 12.1118 6.30513C11.7487 6.77287 11.2403 7.10647 10.6667 7.25334"
+                                                stroke="currentColor" stroke-width="1.33333" stroke-linecap="round"
+                                                stroke-linejoin="round" />
+                                        </svg>
+                                        <p class="featured__card-illustration-row-text">Team</p>
+                                    </div>
+                                    <div class="featured__card-illustration-row">
+                                        <svg class="featured__card-illustration-row-icon" viewBox="0 0 16 16"
+                                            fill="none" aria-hidden="true">
+                                            <path
+                                                d="M8 10C9.10457 10 10 9.10457 10 8C10 6.89543 9.10457 6 8 6C6.89543 6 6 6.89543 6 8C6 9.10457 6.89543 10 8 10Z"
+                                                stroke="currentColor" stroke-width="1.33333" stroke-linecap="round"
+                                                stroke-linejoin="round" />
+                                            <path
+                                                d="M12.9333 10C12.8446 10.2011 12.8181 10.4241 12.8573 10.6404C12.8965 10.8567 12.9996 11.0562 13.1533 11.2133L13.1933 11.2533C13.3172 11.3772 13.4155 11.5243 13.4825 11.6861C13.5496 11.848 13.5841 12.0215 13.5841 12.1967C13.5841 12.3719 13.5496 12.5453 13.4825 12.7072C13.4155 12.8691 13.3172 13.0161 13.1933 13.14C13.0695 13.2639 12.9224 13.3621 12.7605 13.4292C12.5987 13.4962 12.4252 13.5307 12.25 13.5307C12.0748 13.5307 11.9013 13.4962 11.7395 13.4292C11.5776 13.3621 11.4305 13.2639 11.3067 13.14L11.2667 13.1C11.1095 12.9463 10.91 12.8432 10.6937 12.804C10.4775 12.7648 10.2544 12.7913 10.0533 12.88C9.85615 12.9645 9.68799 13.1048 9.56954 13.2837C9.45109 13.4626 9.38752 13.6721 9.38667 13.8867V14C9.38667 14.3536 9.24619 14.6928 8.99614 14.9428C8.74609 15.1929 8.40696 15.3333 8.05333 15.3333C7.69971 15.3333 7.36057 15.1929 7.11052 14.9428C6.86048 14.6928 6.72 14.3536 6.72 14V13.94C6.71484 13.7193 6.64341 13.5053 6.51501 13.3258C6.3866 13.1463 6.20716 13.0095 6 12.9333C5.79892 12.8446 5.57587 12.8181 5.35961 12.8573C5.14334 12.8965 4.94379 12.9996 4.78667 13.1533L4.74667 13.1933C4.49648 13.4435 4.15715 13.5841 3.80333 13.5841C3.44951 13.5841 3.11019 13.4435 2.86 13.1933C2.60981 12.9431 2.46926 12.6038 2.46926 12.25C2.46926 11.8962 2.60981 11.5569 2.86 11.3067L2.9 11.2667C3.05369 11.1095 3.15679 10.91 3.196 10.6937C3.23522 10.4775 3.20874 10.2544 3.12 10.0533C3.03549 9.85615 2.89517 9.68799 2.71631 9.56954C2.53745 9.45109 2.32786 9.38752 2.11333 9.38667H2C1.64638 9.38667 1.30724 9.24619 1.05719 8.99614C0.807143 8.74609 0.666667 8.40696 0.666667 8.05333C0.666667 7.69971 0.807143 7.36057 1.05719 7.11052C1.30724 6.86048 1.64638 6.72 2 6.72H2.06C2.28066 6.71484 2.49467 6.64341 2.6742 6.51501C2.85373 6.3866 2.99048 6.20716 3.06667 6C3.15541 5.79892 3.18188 5.57587 3.14267 5.35961C3.10346 5.14334 3.00036 4.94379 2.84667 4.78667L2.80667 4.74667C2.68279 4.62279 2.58452 4.47572 2.51748 4.31386C2.45043 4.152 2.41593 3.97853 2.41593 3.80333C2.41593 3.62814 2.45043 3.45466 2.51748 3.29281C2.58452 3.13095 2.68279 2.98388 2.80667 2.86C2.93055 2.73612 3.07761 2.63785 3.23947 2.57081C3.40133 2.50377 3.57481 2.46926 3.75 2.46926C3.92519 2.46926 4.09867 2.50377 4.26053 2.57081C4.42239 2.63785 4.56945 2.73612 4.69333 2.86L4.73333 2.9C4.89045 3.05369 5.09001 3.15679 5.30627 3.196C5.52254 3.23522 5.74559 3.20874 5.94667 3.12H6C6.19718 3.03549 6.36534 2.89517 6.4838 2.71631C6.60225 2.53745 6.66581 2.32786 6.66667 2.11333V2C6.66667 1.64638 6.80714 1.30724 7.05719 1.05719C7.30724 0.807143 7.64638 0.666667 8 0.666667C8.35362 0.666667 8.69276 0.807143 8.94281 1.05719C9.19286 1.30724 9.33333 1.64638 9.33333 2V2.06C9.33419 2.27452 9.39775 2.48412 9.51621 2.66298C9.63466 2.84184 9.80282 2.98216 10 3.06667C10.2011 3.15541 10.4241 3.18188 10.6404 3.14267C10.8567 3.10346 11.0562 3.00036 11.2133 2.84667L11.2533 2.80667C11.5035 2.55648 11.8428 2.41593 12.1967 2.41593C12.3719 2.41593 12.5453 2.45043 12.7072 2.51748C12.8691 2.58452 13.0161 2.68279 13.14 2.80667C13.2639 2.93055 13.3621 3.07761 13.4292 3.23947C13.4962 3.40133 13.5307 3.57481 13.5307 3.75C13.5307 3.92519 13.4962 4.09867 13.4292 4.26053C13.3621 4.42239 13.2639 4.56945 13.14 4.69333L13.1 4.73333C12.9463 4.89045 12.8432 5.09001 12.804 5.30627C12.7648 5.52254 12.7913 5.74559 12.88 5.94667V6C13.0667 6.46667 13.1467 7.00667 13.5467 7.00667H14C14.3536 7.00667 14.6928 7.14714 14.9428 7.39719C15.1929 7.64724 15.3333 7.98638 15.3333 8.34C15.3333 8.69362 15.1929 9.03276 14.9428 9.28281C14.6928 9.53286 14.3536 9.67333 14 9.67333H13.94C13.7255 9.67419 13.5159 9.73775 13.337 9.85621C13.1582 9.97466 13.0178 10.1428 12.9333 10.34V10Z"
+                                                stroke="currentColor" stroke-width="1.33333" stroke-linecap="round"
+                                                stroke-linejoin="round" />
+                                        </svg>
+                                        <p class="featured__card-illustration-row-text">Settings</p>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                         <div class="featured__card-content">
                             <div class="featured__card-text">
@@ -1024,6 +1126,60 @@
         }
 
         initKeycap3D('heroIcon3d', 'assets/hero-icon-texture.png', '#2247e6');
+    </script>
+
+    <script>
+        (function () {
+            const rect = document.querySelector('.hero__search-trace-rect');
+            const gradient = document.getElementById('hero-search-trace-gradient');
+            if (!rect || !gradient) return;
+
+            const VISIBLE_LEN = 130;
+            const DURATION = 4000;
+            const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+            let total = 0;
+
+            function measure() {
+                total = rect.getTotalLength();
+                rect.style.strokeDasharray = VISIBLE_LEN + ' ' + Math.max(0, total - VISIBLE_LEN);
+                render(reduceMotion ? VISIBLE_LEN : lastHead);
+            }
+
+            let lastHead = VISIBLE_LEN;
+
+            function render(head) {
+                if (!total) return;
+                lastHead = head;
+                rect.style.strokeDashoffset = (VISIBLE_LEN - head) + 'px';
+                const headDist = ((head % total) + total) % total;
+                const tailDist = ((head - VISIBLE_LEN) % total + total) % total;
+                const p1 = rect.getPointAtLength(tailDist);
+                const p2 = rect.getPointAtLength(headDist);
+                gradient.setAttribute('x1', p1.x);
+                gradient.setAttribute('y1', p1.y);
+                gradient.setAttribute('x2', p2.x);
+                gradient.setAttribute('y2', p2.y);
+            }
+
+            measure();
+            window.addEventListener('resize', measure);
+            window.addEventListener('load', measure);
+            if (document.fonts && document.fonts.ready) {
+                document.fonts.ready.then(measure);
+            }
+
+            if (reduceMotion) return;
+
+            let start = null;
+            function tick(ts) {
+                if (start === null) start = ts;
+                const elapsed = (ts - start) % DURATION;
+                render((elapsed / DURATION) * total);
+                requestAnimationFrame(tick);
+            }
+            requestAnimationFrame(tick);
+        })();
     </script>
 </body>
 
