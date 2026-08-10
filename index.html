@@ -127,8 +127,11 @@
                             <circle cx="7.33333" cy="7.33333" r="4.66667" stroke="currentColor"
                                 stroke-width="1.33333" />
                         </svg>
-                        <span class="hero__search-text">Szukaj hasła, np. &quot;card sorting&quot;...</span>
-                        <div class="hero__shortcut">⌘K</div>
+                        <input type="text" class="hero__search-text"
+                            placeholder="Szukaj hasła, np. &quot;card sorting&quot;..." aria-label="Szukaj hasła"
+                            role="combobox" aria-autocomplete="list" aria-expanded="false"
+                            aria-controls="heroSearchResults" autocomplete="off" spellcheck="false" />
+                        <div class="hero__shortcut" id="heroShortcut">⌘K</div>
                     </div>
                 </div>
                 <div class="hero__marker" aria-hidden="true"></div>
@@ -239,7 +242,8 @@
                             <div class="featured__card-illustration" aria-hidden="true">
                                 <p class="featured__card-illustration-label">DESKTOP · SIDEBAR</p>
                                 <div class="featured__card-illustration-rows">
-                                    <div class="featured__card-illustration-row featured__card-illustration-row--active">
+                                    <div
+                                        class="featured__card-illustration-row featured__card-illustration-row--active">
                                         <svg class="featured__card-illustration-row-icon" viewBox="0 0 16 16"
                                             fill="none" aria-hidden="true">
                                             <path
@@ -831,6 +835,56 @@
                 createHeroShrinkTween();
                 window.addEventListener('heuristika:themechange', createHeroShrinkTween);
 
+                // Na mobile focus na inpucie wyszukiwania potrafi wywołać natywny
+                // scroll przeglądarki (żeby odsłonić pole spod klawiatury) — bez
+                // tego ten scroll od razu odpalał scroll-linked animację "kurczenia"
+                // hero (scrub), przez co sekcja zaczynała się animować w trakcie
+                // próby wpisania czegoś w search. Na czas focusu wyłączamy tylko
+                // ten jeden ScrollTrigger, zachowując aktualny wygląd (reset: false).
+                //
+                // ŚWIADOMIE bez żadnej wersji "wyjdź z trybu wyszukiwania przy
+                // scrollu" — próbowałem to odróżniać po czasie i po odległości
+                // scrolla, ale scroll wywołany klawiaturą i świadome przewijanie
+                // wyglądają dla JS praktycznie identycznie, więc obie wersje w
+                // realu i tak włączały animację w trakcie samego otwierania
+                // klawiatury. Prostsza, niezawodna zasada: dopóki input ma
+                // focus, ScrollTrigger zostaje wyłączony, punkt — wraca tylko
+                // po prawdziwym wyjściu z pola (klik obok / Enter / Escape).
+                const heroSearchInput = document.querySelector('.hero__search-text');
+                let scrollYBeforeFocus = 0;
+
+                function reenableHeroShrink() {
+                    if (heroShrinkTween && heroShrinkTween.scrollTrigger && !heroShrinkTween.scrollTrigger.enabled) {
+                        heroShrinkTween.scrollTrigger.enable();
+                    }
+                }
+
+                if (heroSearchInput) {
+                    heroSearchInput.addEventListener('focus', () => {
+                        scrollYBeforeFocus = window.scrollY;
+                        if (heroShrinkTween && heroShrinkTween.scrollTrigger) {
+                            heroShrinkTween.scrollTrigger.disable(false);
+                        }
+                    });
+                    heroSearchInput.addEventListener('blur', () => {
+                        if (window.lenis) {
+                            window.lenis.scrollTo(scrollYBeforeFocus, { immediate: true });
+                        } else {
+                            window.scrollTo(0, scrollYBeforeFocus);
+                        }
+                        // scrollTo(..., {immediate:true}) nie gwarantuje, że scroll
+                        // faktycznie "dojedzie" jeszcze w tym samym ticku — enable()
+                        // wywołane od razu potrafiło złapać STARĄ pozycję scrolla
+                        // (sprzed przywrócenia) i na moment odpalić animację, zanim
+                        // wszystko się zsynchronizowało. Dwie klatki dają scrollowi
+                        // czas na faktyczne dotarcie do scrollYBeforeFocus, zanim
+                        // ScrollTrigger w ogóle dostanie szansę cokolwiek policzyć.
+                        requestAnimationFrame(() => {
+                            requestAnimationFrame(reenableHeroShrink);
+                        });
+                    });
+                }
+
                 ScrollTrigger.matchMedia({
                     '(min-width: 761px)': function () {
                         const browseGrid = document.querySelector('.browse__grid');
@@ -1088,8 +1142,12 @@
                 pressPhase = 'down';
                 pressPhaseStart = performance.now();
             }
-            window.addEventListener('mousedown', press);
-            window.addEventListener('touchstart', press, { passive: true });
+            // Listener na canvasie (nie na małym base-container 87x89), bo canvas
+            // jest wyrenderowany w rzeczywistym, powiększonym (SAFETY_SCALE)
+            // rozmiarze wizualnym modelu — dopiero to daje hit-area pokrywającą
+            // się z tym, co użytkownik faktycznie widzi (łącznie z krawędziami).
+            renderer.domElement.addEventListener('mousedown', press);
+            renderer.domElement.addEventListener('touchstart', press, { passive: true });
 
             const clock = new THREE.Clock();
             function animate() {
@@ -1179,6 +1237,237 @@
                 requestAnimationFrame(tick);
             }
             requestAnimationFrame(tick);
+        })();
+    </script>
+
+    <!-- Poza .hero celowo — .hero dostaje od GSAP inline transform (nawet w
+         spoczynku, rotation:0/scale:1 to wciąż realny CSS transform), a
+         transform na przodku tworzy nowy containing block dla position:fixed
+         potomków. Wewnątrz .hero ten dropdown pozycjonowałby się względem
+         .hero (i uciekał poza widoczny obszar), nie względem viewportu. Musi
+         też być przed skryptem poniżej (nie tylko poza .hero) — ten skrypt
+         czyta ten element synchronicznie przez getElementById w momencie
+         parsowania dokumentu. -->
+    <ul class="hero__search-results" id="heroSearchResults" role="listbox" aria-label="Wyniki wyszukiwania"
+        hidden></ul>
+
+    <script>
+        (function () {
+            // Statyczny indeks wyszukiwania — na razie jeden realny wpis
+            // (wpis-etykiety-ikon.html), reszta kart na stronie to placeholdery
+            // (href="#"), więc celowo ich tu nie ma. Dodanie kolejnego wpisu
+            // to po prostu kolejny obiekt w tej tablicy.
+            const SEARCH_INDEX = [
+                {
+                    title: 'Etykiety ikon w menu',
+                    excerpt: 'Czy ikona w nawigacji powinna mieć etykietę tekstową, czy wystarczy sam symbol?',
+                    tags: ['UI Design', 'Wzorzec', 'Desktop + Mobile', 'Łatwy'],
+                    url: 'wpis-etykiety-ikon.html'
+                }
+            ];
+
+            const input = document.querySelector('.hero__search-text');
+            const list = document.getElementById('heroSearchResults');
+            const shortcut = document.getElementById('heroShortcut');
+            if (!input || !list) return;
+
+            function normalize(str) {
+                return str.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+            }
+
+            function search(query) {
+                const q = normalize(query.trim());
+                if (!q) return [];
+                return SEARCH_INDEX
+                    .map((entry) => {
+                        const title = normalize(entry.title);
+                        const tags = normalize(entry.tags.join(' '));
+                        const excerpt = normalize(entry.excerpt);
+                        let score = 0;
+                        if (title.includes(q)) score += title.startsWith(q) ? 3 : 2;
+                        if (tags.includes(q)) score += 1.5;
+                        if (excerpt.includes(q)) score += 1;
+                        return { entry, score };
+                    })
+                    .filter((r) => r.score > 0)
+                    .sort((a, b) => b.score - a.score)
+                    .map((r) => r.entry);
+            }
+
+            let results = [];
+            let activeIndex = -1;
+
+            function render(query) {
+                list.innerHTML = '';
+                if (!results.length) {
+                    const empty = document.createElement('li');
+                    empty.className = 'hero__search-empty';
+                    empty.setAttribute('role', 'presentation');
+                    empty.textContent = query.trim() ? `Brak wyników dla „${query.trim()}”` : '';
+                    list.appendChild(empty);
+                    return;
+                }
+                results.forEach((entry, i) => {
+                    const li = document.createElement('li');
+                    li.className = 'hero__search-result' + (i === activeIndex ? ' hero__search-result--active' : '');
+                    li.setAttribute('role', 'option');
+                    li.id = 'heroSearchResult-' + i;
+                    li.setAttribute('aria-selected', String(i === activeIndex));
+
+                    const title = document.createElement('p');
+                    title.className = 'hero__search-result-title';
+                    title.textContent = entry.title;
+                    li.appendChild(title);
+
+                    const excerpt = document.createElement('p');
+                    excerpt.className = 'hero__search-result-excerpt';
+                    excerpt.textContent = entry.excerpt;
+                    li.appendChild(excerpt);
+
+                    const tags = document.createElement('p');
+                    tags.className = 'hero__search-result-tags';
+                    tags.textContent = entry.tags.join(' · ');
+                    li.appendChild(tags);
+
+                    li.addEventListener('mousedown', (e) => {
+                        // mousedown (nie click) — wyprzedza blur inputu, więc
+                        // nawigacja odpala się zanim dropdown zdąży się zamknąć.
+                        e.preventDefault();
+                        navigate(entry);
+                    });
+                    li.addEventListener('mouseenter', () => {
+                        activeIndex = i;
+                        updateActiveDescendant();
+                    });
+
+                    list.appendChild(li);
+                });
+            }
+
+            function updateActiveDescendant() {
+                [...list.children].forEach((li, i) => {
+                    li.classList.toggle('hero__search-result--active', i === activeIndex);
+                    if (li.hasAttribute('role') && li.getAttribute('role') === 'option') {
+                        li.setAttribute('aria-selected', String(i === activeIndex));
+                    }
+                });
+                if (activeIndex >= 0 && list.children[activeIndex]) {
+                    input.setAttribute('aria-activedescendant', list.children[activeIndex].id);
+                } else {
+                    input.removeAttribute('aria-activedescendant');
+                }
+            }
+
+            function positionDropdown() {
+                // Współrzędne DOKUMENTU (+ window.scrollX/Y), nie viewportu —
+                // list ma teraz position:absolute (patrz styles.css) właśnie
+                // po to, żeby ominąć iOS-owy bug z position:fixed + klawiaturą.
+                const rect = input.closest('.hero__search').getBoundingClientRect();
+                list.style.left = (rect.left + window.scrollX) + 'px';
+                list.style.top = (rect.bottom + window.scrollY + 8) + 'px';
+                list.style.width = rect.width + 'px';
+            }
+
+            function isOpen() {
+                return !list.hidden;
+            }
+
+            function openDropdown() {
+                if (isOpen()) return;
+                list.hidden = false;
+                input.setAttribute('aria-expanded', 'true');
+                positionDropdown();
+            }
+
+            function closeDropdown() {
+                list.hidden = true;
+                input.setAttribute('aria-expanded', 'false');
+                input.removeAttribute('aria-activedescendant');
+                activeIndex = -1;
+            }
+
+            function navigate(entry) {
+                window.location.href = entry.url;
+            }
+
+            function updateSearch() {
+                results = search(input.value);
+                activeIndex = -1;
+                render(input.value);
+                if (input.value.trim()) {
+                    openDropdown();
+                } else {
+                    closeDropdown();
+                }
+            }
+
+            input.addEventListener('input', updateSearch);
+
+            // Mobilne klawiatury z autokorektą/predictive text (Gboard, iOS)
+            // wpisują tekst jako "kompozycję" — bez tego sugestie odświeżały
+            // się dopiero po zaakceptowaniu/zatwierdzeniu słowa przez klawiaturę
+            // systemową, zamiast na bieżąco przy każdym znaku.
+            input.addEventListener('compositionupdate', updateSearch);
+            input.addEventListener('compositionend', updateSearch);
+
+            input.addEventListener('focus', () => {
+                if (input.value.trim()) openDropdown();
+            });
+
+            input.addEventListener('keydown', (e) => {
+                if (e.key === 'ArrowDown') {
+                    if (!isOpen()) { if (input.value.trim()) openDropdown(); return; }
+                    if (!results.length) return;
+                    e.preventDefault();
+                    activeIndex = (activeIndex + 1) % results.length;
+                    updateActiveDescendant();
+                } else if (e.key === 'ArrowUp') {
+                    if (!isOpen() || !results.length) return;
+                    e.preventDefault();
+                    activeIndex = (activeIndex - 1 + results.length) % results.length;
+                    updateActiveDescendant();
+                } else if (e.key === 'Enter') {
+                    if (!results.length) return;
+                    e.preventDefault();
+                    navigate(results[activeIndex >= 0 ? activeIndex : 0]);
+                } else if (e.key === 'Escape') {
+                    if (isOpen()) {
+                        closeDropdown();
+                    } else {
+                        input.blur();
+                    }
+                }
+            });
+
+            document.addEventListener('click', (e) => {
+                if (!e.target.closest('.hero__search')) closeDropdown();
+            });
+            window.addEventListener('resize', () => { if (isOpen()) positionDropdown(); });
+            // Scroll zamyka dropdown zamiast go repozycjonować — hero ma
+            // własną scroll-linked animację (obrót/skala), więc statyczny,
+            // osiowo wyrównany dropdown i tak nie mógłby za nią nadążyć i
+            // wyglądałby coraz bardziej rozjechany w trakcie scrollowania.
+            // Świadomie NIE kończy to "trybu wyszukiwania" — patrz komentarz
+            // przy ScrollTrigger.disable() wyżej w pliku.
+            function onSearchScroll() {
+                if (isOpen()) closeDropdown();
+            }
+            window.addEventListener('scroll', onSearchScroll, true);
+            if (window.lenis) window.lenis.on('scroll', onSearchScroll);
+
+            // Cmd+K (Mac) / Ctrl+K (Windows/Linux) — globalny skrót fokusujący
+            // wyszukiwarkę, z etykietą w badge'u dopasowaną do platformy.
+            const isMac = /Mac|iPod|iPhone|iPad/.test(navigator.platform || navigator.userAgent);
+            if (shortcut) shortcut.textContent = isMac ? '⌘K' : 'Ctrl+K';
+
+            window.addEventListener('keydown', (e) => {
+                const key = e.key.toLowerCase();
+                if (key === 'k' && (isMac ? e.metaKey : e.ctrlKey)) {
+                    e.preventDefault();
+                    input.focus();
+                    input.select();
+                }
+            });
         })();
     </script>
 </body>

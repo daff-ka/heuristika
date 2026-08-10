@@ -357,7 +357,7 @@ body {
   height: auto;
   display: block;
   z-index: auto;
-  pointer-events: none;
+  cursor: pointer;
 }
 
 .hero__title {
@@ -382,9 +382,9 @@ body {
 .hero__search {
   display: flex;
   align-items: center;
-  gap: 10px;
-  width: min(100%, 466px);
-  padding: 12px 16px;
+  gap: 12px;
+  width: min(100%, 640px);
+  padding: 16px 20px;
   position: relative;
   border: 1px solid var(--border-strong);
   border-radius: 10px;
@@ -422,9 +422,16 @@ body {
   filter: blur(0.6px) drop-shadow(0 0 3px var(--badge-blue-fg));
 }
 
+/* Stan "typing" (input w środku ma focus) — bez animacji pulsowania, tylko
+   statyczny glow zamrożony w najmocniejszym momencie dawnego pulsu. */
+.hero__search:focus-within {
+  box-shadow: 0 0 0 1.5px color-mix(in srgb, var(--badge-blue-fg) 90%, transparent),
+    0 0 28px color-mix(in srgb, var(--badge-blue-fg) 60%, transparent);
+}
+
 .hero__search-icon {
-  width: 16px;
-  height: 16px;
+  width: 20px;
+  height: 20px;
   flex-shrink: 0;
   color: var(--ink-tertiary);
 }
@@ -432,26 +439,118 @@ body {
 .hero__search-text {
   flex: 1;
   min-width: 0;
-  color: var(--ink-tertiary);
+  border: none;
+  outline: none;
+  background: transparent;
+  padding: 0;
+  color: var(--ink);
   font-family: "Geist", sans-serif;
-  font-size: 13.5px;
+  font-size: 16px;
   line-height: 1.4;
   text-align: left;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.hero__search-text::placeholder {
+  color: var(--ink-tertiary);
 }
 
 .hero__shortcut {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  padding: 3px 7px;
+  padding: 3.75px 8.75px;
   border: 1px solid var(--border);
-  border-radius: 5px;
+  border-radius: 6px;
   background: var(--bg);
   color: var(--ink-tertiary);
   font-family: "Geist Mono", monospace;
-  font-size: 11px;
+  font-size: 14px;
   letter-spacing: 0.1em;
   white-space: nowrap;
+}
+
+/* position:absolute liczony w JS jako współrzędne WZGLĘDEM DOKUMENTU
+   (rect + window.scrollX/Y), nie position:fixed — na iOS Safari fixed bywa
+   liczony względem "layout viewport" (jakby klawiatury nie było) zamiast
+   widocznego obszaru, gdy klawiatura systemowa jest otwarta, przez co
+   dropdown renderował się poza widocznym ekranem/pod klawiaturą. Element
+   jest poza .hero celowo (patrz komentarz przy jego znaczniku w index.html)
+   — .hero ma overflow:hidden (dla ambientowego tła) i własny transform od
+   GSAP, więc position:absolute WEWNĄTRZ .hero i tak by się przycinał/źle
+   pozycjonował. Zamykanie dropdownu na scroll (patrz index.html) oznacza,
+   że pozycja liczy się tylko raz, przy otwarciu — nie trzeba jej odświeżać
+   w locie. */
+.hero__search-results {
+  position: absolute;
+  margin: 0;
+  padding: 6px;
+  list-style: none;
+  background: var(--bg2);
+  border: 1px solid var(--border-strong);
+  border-radius: 10px;
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.32);
+  max-height: 320px;
+  overflow-y: auto;
+  z-index: 20;
+}
+
+.hero__search-results[hidden] {
+  display: none;
+}
+
+.hero__search-result {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  padding: 10px 12px;
+  border-radius: 8px;
+  text-decoration: none;
+  color: inherit;
+  cursor: pointer;
+}
+
+.hero__search-result:hover,
+.hero__search-result--active {
+  background: var(--bg);
+}
+
+.hero__search-result-title {
+  margin: 0;
+  color: var(--ink);
+  font-family: "Geist", sans-serif;
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1.4;
+}
+
+.hero__search-result-excerpt {
+  margin: 0;
+  color: var(--ink-secondary);
+  font-family: "Geist", sans-serif;
+  font-size: 12.5px;
+  line-height: 1.4;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.hero__search-result-tags {
+  margin: 0;
+  color: var(--ink-tertiary);
+  font-family: "Geist Mono", monospace;
+  font-size: 10.5px;
+  letter-spacing: 0.04em;
+}
+
+.hero__search-empty {
+  padding: 16px 12px;
+  color: var(--ink-tertiary);
+  font-family: "Geist", sans-serif;
+  font-size: 13px;
+  text-align: center;
 }
 
 .hero__marker {
@@ -961,9 +1060,14 @@ body {
   }
 
   /* Mniejsza wersja mini-podglądu — 1:1 z node 359:10125 (mobile, ramka
-     328px), ta sama proporcja 0.729 co reszta wymiarów w tym node. */
+     328px), ta sama proporcja 0.729 co reszta wymiarów w tym node.
+     top zmniejszony z 29px na 14px: przy tej skali cała ilustracja
+     (label + 5 wierszy) ma ~157px wysokości, a box ma 174px — przy top:29
+     ostatni wiersz ("Settings") wychodził 12px poza box i był ucinany przez
+     overflow:hidden. Na mobile (w odróżnieniu od desktopu) cały mini-podgląd
+     ma być widoczny w całości, bez efektu "podglądu"/przycięcia. */
   .featured__card-illustration {
-    top: 29px;
+    top: 14px;
     width: min(248px, calc(100% - 80px));
     gap: 8.75px;
     padding: 10.2px;
@@ -1840,6 +1944,7 @@ body {
 
   .hero {
     min-height: 420px;
+    padding-top: 111px;
   }
 
   .hero__title-break {
@@ -1853,6 +1958,16 @@ body {
   .hero__copy {
     font-size: 18px;
   }
+
+  .hero__search {
+    padding: 10px;
+  }
+
+  /* Font-size celowo NIE schodzi poniżej 16px — na iOS Safari input z
+     font-size < 16px powoduje automatyczny zoom całej strony po kliknięciu
+     (dokładnie ten bug: "search się powiększa z całą zawartością strony").
+     Ewentualne zbyt długie placeholdery obcina już ellipsis (patrz baza
+     .hero__search-text: overflow/white-space/text-overflow). */
 
   .footer__cta-subtitle {
     font-size: 15px;
