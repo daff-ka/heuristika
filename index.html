@@ -832,57 +832,17 @@
                             }
                         });
                 }
-                createHeroShrinkTween();
-                window.addEventListener('heuristika:themechange', createHeroShrinkTween);
-
-                // Na mobile focus na inpucie wyszukiwania potrafi wywołać natywny
-                // scroll przeglądarki (żeby odsłonić pole spod klawiatury) — bez
-                // tego ten scroll od razu odpalał scroll-linked animację "kurczenia"
-                // hero (scrub), przez co sekcja zaczynała się animować w trakcie
-                // próby wpisania czegoś w search. Na czas focusu wyłączamy tylko
-                // ten jeden ScrollTrigger, zachowując aktualny wygląd (reset: false).
-                //
-                // ŚWIADOMIE bez żadnej wersji "wyjdź z trybu wyszukiwania przy
-                // scrollu" — próbowałem to odróżniać po czasie i po odległości
-                // scrolla, ale scroll wywołany klawiaturą i świadome przewijanie
-                // wyglądają dla JS praktycznie identycznie, więc obie wersje w
-                // realu i tak włączały animację w trakcie samego otwierania
-                // klawiatury. Prostsza, niezawodna zasada: dopóki input ma
-                // focus, ScrollTrigger zostaje wyłączony, punkt — wraca tylko
-                // po prawdziwym wyjściu z pola (klik obok / Enter / Escape).
-                const heroSearchInput = document.querySelector('.hero__search-text');
-                let scrollYBeforeFocus = 0;
-
-                function reenableHeroShrink() {
-                    if (heroShrinkTween && heroShrinkTween.scrollTrigger && !heroShrinkTween.scrollTrigger.enabled) {
-                        heroShrinkTween.scrollTrigger.enable();
-                    }
-                }
-
-                if (heroSearchInput) {
-                    heroSearchInput.addEventListener('focus', () => {
-                        scrollYBeforeFocus = window.scrollY;
-                        if (heroShrinkTween && heroShrinkTween.scrollTrigger) {
-                            heroShrinkTween.scrollTrigger.disable(false);
-                        }
-                    });
-                    heroSearchInput.addEventListener('blur', () => {
-                        if (window.lenis) {
-                            window.lenis.scrollTo(scrollYBeforeFocus, { immediate: true });
-                        } else {
-                            window.scrollTo(0, scrollYBeforeFocus);
-                        }
-                        // scrollTo(..., {immediate:true}) nie gwarantuje, że scroll
-                        // faktycznie "dojedzie" jeszcze w tym samym ticku — enable()
-                        // wywołane od razu potrafiło złapać STARĄ pozycję scrolla
-                        // (sprzed przywrócenia) i na moment odpalić animację, zanim
-                        // wszystko się zsynchronizowało. Dwie klatki dają scrollowi
-                        // czas na faktyczne dotarcie do scrollYBeforeFocus, zanim
-                        // ScrollTrigger w ogóle dostanie szansę cokolwiek policzyć.
-                        requestAnimationFrame(() => {
-                            requestAnimationFrame(reenableHeroShrink);
-                        });
-                    });
+                // Hero-shrink tylko na desktopie. Na mobile ta sama scroll-linked
+                // animacja non-stop kolidowała z inputem wyszukiwania (natywny
+                // scroll od klawiatury systemowej ją odpalał) — kilka kolejnych
+                // prób pogodzenia jednego z drugim (przez pointerdown/focus/
+                // blur/visualViewport, w różnych kombinacjach) za każdym razem
+                // psuło coś gorszego niż naprawiało, więc na mobile jej po
+                // prostu nie ma. Desktop nie ma problemu z klawiaturą systemową,
+                // więc tam działa bez żadnych ograniczeń, tak jak zawsze.
+                if (!window.matchMedia('(max-width: 760px)').matches) {
+                    createHeroShrinkTween();
+                    window.addEventListener('heuristika:themechange', createHeroShrinkTween);
                 }
 
                 ScrollTrigger.matchMedia({
@@ -1443,13 +1403,15 @@
                 if (!e.target.closest('.hero__search')) closeDropdown();
             });
             window.addEventListener('resize', () => { if (isOpen()) positionDropdown(); });
-            // Scroll zamyka dropdown zamiast go repozycjonować — hero ma
-            // własną scroll-linked animację (obrót/skala), więc statyczny,
-            // osiowo wyrównany dropdown i tak nie mógłby za nią nadążyć i
-            // wyglądałby coraz bardziej rozjechany w trakcie scrollowania.
-            // Świadomie NIE kończy to "trybu wyszukiwania" — patrz komentarz
-            // przy ScrollTrigger.disable() wyżej w pliku.
+            // Scroll zamyka dropdown TYLKO na desktopie — tam hero ma własną
+            // scroll-linked animację (obrót/skala), więc statyczny, osiowo
+            // wyrównany dropdown i tak nie mógłby za nią nadążyć i wyglądałby
+            // coraz bardziej rozjechany w trakcie scrollowania. Na mobile tej
+            // animacji już nie ma, a dropdown (position:absolute liczony
+            // względem dokumentu) i tak zostaje poprawnie przyklejony do
+            // search bara podczas scrolla, więc nie ma powodu go zamykać.
             function onSearchScroll() {
+                if (window.matchMedia('(max-width: 760px)').matches) return;
                 if (isOpen()) closeDropdown();
             }
             window.addEventListener('scroll', onSearchScroll, true);
