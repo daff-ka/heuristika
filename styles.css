@@ -1972,6 +1972,13 @@ body {
     padding: 10px;
   }
 
+  /* Skrót klawiszowy (⌘K/Ctrl+K) nie ma sensu na dotykowym urządzeniu bez
+     fizycznej klawiatury — sam skrót w JS zostaje (niegroźny, po prostu
+     nigdy się nie odpali), chowamy tylko wizualną podpowiedź. */
+  .hero__shortcut {
+    display: none;
+  }
+
   /* Font-size celowo NIE schodzi poniżej 16px — na iOS Safari input z
      font-size < 16px powoduje automatyczny zoom całej strony po kliknięciu
      (dokładnie ten bug: "search się powiększa z całą zawartością strony").

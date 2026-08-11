@@ -942,27 +942,41 @@
                     const MOBILE_REFERENCE_WIDTH = 320;
                     const isMobile = () => window.matchMedia('(max-width: 760px)').matches;
 
-                    function getTextCenter() {
+                    // getTextCenter() robi 3x getBoundingClientRect() — wymuszony,
+                    // synchroniczny reflow. Różnice między tymi rectami (pozycja
+                    // tytułu względem kontenera CTA) są niezmienne przy scrollu:
+                    // scroll przesuwa WSZYSTKIE rects o tyle samo, więc ich
+                    // WZAJEMNY offset się nie zmienia — zmienia się tylko przy
+                    // resize/zmianie layoutu. GSAP wywołuje jednak funkcje x/y
+                    // na KAŻDEJ klatce scrub-a, więc trzymanie tu żywego
+                    // getBoundingClientRect() oznaczało 3 wymuszone reflowy ×
+                    // 4 grafiki = 12 na klatkę scrolla — stąd klatkowanie na
+                    // słabszym mobilnym CPU. Liczymy to raz i cache'ujemy,
+                    // odświeżając tylko przy resize.
+                    let cachedCenter = null;
+                    function computeTextCenter() {
                         const containerRect = ctaEl.getBoundingClientRect();
                         const titleRect = ctaTitleEl.getBoundingClientRect();
                         const subtitleRect = ctaSubtitleEl.getBoundingClientRect();
                         const mobile = isMobile();
-                        return {
+                        cachedCenter = {
                             x: titleRect.left + titleRect.width / 2 - containerRect.left,
                             y: (titleRect.top + subtitleRect.bottom) / 2 - containerRect.top,
                             scale: Math.min(1, containerRect.width / (mobile ? MOBILE_REFERENCE_WIDTH : DESKTOP_REFERENCE_WIDTH)),
                             config: mobile ? MOBILE_CONFIG : DESKTOP_CONFIG,
                         };
                     }
+                    computeTextCenter();
+                    window.addEventListener('resize', computeTextCenter);
 
                     ctaGraphics.forEach((el, i) => {
-                        gsap.set(el, { xPercent: -50, yPercent: -50, rotate: getTextCenter().config[i].rotate });
+                        gsap.set(el, { xPercent: -50, yPercent: -50, rotate: cachedCenter.config[i].rotate });
 
                         gsap.fromTo(el,
-                            { x: () => getTextCenter().x, y: () => getTextCenter().y, scale: 0.3, opacity: 0 },
+                            { x: () => cachedCenter.x, y: () => cachedCenter.y, scale: 0.3, opacity: 0 },
                             {
-                                x: () => { const c = getTextCenter(); return c.x + c.config[i].dx * c.scale; },
-                                y: () => { const c = getTextCenter(); return c.y + c.config[i].dy * c.scale; },
+                                x: () => cachedCenter.x + cachedCenter.config[i].dx * cachedCenter.scale,
+                                y: () => cachedCenter.y + cachedCenter.config[i].dy * cachedCenter.scale,
                                 scale: 1,
                                 opacity: 1,
                                 ease: 'none',
@@ -1088,6 +1102,66 @@
             }
             window.addEventListener('mousemove', onPointerMove);
             window.addEventListener('mouseleave', () => { mouseX = 0; mouseY = 0; });
+
+            // Na dotykowym ekranie mousemove nigdy się nie odpala (nie ma
+            // myszy) — mouseX/mouseY zostają wtedy zamiast tego napędzane
+            // żyroskopem/akcelerometrem przez deviceorientation. Baseline
+            // (pierwszy odczyt) to "pozycja neutralna" — liczy się WYCHYLENIE
+            // od niej, nie odczyt bezwzględny, więc działa niezależnie od
+            // tego, pod jakim kątem ktoś akurat trzyma telefon.
+            const GYRO_TILT_RANGE_DEG = 18;
+            let gyroBaseline = null;
+
+            function onDeviceOrientation(e) {
+                if (e.beta === null || e.gamma === null) return;
+                if (gyroBaseline === null) {
+                    gyroBaseline = { beta: e.beta, gamma: e.gamma };
+                }
+                mouseX = Math.max(-1, Math.min(1, (e.gamma - gyroBaseline.gamma) / GYRO_TILT_RANGE_DEG));
+                mouseY = Math.max(-1, Math.min(1, (e.beta - gyroBaseline.beta) / GYRO_TILT_RANGE_DEG));
+            }
+
+            function enableGyroTilt() {
+                window.addEventListener('deviceorientation', onDeviceOrientation);
+            }
+
+            // DeviceOrientationEvent (i requestPermission) wymaga bezpiecznego
+            // kontekstu — zwykłe http:// (też lokalnie po adresie IP w sieci,
+            // np. http://192.168.x.x) jest przez iOS Safari całkowicie
+            // blokowane, WYJĄTEK: localhost liczy się jako bezpieczny nawet
+            // po http. Ten log ma to od razu uwidocznić w konsoli zamiast
+            // ciche "nic się nie dzieje".
+            if (!window.isSecureContext) {
+                console.warn('[gyro-tilt] window.isSecureContext === false — DeviceOrientationEvent ' +
+                    'będzie zablokowany na iOS (poza localhost). Testuj przez https:// albo http://localhost.');
+            }
+
+            if (typeof DeviceOrientationEvent !== 'undefined' && typeof DeviceOrientationEvent.requestPermission === 'function') {
+                // iOS 13+ wymaga zgody użytkownika, o którą można poprosić
+                // TYLKO w bezpośredniej reakcji na gest (nie można tego zrobić
+                // samodzielnie przy starcie strony) — więc czekamy na pierwszą
+                // interakcję ze stroną.
+                const requestGyroPermission = () => {
+                    document.removeEventListener('touchend', requestGyroPermission);
+                    document.removeEventListener('click', requestGyroPermission);
+                    DeviceOrientationEvent.requestPermission()
+                        .then((state) => {
+                            if (state === 'granted') {
+                                enableGyroTilt();
+                            } else {
+                                console.warn('[gyro-tilt] Uprawnienie do czujników ruchu: ' + state);
+                            }
+                        })
+                        .catch((err) => console.warn('[gyro-tilt] requestPermission() rzucił błąd:', err));
+                };
+                document.addEventListener('touchend', requestGyroPermission, { once: true });
+                document.addEventListener('click', requestGyroPermission, { once: true });
+            } else if (typeof DeviceOrientationEvent !== 'undefined') {
+                // Android i starsze iOS — bez promptu, działa od razu.
+                enableGyroTilt();
+            } else {
+                console.warn('[gyro-tilt] DeviceOrientationEvent nieobsługiwany w tej przeglądarce.');
+            }
 
             const DOWN_MS = 55;
             const UP_MS = 160;
