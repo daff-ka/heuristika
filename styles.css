@@ -375,7 +375,7 @@ body {
    podstawy, każdy tylko przełączając opacity/transform na 1/0. */
 .hero__icon-tooltip {
   position: absolute;
-  bottom: calc(100% + 20px);
+  bottom: calc(100% + 80px);
   left: 50%;
   width: 260px;
   padding: 10px;
@@ -415,6 +415,7 @@ body {
   background: var(--bg2);
   border-right: 1px solid var(--border-strong);
   border-bottom: 1px solid var(--border-strong);
+  border-radius: 0 0 3px 0;
   z-index: -1;
 }
 
@@ -435,6 +436,7 @@ body {
     border-bottom: none;
     border-left: 1px solid var(--border-strong);
     border-top: 1px solid var(--border-strong);
+    border-radius: 3px 0 0 0;
   }
 }
 
