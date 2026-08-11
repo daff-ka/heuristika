@@ -1,0 +1,605 @@
+<html lang="pl">
+
+<head>
+    <script>
+        (function () {
+            try {
+                var stored = localStorage.getItem('heuristika-theme');
+                var theme = stored || (window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark');
+                document.documentElement.setAttribute('data-theme', theme);
+            } catch (e) {
+                document.documentElement.setAttribute('data-theme', 'dark');
+            }
+        })();
+    </script>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Katalog wpisów – Heuristika</title>
+    <link rel="icon" type="image/svg+xml" href="assets/favicon.svg" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600&family=Geist+Mono:wght@400;500&family=Inter:wght@400;500;600;700&family=BBH+Bartle:wght@400&display=swap"
+        rel="stylesheet" />
+    <link rel="stylesheet" href="styles.css" />
+</head>
+
+<body>
+    <canvas id="dots"></canvas>
+    <div class="page">
+        <div class="shell">
+            <nav class="nav" aria-label="Top navigation">
+                <div class="nav-left">
+                    <a href="index.html" class="brand" aria-label="Heuristika home">
+                        <svg class="brand-icon" viewBox="0 0 20 17.32" fill="none" aria-hidden="true">
+                            <path d="M10 0L20 17.32H0L10 0Z" fill="currentColor" />
+                        </svg>
+                        <span class="brand-title">Heuristika</span>
+                    </a>
+                    <div class="nav-links" id="navLinks">
+                        <a href="katalog.html" class="nav-link" aria-current="page">Katalog</a>
+                        <a href="o-projekcie.html" class="nav-link nav-link--small">O projekcie</a>
+                    </div>
+                </div>
+
+                <div class="nav-right">
+                    <button type="button" class="icon-button theme-toggle" id="themeToggle"
+                        aria-label="Przełącz tryb jasny/ciemny" aria-pressed="false">
+                        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                            <path d="M8 2V4" stroke="currentColor" stroke-width="1.33333" stroke-linecap="round"
+                                stroke-linejoin="round" />
+                            <path d="M8 12V14" stroke="currentColor" stroke-width="1.33333" stroke-linecap="round"
+                                stroke-linejoin="round" />
+                            <path d="M2 8H4" stroke="currentColor" stroke-width="1.33333" stroke-linecap="round"
+                                stroke-linejoin="round" />
+                            <path d="M12 8H14" stroke="currentColor" stroke-width="1.33333" stroke-linecap="round"
+                                stroke-linejoin="round" />
+                            <path d="M3.73333 3.73333L5.2 5.2" stroke="currentColor" stroke-width="1.33333"
+                                stroke-linecap="round" stroke-linejoin="round" />
+                            <path d="M10.8 10.8L12.2667 12.2667" stroke="currentColor" stroke-width="1.33333"
+                                stroke-linecap="round" stroke-linejoin="round" />
+                            <path d="M3.73333 12.2667L5.2 10.8" stroke="currentColor" stroke-width="1.33333"
+                                stroke-linecap="round" stroke-linejoin="round" />
+                            <path d="M10.8 5.2L12.2667 3.73333" stroke="currentColor" stroke-width="1.33333"
+                                stroke-linecap="round" stroke-linejoin="round" />
+                            <circle cx="8" cy="8" r="1.66667" stroke="currentColor" stroke-width="1.33333" />
+                        </svg>
+                    </button>
+                    <button type="button" class="footer__subscribe">
+                        <svg class="footer__subscribe-icon" width="16" height="16" viewBox="0 0 16 16" fill="none"
+                            aria-hidden="true">
+                            <path d="M6.667 4.667V3.334H10.667V4.667L12.667 10.667H4.667L6.667 4.667Z"
+                                stroke="currentColor" stroke-width="1.333" stroke-linecap="round"
+                                stroke-linejoin="round" />
+                            <circle cx="8" cy="11.8" r="0.8" fill="currentColor" />
+                        </svg>
+                        Subskrybuj
+                    </button>
+                </div>
+
+                <button type="button" class="nav-toggle" aria-label="Otwórz menu" aria-expanded="false"
+                    aria-controls="navLinks">
+                    <svg class="nav-toggle-icon" viewBox="0 0 20 16" width="20" height="16" fill="none"
+                        aria-hidden="true">
+                        <path d="M1 1H19" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" />
+                        <path d="M1 8H19" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" />
+                        <path d="M1 15H19" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" />
+                    </svg>
+                </button>
+            </nav>
+            <div class="divider"></div>
+
+            <main class="katalog">
+                <div class="katalog__container katalog__header">
+                    <p class="katalog__eyebrow">KATALOG</p>
+                    <h1 class="katalog__title">Katalog wpisów</h1>
+                    <p class="katalog__lead">Wszystkie hasła, metody i wzorce z biblioteki – filtruj i sortuj, żeby
+                        znaleźć to, czego potrzebujesz.</p>
+                </div>
+
+                <div class="katalog__container katalog__controls">
+                    <div class="hero__search katalog__search" role="search">
+                        <svg class="hero__search-icon" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                            <path d="M14 14L11.1 11.1" stroke="currentColor" stroke-width="1.33333"
+                                stroke-linecap="round" stroke-linejoin="round" />
+                            <circle cx="7.33333" cy="7.33333" r="4.66667" stroke="currentColor"
+                                stroke-width="1.33333" />
+                        </svg>
+                        <input type="text" class="hero__search-text" id="katalogSearchInput"
+                            placeholder="Szukaj w katalogu – nazwa, tag, opis..." aria-label="Szukaj w katalogu"
+                            autocomplete="off" spellcheck="false" />
+                        <div class="hero__shortcut" id="katalogShortcut">⌘K</div>
+                    </div>
+
+                    <!-- Na mobile filtry są domyślnie zwinięte (schowane za tym przyciskiem) —
+                         4 dropdowny w kolumnie zajmują sporo miejsca i spychają wyniki w dół,
+                         a to strona z niewielką (na razie) liczbą wpisów. Na desktopie ten
+                         przycisk jest ukryty przez CSS, filtry są tam zawsze widoczne. -->
+                    <button type="button" class="katalog__filters-toggle" id="katalogFiltersToggle"
+                        aria-expanded="false" aria-controls="katalogFilters">
+                        <span>Włącz filtry</span>
+                        <svg class="katalog__filters-toggle-icon" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                            <path d="M2 4H14M4.667 8H11.333M6.667 12H9.333" stroke="currentColor"
+                                stroke-width="1.33333" stroke-linecap="round" stroke-linejoin="round" />
+                        </svg>
+                    </button>
+
+                    <div class="katalog__filters" id="katalogFilters">
+                        <!-- Filtry (Dyscyplina / Typ wpisu / Platforma / Poziom) są renderowane w JS
+                             (patrz FILTER_DEFS niżej) — ich opcje liczą się z realnych tagów w
+                             KATALOG_ENTRIES, więc zawsze dają ≥1 wynik i nie trzeba ich ręcznie
+                             synchronizować przy dodawaniu nowych wpisów. -->
+                        <div class="katalog__filters-meta">
+                            <span class="katalog__result-count" id="katalogResultCount"></span>
+                            <button type="button" class="katalog__clear-filters" id="katalogClearFilters">Wyczyść
+                                filtry</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="katalog__container katalog__grid-wrap">
+                    <div class="featured__grid" id="katalogGrid"></div>
+                    <p class="katalog__empty" id="katalogEmpty">Brak wpisów spełniających wybrane kryteria.</p>
+                </div>
+
+                <nav class="katalog__pagination" id="katalogPagination" aria-label="Paginacja katalogu" hidden>
+                </nav>
+            </main>
+
+            <div class="divider"></div>
+            <footer class="footer__bottom">
+                <p class="footer__copyright">© 2026 Heuristika – Osobista Biblioteka Projektanta</p>
+                <nav class="footer__links">
+                    <a href="katalog.html" class="footer__link" aria-current="page">Katalog</a>
+                    <a href="o-projekcie.html" class="footer__link">O projekcie</a>
+                </nav>
+            </footer>
+        </div>
+    </div>
+
+    <script src="dots-pattern.js"></script>
+
+    <script>
+        (function () {
+            const nav = document.querySelector('.nav');
+            const toggle = document.querySelector('.nav-toggle');
+            if (!nav || !toggle) return;
+
+            function closeMenu() {
+                nav.classList.remove('is-open');
+                toggle.setAttribute('aria-expanded', 'false');
+            }
+
+            toggle.addEventListener('click', () => {
+                const isOpen = nav.classList.toggle('is-open');
+                toggle.setAttribute('aria-expanded', String(isOpen));
+            });
+
+            nav.querySelectorAll('.nav-links a, .nav-right button').forEach((el) => {
+                el.addEventListener('click', closeMenu);
+            });
+
+            window.addEventListener('resize', () => {
+                if (window.innerWidth > 760) closeMenu();
+            });
+        })();
+    </script>
+
+    <script>
+        (function () {
+            const btn = document.getElementById('themeToggle');
+            if (!btn) return;
+            const root = document.documentElement;
+
+            function sync() {
+                btn.setAttribute('aria-pressed', String(root.getAttribute('data-theme') === 'light'));
+            }
+            sync();
+
+            btn.addEventListener('click', () => {
+                const next = root.getAttribute('data-theme') === 'light' ? 'dark' : 'light';
+                root.setAttribute('data-theme', next);
+                try { localStorage.setItem('heuristika-theme', next); } catch (e) { }
+                sync();
+            });
+        })();
+    </script>
+
+    <script>
+        (function () {
+            // Te same 6 kart co w sekcji "Ostatnio dodane" na stronie głównej —
+            // jedna realna treść (Etykiety ikon w menu) + 5 placeholderów
+            // (href="#"), 1:1 skopiowane, żeby katalog i homepage się nie rozjeżdżały.
+            const KATALOG_ENTRIES = [
+                {
+                    title: 'Etykiety ikon w menu',
+                    desc: 'Czy ikona w nawigacji powinna mieć etykietę tekstową, czy wystarczy sam symbol?',
+                    tags: { dyscyplina: 'UI Design', typ: 'Wzorzec', platforma: 'Desktop + Mobile', poziom: 'Łatwy' },
+                    url: 'wpis-etykiety-ikon.html',
+                    icon: 'illustration',
+                },
+                {
+                    title: 'Card sorting',
+                    desc: 'Grupowanie treści wg mentalnych modeli użytkowników.',
+                    tags: { dyscyplina: 'UX Research', typ: 'Metoda', platforma: 'Web + Mobile', poziom: 'Średni' },
+                    url: '#',
+                    icon: 'entry-5',
+                },
+                {
+                    title: 'Reset vs Confirm',
+                    desc: 'Konkretny przypadek: panel „Skróty klawiszowe” w macOS.',
+                    tags: { dyscyplina: 'UI Design', typ: 'Wzorzec', platforma: 'Desktop + Mobile', poziom: 'Średni' },
+                    url: '#',
+                    icon: 'entry-u',
+                },
+                {
+                    title: 'Delete vs Confirm',
+                    desc: 'Konkretny przypadek: alert „Erase All Content and Settings” w macOS/iOS.',
+                    tags: { dyscyplina: 'UI Design', typ: 'Wzorzec', platforma: 'Desktop + Mobile', poziom: 'Trudny' },
+                    url: '#',
+                    icon: 'entry-heart',
+                },
+                {
+                    title: 'Desirable Friction',
+                    desc: 'Kiedy warto celowo utrudnić interakcję, zamiast ją ułatwiać.',
+                    tags: { dyscyplina: 'UI Design', typ: 'Wzorzec', platforma: 'Desktop + Mobile', poziom: 'Łatwy' },
+                    url: '#',
+                    icon: 'entry-f',
+                },
+                {
+                    title: 'Card sorting',
+                    desc: 'Grupowanie treści wg mentalnych modeli użytkowników.',
+                    tags: { dyscyplina: 'UX Research', typ: 'Metoda', platforma: 'Web + Mobile', poziom: 'Średni' },
+                    url: '#',
+                    icon: 'entry-4',
+                },
+            ];
+
+            const PAGE_SIZE = 6;
+
+            const FILTER_DEFS = [
+                { key: 'dyscyplina', label: 'Dyscyplina' },
+                { key: 'typ', label: 'Typ wpisu' },
+                { key: 'platforma', label: 'Platforma' },
+                { key: 'poziom', label: 'Poziom' },
+            ];
+
+            const BADGE_COLOR = { dyscyplina: 'blue', typ: 'violet', platforma: 'green', poziom: 'amber' };
+            const POZIOM_ORDER = { 'Łatwy': 1, 'Średni': 2, 'Trudny': 3 };
+
+            const filtersEl = document.getElementById('katalogFilters');
+            const clearBtn = document.getElementById('katalogClearFilters');
+            const resultCountEl = document.getElementById('katalogResultCount');
+            const gridEl = document.getElementById('katalogGrid');
+            const emptyEl = document.getElementById('katalogEmpty');
+            const paginationEl = document.getElementById('katalogPagination');
+            const searchInput = document.getElementById('katalogSearchInput');
+            const shortcut = document.getElementById('katalogShortcut');
+
+            const activeFilters = { dyscyplina: '', typ: '', platforma: '', poziom: '' };
+            let searchQuery = '';
+            let currentPage = 1;
+
+            function normalize(str) {
+                return str.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+            }
+
+            // --- Budowa dropdownów filtrów (opcje liczone z realnych danych, nie
+            // z sztywno wpisanej listy — każda opcja zawsze da ≥1 wynik i nowe
+            // wpisy automatycznie poszerzą listę bez ręcznej synchronizacji). ---
+            function buildFilters() {
+                FILTER_DEFS.forEach((def) => {
+                    let values = [...new Set(KATALOG_ENTRIES.map((e) => e.tags[def.key]))];
+                    if (def.key === 'poziom') values.sort((a, b) => POZIOM_ORDER[a] - POZIOM_ORDER[b]);
+                    else values.sort((a, b) => a.localeCompare(b, 'pl'));
+
+                    const wrap = document.createElement('div');
+                    wrap.className = 'katalog__filter';
+                    wrap.dataset.filter = def.key;
+
+                    const label = document.createElement('span');
+                    label.className = 'katalog__filter-label';
+                    label.textContent = def.label;
+                    wrap.appendChild(label);
+
+                    // Osobny wrapper wokół samego przycisku (nie całego wiersza z labelem) —
+                    // panel opcji liczy swoją min-width względem TEGO kontenera, więc jest
+                    // dokładnie tak szeroki jak przycisk, nie szerszy o etykietę z lewej.
+                    // Panel NIE może być dzieckiem samego <button> — klik w opcję bąbelkowałby
+                    // do handlera przycisku i natychmiast otwierał dropdown z powrotem.
+                    const control = document.createElement('div');
+                    control.className = 'katalog__filter-control';
+                    wrap.appendChild(control);
+
+                    const btn = document.createElement('button');
+                    btn.type = 'button';
+                    btn.className = 'katalog__filter-select';
+                    btn.setAttribute('aria-haspopup', 'listbox');
+                    btn.setAttribute('aria-expanded', 'false');
+
+                    const valueEl = document.createElement('span');
+                    valueEl.className = 'katalog__filter-value';
+                    valueEl.textContent = 'Wszystkie';
+                    btn.appendChild(valueEl);
+
+                    const chevron = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+                    chevron.setAttribute('class', 'katalog__filter-chevron');
+                    chevron.setAttribute('viewBox', '0 0 8 5');
+                    chevron.setAttribute('fill', 'none');
+                    chevron.setAttribute('aria-hidden', 'true');
+                    chevron.innerHTML = '<path d="M1 1L4 4L7 1" stroke="currentColor" stroke-width="1.33" stroke-linecap="round" stroke-linejoin="round" />';
+                    btn.appendChild(chevron);
+                    control.appendChild(btn);
+
+                    const list = document.createElement('ul');
+                    list.className = 'katalog__filter-options';
+                    list.setAttribute('role', 'listbox');
+                    list.hidden = true;
+
+                    function renderOptions() {
+                        list.innerHTML = '';
+                        const all = ['', ...values];
+                        all.forEach((val) => {
+                            const li = document.createElement('li');
+                            li.className = 'katalog__filter-option';
+                            li.setAttribute('role', 'option');
+                            li.setAttribute('aria-selected', String(activeFilters[def.key] === val));
+
+                            const label = document.createElement('span');
+                            label.textContent = val === '' ? 'Wszystkie' : val;
+                            li.appendChild(label);
+
+                            const check = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+                            check.setAttribute('class', 'katalog__filter-option-check');
+                            check.setAttribute('viewBox', '0 0 16 16');
+                            check.setAttribute('fill', 'none');
+                            check.setAttribute('aria-hidden', 'true');
+                            check.innerHTML = '<path d="M3 8.5L6.2 11.7L13 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />';
+                            li.appendChild(check);
+
+                            li.addEventListener('click', () => {
+                                activeFilters[def.key] = val;
+                                valueEl.textContent = val === '' ? 'Wszystkie' : val;
+                                renderOptions();
+                                closeDropdown();
+                                currentPage = 1;
+                                render();
+                            });
+                            list.appendChild(li);
+                        });
+                    }
+                    renderOptions();
+                    control.appendChild(list);
+
+                    function isOpen() { return !list.hidden; }
+                    function openDropdown() {
+                        closeAllDropdowns();
+                        list.hidden = false;
+                        btn.setAttribute('aria-expanded', 'true');
+                    }
+                    function closeDropdown() {
+                        list.hidden = true;
+                        btn.setAttribute('aria-expanded', 'false');
+                    }
+                    btn.addEventListener('click', () => { isOpen() ? closeDropdown() : openDropdown(); });
+                    wrap._closeDropdown = closeDropdown;
+                    wrap._renderOptions = renderOptions;
+
+                    filtersEl.insertBefore(wrap, filtersEl.querySelector('.katalog__filters-meta'));
+                });
+            }
+
+            function closeAllDropdowns() {
+                filtersEl.querySelectorAll('.katalog__filter').forEach((wrap) => {
+                    if (wrap._closeDropdown) wrap._closeDropdown();
+                });
+            }
+
+            document.addEventListener('click', (e) => {
+                if (!e.target.closest('.katalog__filter')) closeAllDropdowns();
+            });
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape') closeAllDropdowns();
+            });
+
+            function refreshFilterOptionStates() {
+                filtersEl.querySelectorAll('.katalog__filter').forEach((wrap) => {
+                    if (wrap._renderOptions) wrap._renderOptions();
+                });
+            }
+
+            clearBtn.addEventListener('click', () => {
+                FILTER_DEFS.forEach((def) => { activeFilters[def.key] = ''; });
+                filtersEl.querySelectorAll('.katalog__filter-value').forEach((el) => { el.textContent = 'Wszystkie'; });
+                searchQuery = '';
+                searchInput.value = '';
+                currentPage = 1;
+                refreshFilterOptionStates();
+                render();
+            });
+
+            function poziomMeterSvg(poziom) {
+                const filled = POZIOM_ORDER[poziom] || 1;
+                const cx = [2.5, 10.5, 18.5];
+                const circles = cx.map((x, i) => {
+                    const fill = i < filled ? 'currentColor' : 'var(--badge-amber-border)';
+                    return `<circle cx="${x}" cy="2.5" r="2.5" fill="${fill}" />`;
+                }).join('');
+                return `<svg width="21" height="5" viewBox="0 0 21 5" aria-hidden="true">${circles}</svg>`;
+            }
+
+            function dotSvg() {
+                return '<svg width="6" height="6" viewBox="0 0 6 6" aria-hidden="true"><circle cx="3" cy="3" r="3" fill="currentColor" /></svg>';
+            }
+
+            function badgeHtml(kind, value) {
+                if (kind === 'poziom') {
+                    return `<span class="about__badge about__badge--${BADGE_COLOR[kind]} about__badge--meter">${poziomMeterSvg(value)}${value}</span>`;
+                }
+                return `<span class="about__badge about__badge--${BADGE_COLOR[kind]}">${dotSvg()}${value}</span>`;
+            }
+
+            function cardIconHtml(entry) {
+                if (entry.icon === 'illustration') {
+                    const ICONS = {
+                        overview: '<path d="M6 2H2.66667C2.29848 2 2 2.29848 2 2.66667V7.33333C2 7.70152 2.29848 8 2.66667 8H6C6.36819 8 6.66667 7.70152 6.66667 7.33333V2.66667C6.66667 2.29848 6.36819 2 6 2Z" stroke="currentColor" stroke-width="1.33333" stroke-linecap="round" stroke-linejoin="round" /><path d="M13.3333 2H10C9.63181 2 9.33333 2.29848 9.33333 2.66667V4.66667C9.33333 5.03486 9.63181 5.33333 10 5.33333H13.3333C13.7015 5.33333 14 5.03486 14 4.66667V2.66667C14 2.29848 13.7015 2 13.3333 2Z" stroke="currentColor" stroke-width="1.33333" stroke-linecap="round" stroke-linejoin="round" /><path d="M13.3333 8H10C9.63181 8 9.33333 8.29848 9.33333 8.66667V13.3333C9.33333 13.7015 9.63181 14 10 14H13.3333C13.7015 14 14 13.7015 14 13.3333V8.66667C14 8.29848 13.7015 8 13.3333 8Z" stroke="currentColor" stroke-width="1.33333" stroke-linecap="round" stroke-linejoin="round" /><path d="M6 10.6667H2.66667C2.29848 10.6667 2 10.9651 2 11.3333V13.3333C2 13.7015 2.29848 14 2.66667 14H6C6.36819 14 6.66667 13.7015 6.66667 13.3333V11.3333C6.66667 10.9651 6.36819 10.6667 6 10.6667Z" stroke="currentColor" stroke-width="1.33333" stroke-linecap="round" stroke-linejoin="round" />',
+                        analytics: '<path d="M4 13.3333V9.33333" stroke="currentColor" stroke-width="1.33333" stroke-linecap="round" stroke-linejoin="round" /><path d="M8 13.3333V5.33333" stroke="currentColor" stroke-width="1.33333" stroke-linecap="round" stroke-linejoin="round" /><path d="M12 13.3333V2.66667" stroke="currentColor" stroke-width="1.33333" stroke-linecap="round" stroke-linejoin="round" />',
+                        deployments: '<path d="M13.3333 2H2.66667C1.93029 2 1.33333 2.59695 1.33333 3.33333V6C1.33333 6.73638 1.93029 7.33333 2.66667 7.33333H13.3333C14.0697 7.33333 14.6667 6.73638 14.6667 6V3.33333C14.6667 2.59695 14.0697 2 13.3333 2Z" stroke="currentColor" stroke-width="1.33333" stroke-linecap="round" stroke-linejoin="round" /><path d="M13.3333 8.66667H2.66667C1.93029 8.66667 1.33333 9.26362 1.33333 10V12.6667C1.33333 13.403 1.93029 14 2.66667 14H13.3333C14.0697 14 14.6667 13.403 14.6667 12.6667V10C14.6667 9.26362 14.0697 8.66667 13.3333 8.66667Z" stroke="currentColor" stroke-width="1.33333" stroke-linecap="round" stroke-linejoin="round" /><path d="M4 4.66667H4.00667" stroke="currentColor" stroke-width="1.33333" stroke-linecap="round" stroke-linejoin="round" /><path d="M4 11.3333H4.00667" stroke="currentColor" stroke-width="1.33333" stroke-linecap="round" stroke-linejoin="round" />',
+                        team: '<path d="M11.3333 14V12.6667C11.3333 11.9594 11.0524 11.2811 10.5523 10.781C10.0522 10.281 9.37391 10 8.66667 10H3.33333C2.62609 10 1.94781 10.281 1.44772 10.781C0.947618 11.2811 0.666667 11.9594 0.666667 12.6667V14" stroke="currentColor" stroke-width="1.33333" stroke-linecap="round" stroke-linejoin="round" /><path d="M6 7.33333C7.47276 7.33333 8.66667 6.13943 8.66667 4.66667C8.66667 3.19391 7.47276 2 6 2C4.52724 2 3.33333 3.19391 3.33333 4.66667C3.33333 6.13943 4.52724 7.33333 6 7.33333Z" stroke="currentColor" stroke-width="1.33333" stroke-linecap="round" stroke-linejoin="round" /><path d="M15.3333 14V12.6667C15.3329 12.0758 15.1362 11.5019 14.7742 11.0349C14.4122 10.5679 13.9054 10.2344 13.3333 10.0867" stroke="currentColor" stroke-width="1.33333" stroke-linecap="round" stroke-linejoin="round" /><path d="M10.6667 2.08667C11.2403 2.23354 11.7487 2.56714 12.1118 3.03488C12.4748 3.50262 12.6719 4.07789 12.6719 4.67C12.6719 5.26212 12.4748 5.83739 12.1118 6.30513C11.7487 6.77287 11.2403 7.10647 10.6667 7.25334" stroke="currentColor" stroke-width="1.33333" stroke-linecap="round" stroke-linejoin="round" />',
+                        settings: '<path d="M8 10C9.10457 10 10 9.10457 10 8C10 6.89543 9.10457 6 8 6C6.89543 6 6 6.89543 6 8C6 9.10457 6.89543 10 8 10Z" stroke="currentColor" stroke-width="1.33333" stroke-linecap="round" stroke-linejoin="round" /><path d="M12.9333 10C12.8446 10.2011 12.8181 10.4241 12.8573 10.6404C12.8965 10.8567 12.9996 11.0562 13.1533 11.2133L13.1933 11.2533C13.3172 11.3772 13.4155 11.5243 13.4825 11.6861C13.5496 11.848 13.5841 12.0215 13.5841 12.1967C13.5841 12.3719 13.5496 12.5453 13.4825 12.7072C13.4155 12.8691 13.3172 13.0161 13.1933 13.14C13.0695 13.2639 12.9224 13.3621 12.7605 13.4292C12.5987 13.4962 12.4252 13.5307 12.25 13.5307C12.0748 13.5307 11.9013 13.4962 11.7395 13.4292C11.5776 13.3621 11.4305 13.2639 11.3067 13.14L11.2667 13.1C11.1095 12.9463 10.91 12.8432 10.6937 12.804C10.4775 12.7648 10.2544 12.7913 10.0533 12.88C9.85615 12.9645 9.68799 13.1048 9.56954 13.2837C9.45109 13.4626 9.38752 13.6721 9.38667 13.8867V14C9.38667 14.3536 9.24619 14.6928 8.99614 14.9428C8.74609 15.1929 8.40696 15.3333 8.05333 15.3333C7.69971 15.3333 7.36057 15.1929 7.11052 14.9428C6.86048 14.6928 6.72 14.3536 6.72 14V13.94C6.71484 13.7193 6.64341 13.5053 6.51501 13.3258C6.3866 13.1463 6.20716 13.0095 6 12.9333C5.79892 12.8446 5.57587 12.8181 5.35961 12.8573C5.14334 12.8965 4.94379 12.9996 4.78667 13.1533L4.74667 13.1933C4.49648 13.4435 4.15715 13.5841 3.80333 13.5841C3.44951 13.5841 3.11019 13.4435 2.86 13.1933C2.60981 12.9431 2.46926 12.6038 2.46926 12.25C2.46926 11.8962 2.60981 11.5569 2.86 11.3067L2.9 11.2667C3.05369 11.1095 3.15679 10.91 3.196 10.6937C3.23522 10.4775 3.20874 10.2544 3.12 10.0533C3.03549 9.85615 2.89517 9.68799 2.71631 9.56954C2.53745 9.45109 2.32786 9.38752 2.11333 9.38667H2C1.64638 9.38667 1.30724 9.24619 1.05719 8.99614C0.807143 8.74609 0.666667 8.40696 0.666667 8.05333C0.666667 7.69971 0.807143 7.36057 1.05719 7.11052C1.30724 6.86048 1.64638 6.72 2 6.72H2.06C2.28066 6.71484 2.49467 6.64341 2.6742 6.51501C2.85373 6.3866 2.99048 6.20716 3.06667 6C3.15541 5.79892 3.18188 5.57587 3.14267 5.35961C3.10346 5.14334 3.00036 4.94379 2.84667 4.78667L2.80667 4.74667C2.68279 4.62279 2.58452 4.47572 2.51748 4.31386C2.45043 4.152 2.41593 3.97853 2.41593 3.80333C2.41593 3.62814 2.45043 3.45466 2.51748 3.29281C2.58452 3.13095 2.68279 2.98388 2.80667 2.86C2.93055 2.73612 3.07761 2.63785 3.23947 2.57081C3.40133 2.50377 3.57481 2.46926 3.75 2.46926C3.92519 2.46926 4.09867 2.50377 4.26053 2.57081C4.42239 2.63785 4.56945 2.73612 4.69333 2.86L4.73333 2.9C4.89045 3.05369 5.09001 3.15679 5.30627 3.196C5.52254 3.23522 5.74559 3.20874 5.94667 3.12H6C6.19718 3.03549 6.36534 2.89517 6.4838 2.71631C6.60225 2.53745 6.66581 2.32786 6.66667 2.11333V2C6.66667 1.64638 6.80714 1.30724 7.05719 1.05719C7.30724 0.807143 7.64638 0.666667 8 0.666667C8.35362 0.666667 8.69276 0.807143 8.94281 1.05719C9.19286 1.30724 9.33333 1.64638 9.33333 2V2.06C9.33419 2.27452 9.39775 2.48412 9.51621 2.66298C9.63466 2.84184 9.80282 2.98216 10 3.06667C10.2011 3.15541 10.4241 3.18188 10.6404 3.14267C10.8567 3.10346 11.0562 3.00036 11.2133 2.84667L11.2533 2.80667C11.5035 2.55648 11.8428 2.41593 12.1967 2.41593C12.3719 2.41593 12.5453 2.45043 12.7072 2.51748C12.8691 2.58452 13.0161 2.68279 13.14 2.80667C13.2639 2.93055 13.3621 3.07761 13.4292 3.23947C13.4962 3.40133 13.5307 3.57481 13.5307 3.75C13.5307 3.92519 13.4962 4.09867 13.4292 4.26053C13.3621 4.42239 13.2639 4.56945 13.14 4.69333L13.1 4.73333C12.9463 4.89045 12.8432 5.09001 12.804 5.30627C12.7648 5.52254 12.7913 5.74559 12.88 5.94667V6C13.0667 6.46667 13.1467 7.00667 13.5467 7.00667H14C14.3536 7.00667 14.6928 7.14714 14.9428 7.39719C15.1929 7.64724 15.3333 7.98638 15.3333 8.34C15.3333 8.69362 15.1929 9.03276 14.9428 9.28281C14.6928 9.53286 14.3536 9.67333 14 9.67333H13.94C13.7255 9.67419 13.5159 9.73775 13.337 9.85621C13.1582 9.97466 13.0178 10.1428 12.9333 10.34V10Z" stroke="currentColor" stroke-width="1.33333" stroke-linecap="round" stroke-linejoin="round" />',
+                    };
+                    const rows = [
+                        ['overview', 'Overview', true],
+                        ['analytics', 'Analytics', false],
+                        ['deployments', 'Deployments', false],
+                        ['team', 'Team', false],
+                        ['settings', 'Settings', false],
+                    ];
+                    const rowsHtml = rows.map(([key, label, active]) => `
+                                <div class="featured__card-illustration-row${active ? ' featured__card-illustration-row--active' : ''}">
+                                    <svg class="featured__card-illustration-row-icon" viewBox="0 0 16 16" fill="none" aria-hidden="true">${ICONS[key]}</svg>
+                                    <p class="featured__card-illustration-row-text">${label}</p>
+                                </div>`).join('');
+                    return `
+                        <div class="featured__card-illustration" aria-hidden="true">
+                            <p class="featured__card-illustration-label">DESKTOP · SIDEBAR</p>
+                            <div class="featured__card-illustration-rows">${rowsHtml}
+                            </div>
+                        </div>`;
+                }
+                return `
+                    <img class="featured__card-icon-img featured__card-icon-img--dark" src="assets/icons/entries/${entry.icon}.svg" alt="" />
+                    <img class="featured__card-icon-img featured__card-icon-img--light" src="assets/icons/entries/${entry.icon}-light.svg" alt="" />`;
+            }
+
+            function cardHtml(entry) {
+                return `
+                    <a href="${entry.url}" class="featured__card">
+                        <div class="featured__card-icon">${cardIconHtml(entry)}</div>
+                        <div class="featured__card-content">
+                            <div class="featured__card-text">
+                                <h3 class="featured__card-title">${entry.title}</h3>
+                                <p class="featured__card-desc">${entry.desc}</p>
+                            </div>
+                            <div class="featured__tags">
+                                ${badgeHtml('dyscyplina', entry.tags.dyscyplina)}
+                                ${badgeHtml('typ', entry.tags.typ)}
+                                ${badgeHtml('platforma', entry.tags.platforma)}
+                                ${badgeHtml('poziom', entry.tags.poziom)}
+                            </div>
+                        </div>
+                    </a>`;
+            }
+
+            function getFiltered() {
+                const q = normalize(searchQuery.trim());
+                return KATALOG_ENTRIES.filter((entry) => {
+                    for (const def of FILTER_DEFS) {
+                        if (activeFilters[def.key] && entry.tags[def.key] !== activeFilters[def.key]) return false;
+                    }
+                    if (!q) return true;
+                    const haystack = normalize([entry.title, entry.desc, Object.values(entry.tags).join(' ')].join(' '));
+                    return haystack.includes(q);
+                });
+            }
+
+            function arrowIconSvg(direction) {
+                const d = direction === 'left'
+                    ? 'M9.333 2.667L4 8L9.333 13.333M4 8H14'
+                    : 'M6.667 2.667L12 8L6.667 13.333M12 8H2';
+                return `<svg viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="${d}" stroke="currentColor" stroke-width="1.33333" stroke-linecap="round" stroke-linejoin="round" /></svg>`;
+            }
+
+            function renderPagination(totalPages) {
+                paginationEl.innerHTML = '';
+                if (totalPages <= 1) { paginationEl.hidden = true; return; }
+                paginationEl.hidden = false;
+
+                const prev = document.createElement('button');
+                prev.type = 'button';
+                prev.className = 'katalog__page-btn';
+                prev.innerHTML = `${arrowIconSvg('left')}Poprzednia`;
+                prev.disabled = currentPage === 1;
+                prev.addEventListener('click', () => { currentPage -= 1; render(); });
+                paginationEl.appendChild(prev);
+
+                for (let p = 1; p <= totalPages; p += 1) {
+                    const numBtn = document.createElement('button');
+                    numBtn.type = 'button';
+                    numBtn.className = 'katalog__page-number';
+                    numBtn.textContent = String(p);
+                    numBtn.setAttribute('aria-current', String(p === currentPage));
+                    numBtn.addEventListener('click', () => { currentPage = p; render(); });
+                    paginationEl.appendChild(numBtn);
+                }
+
+                const next = document.createElement('button');
+                next.type = 'button';
+                next.className = 'katalog__page-btn';
+                next.innerHTML = `Następna${arrowIconSvg('right')}`;
+                next.disabled = currentPage === totalPages;
+                next.addEventListener('click', () => { currentPage += 1; render(); });
+                paginationEl.appendChild(next);
+            }
+
+            function render() {
+                const filtered = getFiltered();
+                const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
+                currentPage = Math.min(currentPage, totalPages);
+                const start = (currentPage - 1) * PAGE_SIZE;
+                const pageItems = filtered.slice(start, start + PAGE_SIZE);
+
+                resultCountEl.textContent = filtered.length === 1 ? '1 wynik' : `${filtered.length} wyników`;
+                gridEl.innerHTML = pageItems.map(cardHtml).join('');
+                emptyEl.classList.toggle('is-visible', filtered.length === 0);
+                renderPagination(totalPages);
+            }
+
+            buildFilters();
+            render();
+
+            // Zwijanie filtrów tylko na mobile — na desktopie przycisk jest
+            // ukryty przez CSS i filtry są zawsze widoczne (patrz styles.css).
+            const filtersToggle = document.getElementById('katalogFiltersToggle');
+            const MOBILE_QUERY = window.matchMedia('(max-width: 760px)');
+
+            function syncFiltersCollapse() {
+                if (MOBILE_QUERY.matches) {
+                    filtersEl.classList.add('is-collapsed');
+                    filtersToggle.setAttribute('aria-expanded', 'false');
+                    filtersToggle.querySelector('span').textContent = 'Włącz filtry';
+                } else {
+                    filtersEl.classList.remove('is-collapsed');
+                }
+            }
+            syncFiltersCollapse();
+            MOBILE_QUERY.addEventListener('change', syncFiltersCollapse);
+
+            filtersToggle.addEventListener('click', () => {
+                const isCollapsed = filtersEl.classList.toggle('is-collapsed');
+                filtersToggle.setAttribute('aria-expanded', String(!isCollapsed));
+                filtersToggle.querySelector('span').textContent = isCollapsed ? 'Włącz filtry' : 'Ukryj filtry';
+            });
+
+            searchInput.addEventListener('input', () => { searchQuery = searchInput.value; currentPage = 1; render(); });
+            // Klawiatury mobilne z autokorektą (Gboard/iOS) wysyłają tekst jako
+            // "kompozycję" — bez tego filtrowanie odświeżało się dopiero po
+            // zaakceptowaniu słowa przez klawiaturę systemową.
+            searchInput.addEventListener('compositionupdate', () => { searchQuery = searchInput.value; currentPage = 1; render(); });
+            searchInput.addEventListener('compositionend', () => { searchQuery = searchInput.value; currentPage = 1; render(); });
+
+            const isMac = /Mac|iPod|iPhone|iPad/.test(navigator.platform || navigator.userAgent);
+            if (shortcut) shortcut.textContent = isMac ? '⌘K' : 'Ctrl+K';
+            window.addEventListener('keydown', (e) => {
+                const key = e.key.toLowerCase();
+                if (key === 'k' && (isMac ? e.metaKey : e.ctrlKey)) {
+                    e.preventDefault();
+                    searchInput.focus();
+                    searchInput.select();
+                }
+            });
+        })();
+    </script>
+</body>
+
+</html>

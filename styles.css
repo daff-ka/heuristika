@@ -50,7 +50,7 @@
   --ink-subtle: #666666;
   --border: #eaeaea;
   --border-strong: #d4d4d4;
-  --surface: #fafafa;
+  --surface: #eaeaea;
   --bg2: #ececec;
 
   --glass-bg: #ffffff;
@@ -982,6 +982,7 @@ body {
   flex-shrink: 0;
   width: 100%;
   background: var(--surface);
+  border-bottom: 1px solid var(--border);
   transition: background-color 0.2s ease;
 }
 
@@ -1171,7 +1172,7 @@ body {
      overflow:hidden. Na mobile (w odróżnieniu od desktopu) cały mini-podgląd
      ma być widoczny w całości, bez efektu "podglądu"/przycięcia. */
   .featured__card-illustration {
-    top: 14px;
+    top: 28px;
     width: min(248px, calc(100% - 80px));
     gap: 8.75px;
     padding: 10.2px;
@@ -2048,7 +2049,7 @@ body {
 
   .hero {
     min-height: 420px;
-    padding-top: 111px;
+    padding-top: 135px;
   }
 
   .hero__title-break {
@@ -2134,5 +2135,395 @@ body {
 
   .entry__dodont-card {
     flex: 0 0 auto;
+  }
+}
+
+/* ---------- Katalog (strona z listą wszystkich wpisów) ---------- */
+
+.nav-link[aria-current="page"] {
+  font-weight: 600;
+}
+
+.katalog {
+  width: 100%;
+  padding-top: 160px;
+  display: flex;
+  flex-direction: column;
+}
+
+.katalog__container {
+  width: 100%;
+  max-width: 1400px;
+  margin: 0 auto;
+  padding-left: 40px;
+  padding-right: 40px;
+  box-sizing: border-box;
+}
+
+.katalog__header {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding-bottom: 32px;
+}
+
+.katalog__eyebrow {
+  margin: 0;
+  color: var(--ink-tertiary);
+  font-family: "Geist Mono", monospace;
+  font-size: 12.5px;
+  font-weight: 500;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+}
+
+.katalog__title {
+  margin: 0;
+  color: var(--ink);
+  font-family: "Geist", sans-serif;
+  font-size: 42px;
+  font-weight: 600;
+  line-height: 1.3;
+  letter-spacing: -0.02em;
+}
+
+.katalog__lead {
+  margin: 0;
+  max-width: 640px;
+  color: var(--ink-secondary);
+  font-family: "Geist", sans-serif;
+  font-size: 18px;
+  line-height: 1.6;
+}
+
+.katalog__controls {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  padding-bottom: 32px;
+}
+
+.katalog__search {
+  width: 100%;
+  max-width: none;
+}
+
+.katalog__filters {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 24px;
+}
+
+/* Widoczny tylko na mobile (patrz media query niżej) — na desktopie filtry
+   mieszczą się wygodnie w jednym rzędzie, więc chowanie ich za dodatkowym
+   klikiem tylko dodawałoby tarcie bez korzyści. */
+.katalog__filters-toggle {
+  display: none;
+}
+
+.katalog__filter {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* Panel opcji jest dzieckiem TEGO kontenera (nie całego .katalog__filter),
+   więc jego min-width:100% liczy się względem samego przycisku, a nie
+   przycisku razem z etykietą z lewej. */
+.katalog__filter-control {
+  position: relative;
+  display: flex;
+}
+
+.katalog__filter-label {
+  color: var(--ink);
+  font-family: "Geist", sans-serif;
+  font-size: 14px;
+  white-space: nowrap;
+}
+
+.katalog__filter-select {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: "Geist", sans-serif;
+  font-size: 14px;
+  cursor: pointer;
+  transition: border-color 0.15s ease, background-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.katalog__filter-select:hover {
+  background: var(--bg2);
+  border-color: var(--ink-secondary);
+}
+
+.katalog__filter-select[aria-expanded="true"] {
+  border-color: var(--badge-blue-border);
+  box-shadow: 0 0 0 1px color-mix(in srgb, var(--badge-blue-fg) 35%, transparent);
+}
+
+.katalog__filter-chevron {
+  width: 8px;
+  height: 5px;
+  color: var(--ink-tertiary);
+  flex-shrink: 0;
+  transition: transform 0.15s ease;
+}
+
+.katalog__filter-select[aria-expanded="true"] .katalog__filter-chevron {
+  transform: rotate(180deg);
+}
+
+.katalog__filter-options {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  min-width: 100%;
+  margin: 0;
+  padding: 6px;
+  list-style: none;
+  background: var(--bg);
+  border: 1px solid var(--border-strong);
+  border-radius: 10px;
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.32);
+  z-index: 20;
+  white-space: nowrap;
+}
+
+.katalog__filter-options[hidden] {
+  display: none;
+}
+
+.katalog__filter-option {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 8px 12px;
+  border-radius: 6px;
+  color: var(--ink-secondary);
+  font-family: "Geist", sans-serif;
+  font-size: 14px;
+  cursor: pointer;
+  transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+/* Wzorzec z GitHuba: hover = wyraźne, neutralne tło (border-strong — ten sam
+   token działa w obu motywach, bo zawsze wyraźnie odróżnia się od tła panelu
+   bg2). Selected NIE dostaje tła (żeby nie kolidować wizualnie z hoverem) —
+   zamiast tego pokazuje niebieski checkmark po prawej. */
+.katalog__filter-option:hover {
+  background: var(--border);
+  color: var(--ink);
+}
+
+.katalog__filter-option[aria-selected="true"] {
+  color: var(--ink);
+}
+
+.katalog__filter-option-check {
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
+  color: var(--badge-blue-fg);
+  visibility: hidden;
+}
+
+.katalog__filter-option[aria-selected="true"] .katalog__filter-option-check {
+  visibility: visible;
+}
+
+.katalog__filters-meta {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  margin-left: auto;
+  min-width: 0;
+}
+
+.katalog__result-count {
+  color: var(--ink-tertiary);
+  font-family: "Geist Mono", monospace;
+  font-size: 13px;
+  white-space: nowrap;
+}
+
+.katalog__clear-filters {
+  border: none;
+  background: none;
+  padding: 0;
+  color: var(--ink);
+  font-family: "Geist", sans-serif;
+  font-size: 13.5px;
+  font-weight: 500;
+  cursor: pointer;
+  white-space: nowrap;
+  opacity: 1;
+  transition: opacity 0.15s ease;
+}
+
+.katalog__clear-filters:hover {
+  opacity: 0.7;
+}
+
+.katalog__grid-wrap {
+  padding-bottom: 64px;
+}
+
+.katalog__empty {
+  display: none;
+  padding: 64px 0;
+  color: var(--ink-tertiary);
+  font-family: "Geist", sans-serif;
+  font-size: 15px;
+  text-align: center;
+}
+
+.katalog__empty.is-visible {
+  display: block;
+}
+
+.katalog__pagination {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  padding-bottom: 64px;
+}
+
+.katalog__pagination[hidden] {
+  display: none;
+}
+
+.katalog__page-btn,
+.katalog__page-number {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 14px;
+  border: none;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--ink-secondary);
+  font-family: "Geist", sans-serif;
+  font-size: 14px;
+  cursor: pointer;
+  transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+.katalog__page-btn:hover:not(:disabled) {
+  background: var(--bg2);
+  color: var(--ink);
+}
+
+.katalog__page-btn:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+
+.katalog__page-btn svg {
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
+}
+
+.katalog__page-number:hover {
+  background: var(--bg2);
+  color: var(--ink);
+}
+
+.katalog__page-number[aria-current="true"] {
+  background: var(--surface);
+  color: var(--ink);
+}
+
+:root[data-theme="light"] .katalog__page-number[aria-current="true"] {
+  background: var(--border-strong);
+}
+
+@media (max-width: 760px) {
+  .katalog {
+    padding-top: 111px;
+  }
+
+  .katalog__container {
+    padding-left: 20px;
+    padding-right: 20px;
+  }
+
+  .katalog__title {
+    font-size: 28px;
+  }
+
+  /* Jedna kolumna zamiast 2x2 — przy siatce otwarty dropdown nachodził na
+     sąsiedni filtr w tym samym rzędzie (za mało miejsca na rozwinięcie). */
+  .katalog__filters {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 12px;
+  }
+
+  .katalog__filter {
+    justify-content: space-between;
+  }
+
+  /* Stała szerokość, żeby dropdowny wyrównały się do jednej kolumny mimo
+     różnej długości etykiet ("Dyscyplina" vs "Poziom"). */
+  .katalog__filter-label {
+    flex: 0 0 88px;
+  }
+
+  .katalog__filter-control {
+    flex: 1;
+  }
+
+  .katalog__filter-select {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .katalog__filters-meta {
+    margin-left: 0;
+    justify-content: space-between;
+  }
+
+  .katalog__filters-toggle {
+    display: inline-flex;
+    align-items: center;
+    align-self: flex-end;
+    gap: 8px;
+    padding: 8px 14px;
+    border: 1px solid var(--border-strong);
+    border-radius: 8px;
+    background: var(--bg2);
+    color: var(--ink);
+    font-family: "Geist", sans-serif;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.15s ease, border-color 0.15s ease;
+  }
+
+  .katalog__filters-toggle:hover {
+    background: var(--bg);
+    border-color: var(--ink-secondary);
+  }
+
+  .katalog__filters-toggle-icon {
+    width: 16px;
+    height: 16px;
+    color: var(--ink-secondary);
+    flex-shrink: 0;
+  }
+
+  .katalog__filters.is-collapsed {
+    display: none;
   }
 }
