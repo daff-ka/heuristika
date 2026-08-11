@@ -100,7 +100,13 @@
                     <source src="assets/animation-heuristic-2.mp4" type="video/mp4">
                 </video>
                 <div class="hero__content">
-                    <div class="hero__icon hero__icon--3d js-intro" id="heroIcon3d" aria-hidden="true"></div>
+                    <div class="hero__icon hero__icon--3d js-intro" id="heroIcon3d" aria-hidden="true">
+                        <div class="hero__icon-tooltip" role="tooltip">
+                            Zaskocz mnie – kliknij, żeby <span class="hero__icon-tooltip-highlight">wylosować</span>
+                            hasło z biblioteki
+                            <span class="hero__icon-tooltip-arrow" aria-hidden="true"></span>
+                        </div>
+                    </div>
                     <p class="hero__eyebrow js-intro">OSOBISTA BIBLIOTEKA PROJEKTANTA</p>
                     <h1 class="hero__title js-intro">
                         Terminologia i wzorce <span style="white-space: nowrap;">UI/UX,</span>
@@ -1183,6 +1189,62 @@
             renderer.domElement.addEventListener('mousedown', press);
             renderer.domElement.addEventListener('touchstart', press, { passive: true });
 
+            function navigateToRandomEntry() {
+                const entries = window.__heuristikaEntries || [];
+                if (!entries.length) return;
+                const entry = entries[Math.floor(Math.random() * entries.length)];
+                // Małe opóźnienie, żeby zdążyła się pokazać animacja
+                // "wciśnięcia" zanim strona zmieni się pod użytkownikiem.
+                setTimeout(() => { window.location.href = entry.url; }, 180);
+            }
+
+            // Na myszy (:hover realnie działa) tooltip pokazuje się sam przy
+            // najechaniu, więc klik od razu nawiguje. Na dotyku nie ma
+            // najechania — pierwszy tap tylko odsłania tooltip (żeby było
+            // wiadomo, co się kliknie), dopiero DRUGI tap faktycznie
+            // nawiguje. Tooltip sam się chowa po chwili bezczynności albo
+            // po dotknięciu gdzieś indziej.
+            const canHover = window.matchMedia('(hover: hover) and (pointer: fine)').matches;
+            let tooltipArmed = false;
+            let tooltipHideTimer = null;
+
+            function armMobileTooltip() {
+                tooltipArmed = true;
+                container.classList.add('hero__icon--3d--tapped');
+                clearTimeout(tooltipHideTimer);
+                tooltipHideTimer = setTimeout(disarmMobileTooltip, 2500);
+            }
+
+            function disarmMobileTooltip() {
+                tooltipArmed = false;
+                clearTimeout(tooltipHideTimer);
+                container.classList.remove('hero__icon--3d--tapped');
+            }
+
+            if (!canHover) {
+                document.addEventListener('click', (e) => {
+                    if (!container.contains(e.target)) disarmMobileTooltip();
+                });
+            }
+
+            // Klik/tap na model → losowe hasło z biblioteki (patrz
+            // navigateToRandomEntry). Czyta z window.__heuristikaEntries —
+            // tej samej listy co wyszukiwarka (patrz skrypt niżej, setup
+            // search), więc obie rzeczy zawsze widzą te same, realnie
+            // istniejące wpisy.
+            renderer.domElement.addEventListener('click', () => {
+                if (canHover) {
+                    navigateToRandomEntry();
+                    return;
+                }
+                if (!tooltipArmed) {
+                    armMobileTooltip();
+                    return;
+                }
+                disarmMobileTooltip();
+                navigateToRandomEntry();
+            });
+
             const clock = new THREE.Clock();
             function animate() {
                 requestAnimationFrame(animate);
@@ -1299,6 +1361,10 @@
                     url: 'wpis-etykiety-ikon.html'
                 }
             ];
+            // Udostępnione dla losowania hasła po kliknięciu w model 3D w hero
+            // (patrz initKeycap3D) — jedno źródło prawdy o realnych wpisach,
+            // żeby oba miejsca automatycznie widziały te same pozycje.
+            window.__heuristikaEntries = SEARCH_INDEX;
 
             const input = document.querySelector('.hero__search-text');
             const list = document.getElementById('heroSearchResults');

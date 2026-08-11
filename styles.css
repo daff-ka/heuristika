@@ -343,8 +343,16 @@ body {
   object-fit: contain;
 }
 
+/* z-index jawnie ustawiony (nie tylko position:relative) — GSAP nadaje
+   eyebrow/title/copy (dalej w DOM, .js-intro) inline transform nawet po
+   zakończeniu animacji wejścia, a transform tworzy nowy stacking context;
+   bez własnego z-index tutaj te PÓŹNIEJSZE w DOM elementy malowałyby się NAD
+   ikoną (i jej tooltipem) niezależnie od z-index samego tooltipa, bo ten
+   działałby tylko względem rodzeństwa wewnątrz ikony, nie względem sąsiadów
+   .hero__icon--3d w .hero__content. */
 .hero__icon--3d {
   position: relative;
+  z-index: 1;
   display: block;
 }
 
@@ -358,6 +366,91 @@ body {
   display: block;
   z-index: auto;
   cursor: pointer;
+}
+
+/* Wygląd jest zawsze zdefiniowany (opacity:0 domyślnie, position:absolute
+   trzyma go poza normalnym flow) — dzięki temu nie trzeba osobnej reguły
+   "ukryj na starcie" per urządzenie: i trigger na hover (mysz), i trigger
+   klasowy z JS (dotyk, patrz initKeycap3D) mogą korzystać z tej samej
+   podstawy, każdy tylko przełączając opacity/transform na 1/0. */
+.hero__icon-tooltip {
+  position: absolute;
+  bottom: calc(100% + 20px);
+  left: 50%;
+  width: 260px;
+  padding: 10px;
+  border-radius: 10px;
+  background: var(--bg2);
+  border: 1px solid var(--border-strong);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.22);
+  color: var(--ink);
+  font-family: "Geist", sans-serif;
+  font-size: 16px;
+  line-height: 1.6;
+  text-align: center;
+  opacity: 0;
+  pointer-events: none;
+  transform: translate(-50%, 4px);
+  transition: opacity 0.15s ease, transform 0.15s ease;
+  z-index: 5;
+}
+
+.hero__icon-tooltip-highlight {
+  color: var(--badge-blue-fg);
+  font-weight: 600;
+}
+
+/* "Dziubek" jako obrócony o 45° kwadrat (nie trójkąt z border) — tylko taka
+   technika pozwala mu dostać WŁASNY border pasujący do dymka. Połowa
+   kwadratu chowa się pod dymkiem (z-index:-1 + bottom:-8px, czyli pół
+   wysokości 16px kwadratu), widoczna zostaje tylko dolna, "spiczasta"
+   połówka skierowana w stronę ikony. */
+.hero__icon-tooltip-arrow {
+  position: absolute;
+  bottom: -8px;
+  left: 50%;
+  width: 16px;
+  height: 16px;
+  transform: translateX(-50%) rotate(45deg);
+  background: var(--bg2);
+  border-right: 1px solid var(--border-strong);
+  border-bottom: 1px solid var(--border-strong);
+  z-index: -1;
+}
+
+/* Na mobile ikona siedzi blisko górnego navu (mniejszy padding-top niż na
+   desktopie), więc nad nią nie ma miejsca na dymek — chowałby się pod nav.
+   Tooltip pokazuje się więc PONIŻEJ ikony, ze strzałką odwróconą do góry. */
+@media (max-width: 760px) {
+  .hero__icon-tooltip {
+    bottom: auto;
+    top: calc(100% + 4px);
+    transform: translate(-50%, -4px);
+  }
+
+  .hero__icon-tooltip-arrow {
+    bottom: auto;
+    top: -8px;
+    border-right: none;
+    border-bottom: none;
+    border-left: 1px solid var(--border-strong);
+    border-top: 1px solid var(--border-strong);
+  }
+}
+
+/* Tylko na urządzeniach z realnym hover (mysz) — na dotyku nie ma stanu
+   "najechania", więc tam o widoczności decyduje wyłącznie klasa z JS
+   (.hero__icon--3d--tapped) po pierwszym dotknięciu, nie :hover. */
+@media (hover: hover) {
+  .hero__icon--3d:hover .hero__icon-tooltip {
+    opacity: 1;
+    transform: translate(-50%, 0);
+  }
+}
+
+.hero__icon--3d--tapped .hero__icon-tooltip {
+  opacity: 1;
+  transform: translate(-50%, 0);
 }
 
 .hero__title {
