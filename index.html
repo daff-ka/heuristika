@@ -153,10 +153,7 @@
                 <div class="browse__grid">
                     <div class="browse__card">
                         <div class="browse__icon-wrap">
-                            <img class="browse__icon browse__icon--dark" src="assets/icons/taxonomy-dyscyplina-test.svg"
-                                alt="" aria-hidden="true" />
-                            <img class="browse__icon browse__icon--light"
-                                src="assets/icons/taxonomy-dyscyplina-test-light.svg" alt="" aria-hidden="true" />
+                            <div class="browse__icon-3d" id="taxonomyIcon3d" aria-hidden="true"></div>
                         </div>
                         <div class="browse__body">
                             <div class="browse__top">
@@ -1002,27 +999,54 @@
         })();
     </script>
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js"></script>
-    <script>
-        function initKeycap3D(containerId, textureUrl, bodyColor) {
+    <script type="importmap">
+        {
+            "imports": {
+                "three": "https://cdn.jsdelivr.net/npm/three@0.180.0/build/three.module.js",
+                "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.180.0/examples/jsm/"
+            }
+        }
+    </script>
+    <script type="module">
+        import * as THREE from 'three';
+        import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+        import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
+
+        function initKeycap3D(containerId, textureUrl, bodyColor, options = {}) {
+            const { interactive = true } = options;
             const container = document.getElementById(containerId);
-            if (!container || typeof THREE === 'undefined') return;
+            if (!container) return;
 
             const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
             renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
             renderer.setClearColor(0x000000, 0);
+            // Bez tone mappingu jasne miejsca (odbicie światła w połyskliwym
+            // clearcoat) twardo obcinają się do pełnej bieli przy pierwszym
+            // przekroczeniu 1.0 — stąd front całkowicie biały pod pewnym
+            // kątem, zasłaniający ikonę. ACESFilmic łagodnie kompresuje jasne
+            // partie zamiast je ucinać.
+            renderer.toneMapping = THREE.ACESFilmicToneMapping;
+            renderer.toneMappingExposure = 0.8;
 
             const CAMERA_FOV = 6;
 
-            const SIZE_BOOST = 1.5;
+            const SIZE_BOOST = 1.8;
             const SAFETY_SCALE = 1.3 * SIZE_BOOST;
 
             const scene = new THREE.Scene();
             const camera = new THREE.PerspectiveCamera(CAMERA_FOV * SAFETY_SCALE, 1, 1, 5000);
 
+            // Usunięty własny "softbox" environment (dawał małe, punktowe
+            // kolorowe rozbłyski w ODBICIU — nie to, o co chodziło). Prosty,
+            // neutralny RoomEnvironment tylko do podstawowych,
+            // bezbarwnych odbić/highlightów — cały kolor ma teraz pochodzić
+            // z brył w tle (bgGroup niżej), widocznych PRZEZ transmisję.
+            const pmremGenerator = new THREE.PMREMGenerator(renderer);
+            const envRT = pmremGenerator.fromScene(new RoomEnvironment(), 0.04);
+            scene.environment = envRT.texture;
+
             scene.add(new THREE.AmbientLight(0x1a2050, 0.5));
-            const keyLight = new THREE.DirectionalLight(0xffffff, 1.6);
+            const keyLight = new THREE.DirectionalLight(0xffffff, 0.55);
             keyLight.position.set(150, 300, 200);
             scene.add(keyLight);
             const fillLight = new THREE.DirectionalLight(0x5d7cff, 0.4);
@@ -1037,19 +1061,53 @@
             let modelReady = false;
             let footprint = 200;
 
+            // Frosted glass (nowa referencja — miękkie, matowe, rozmyte
+            // przenikanie koloru, NIE ostry kryształ z tęczą jak poprzednio):
+            // wysoki roughness rozmywa to, co widać przez materiał, w miękkie
+            // plamy koloru zamiast ostrego, wyraźnego obrazu — to właśnie
+            // "frosted" na referencji. Bez fresnel-shadera z tęczą (usunięty,
+            // bo pasował do INNEJ, odrzuconej referencji).
             const bodyMat = new THREE.MeshPhysicalMaterial({
-                color: bodyColor,
-                roughness: 0.28,
-                metalness: 0.03,
-                clearcoat: 1,
-                clearcoatRoughness: 0.1
+                color: 0xffffff,
+                metalness: 0,
+                // Przy roughness 0.18 odblask (keyLight + clearcoat) był tak
+                // ostro skupiony, że jego szczytowa jasność zostawała biała
+                // nawet po ACES tone mappingu i przyciemnianiu świateł —
+                // sam hotspot się nie rozpraszał. Wyższy roughness rozmywa
+                // ten sam odblask na większą powierzchnię, więc szczytowa
+                // jasność w pojedynczym pikselu spada.
+                roughness: 0.4,
+                transmission: 1,
+                thickness: 1.2,
+                ior: 1.45,
+                // Niższy clearcoat/wyższy clearcoatRoughness: ta warstwa jest
+                // bezbarwna, więc jej ostry odblask wcześniej "wybielał"
+                // front pod pewnymi kątami (np. kursor na dole ekranu).
+                clearcoat: 0.25,
+                clearcoatRoughness: 0.5,
+                // Cały niebieski odcień szkła pochodzi TYLKO stąd — bez
+                // żadnych brył w tle. attenuationDistance BLIŻEJ thickness
+                // (1.2 vs 1.1) niż poprzednio, żeby zabarwienie było mocniejsze
+                // i nie "znikało" pod jasnym tłem (blade na białym tle mimo
+                // że OK na czarnym — kontrast z otoczeniem robi różnicę).
+                attenuationColor: new THREE.Color(0x0937ff),
+                attenuationDistance: 1.1,
+                // RoomEnvironment (three.js addon) symuluje jasne studio z
+                // jasnymi ścianami — to ŹRÓDŁO ŚWIATŁA NIEZALEŻNE od moich
+                // scenowych lights (dlatego przyciemnianie keyLight/fillLight
+                // nic nie dawało). envMapIntensity skaluje TYLKO wkład tego
+                // konkretnego źródła.
+                envMapIntensity: 0.18
             });
 
             function addIcon(topY, footprint) {
                 const texture = new THREE.TextureLoader().load(textureUrl);
                 texture.magFilter = THREE.NearestFilter;
                 texture.minFilter = THREE.NearestFilter;
-                const iconMat = new THREE.MeshBasicMaterial({ map: texture, transparent: true, depthWrite: false });
+                // color przyciemnia teksturę (mnoży się z jej pikselami) —
+                // sama tekstura to biały rysunek, MeshBasicMaterial ignoruje
+                // oświetlenie i pokazuje ją w pełnej jasności, stąd "ostro".
+                const iconMat = new THREE.MeshBasicMaterial({ map: texture, color: 0xb8b8b8, transparent: true, depthWrite: false });
                 const iconSize = footprint * 0.45;
 
                 const iconGeo = new THREE.PlaneGeometry(iconSize, iconSize);
@@ -1059,7 +1117,7 @@
                 keyGroup.add(iconMesh);
             }
 
-            const loader = new THREE.GLTFLoader();
+            const loader = new GLTFLoader();
             loader.load('assets/keycap.glb', function (gltf) {
                 const model = gltf.scene;
                 model.traverse(c => { if (c.isMesh) { c.material = bodyMat; } });
@@ -1183,68 +1241,74 @@
                 pressPhase = 'down';
                 pressPhaseStart = performance.now();
             }
-            // Listener na canvasie (nie na małym base-container 87x89), bo canvas
-            // jest wyrenderowany w rzeczywistym, powiększonym (SAFETY_SCALE)
-            // rozmiarze wizualnym modelu — dopiero to daje hit-area pokrywającą
-            // się z tym, co użytkownik faktycznie widzi (łącznie z krawędziami).
-            renderer.domElement.addEventListener('mousedown', press);
-            renderer.domElement.addEventListener('touchstart', press, { passive: true });
+            // Klik/tap → nawigacja do losowego hasła i tooltip "zaskocz mnie"
+            // dotyczą tylko hero (patrz tekst tooltipa w markupie) — w innych
+            // miejscach (np. mniejsza bryła w przeglądzie taksonomii) bryła
+            // jest czysto dekoracyjna, więc to zachowanie jest wyłączone.
+            if (interactive) {
+                // Listener na canvasie (nie na małym base-container 87x89), bo canvas
+                // jest wyrenderowany w rzeczywistym, powiększonym (SAFETY_SCALE)
+                // rozmiarze wizualnym modelu — dopiero to daje hit-area pokrywającą
+                // się z tym, co użytkownik faktycznie widzi (łącznie z krawędziami).
+                renderer.domElement.addEventListener('mousedown', press);
+                renderer.domElement.addEventListener('touchstart', press, { passive: true });
 
-            function navigateToRandomEntry() {
-                const entries = window.__heuristikaEntries || [];
-                if (!entries.length) return;
-                const entry = entries[Math.floor(Math.random() * entries.length)];
-                // Małe opóźnienie, żeby zdążyła się pokazać animacja
-                // "wciśnięcia" zanim strona zmieni się pod użytkownikiem.
-                setTimeout(() => { window.location.href = entry.url; }, 180);
-            }
+                const navigateToRandomEntry = () => {
+                    const entries = window.__heuristikaEntries || [];
+                    if (!entries.length) return;
+                    const entry = entries[Math.floor(Math.random() * entries.length)];
+                    // Małe opóźnienie, żeby zdążyła się pokazać animacja
+                    // "wciśnięcia" zanim strona zmieni się pod użytkownikiem.
+                    setTimeout(() => { window.location.href = entry.url; }, 180);
+                };
 
-            // Na myszy (:hover realnie działa) tooltip pokazuje się sam przy
-            // najechaniu, więc klik od razu nawiguje. Na dotyku nie ma
-            // najechania — pierwszy tap tylko odsłania tooltip (żeby było
-            // wiadomo, co się kliknie), dopiero DRUGI tap faktycznie
-            // nawiguje. Tooltip sam się chowa po chwili bezczynności albo
-            // po dotknięciu gdzieś indziej.
-            const canHover = window.matchMedia('(hover: hover) and (pointer: fine)').matches;
-            let tooltipArmed = false;
-            let tooltipHideTimer = null;
+                // Na myszy (:hover realnie działa) tooltip pokazuje się sam przy
+                // najechaniu, więc klik od razu nawiguje. Na dotyku nie ma
+                // najechania — pierwszy tap tylko odsłania tooltip (żeby było
+                // wiadomo, co się kliknie), dopiero DRUGI tap faktycznie
+                // nawiguje. Tooltip sam się chowa po chwili bezczynności albo
+                // po dotknięciu gdzieś indziej.
+                const canHover = window.matchMedia('(hover: hover) and (pointer: fine)').matches;
+                let tooltipArmed = false;
+                let tooltipHideTimer = null;
 
-            function armMobileTooltip() {
-                tooltipArmed = true;
-                container.classList.add('hero__icon--3d--tapped');
-                clearTimeout(tooltipHideTimer);
-                tooltipHideTimer = setTimeout(disarmMobileTooltip, 5000);
-            }
+                const armMobileTooltip = () => {
+                    tooltipArmed = true;
+                    container.classList.add('hero__icon--3d--tapped');
+                    clearTimeout(tooltipHideTimer);
+                    tooltipHideTimer = setTimeout(disarmMobileTooltip, 5000);
+                };
 
-            function disarmMobileTooltip() {
-                tooltipArmed = false;
-                clearTimeout(tooltipHideTimer);
-                container.classList.remove('hero__icon--3d--tapped');
-            }
+                const disarmMobileTooltip = () => {
+                    tooltipArmed = false;
+                    clearTimeout(tooltipHideTimer);
+                    container.classList.remove('hero__icon--3d--tapped');
+                };
 
-            if (!canHover) {
-                document.addEventListener('click', (e) => {
-                    if (!container.contains(e.target)) disarmMobileTooltip();
+                if (!canHover) {
+                    document.addEventListener('click', (e) => {
+                        if (!container.contains(e.target)) disarmMobileTooltip();
+                    });
+                }
+
+                // Klik/tap na model → losowe hasło z biblioteki (patrz
+                // navigateToRandomEntry). Czyta z window.__heuristikaEntries —
+                // tej samej listy co wyszukiwarka (patrz skrypt niżej, setup
+                // search), więc obie rzeczy zawsze widzą te same, realnie
+                // istniejące wpisy.
+                renderer.domElement.addEventListener('click', () => {
+                    if (canHover) {
+                        navigateToRandomEntry();
+                        return;
+                    }
+                    if (!tooltipArmed) {
+                        armMobileTooltip();
+                        return;
+                    }
+                    disarmMobileTooltip();
+                    navigateToRandomEntry();
                 });
             }
-
-            // Klik/tap na model → losowe hasło z biblioteki (patrz
-            // navigateToRandomEntry). Czyta z window.__heuristikaEntries —
-            // tej samej listy co wyszukiwarka (patrz skrypt niżej, setup
-            // search), więc obie rzeczy zawsze widzą te same, realnie
-            // istniejące wpisy.
-            renderer.domElement.addEventListener('click', () => {
-                if (canHover) {
-                    navigateToRandomEntry();
-                    return;
-                }
-                if (!tooltipArmed) {
-                    armMobileTooltip();
-                    return;
-                }
-                disarmMobileTooltip();
-                navigateToRandomEntry();
-            });
 
             const clock = new THREE.Clock();
             function animate() {
@@ -1281,6 +1345,7 @@
         }
 
         initKeycap3D('heroIcon3d', 'assets/hero-icon-texture.png', '#2247e6');
+        initKeycap3D('taxonomyIcon3d', 'assets/hero-icon-texture.png', '#2247e6', { interactive: false });
     </script>
 
     <script>

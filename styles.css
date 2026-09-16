@@ -360,7 +360,7 @@ body {
   position: absolute;
   top: 50%;
   left: 50%;
-  transform: translate(-50%, calc(-50% - 40px));
+  transform: translate(-50%, calc(-50% - 50px));
   width: auto;
   height: auto;
   display: block;
@@ -757,6 +757,25 @@ body {
   object-fit: contain;
 }
 
+/* Ta sama bryła 3D co w hero (.hero__icon--3d), tylko mniejsza — wizualny
+   rozmiar modelu skaluje się liniowo z boxem kontenera (87x89 w hero). */
+.browse__icon-3d {
+  position: relative;
+  width: 74px;
+  height: 75px;
+  flex-shrink: 0;
+}
+
+.browse__icon-3d canvas {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: auto;
+  height: auto;
+  display: block;
+}
+
 .browse__icon--light {
   display: none;
 }
@@ -883,6 +902,11 @@ body {
   .browse__icon {
     height: auto;
     width: 80px;
+  }
+
+  .browse__icon-3d {
+    width: 68px;
+    height: 69px;
   }
 
   .browse__body {
