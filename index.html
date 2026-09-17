@@ -170,10 +170,7 @@
                     </div>
                     <div class="browse__card">
                         <div class="browse__icon-wrap">
-                            <img class="browse__icon browse__icon--dark" src="assets/icons/taxonomy-typ-test.svg" alt=""
-                                aria-hidden="true" />
-                            <img class="browse__icon browse__icon--light" src="assets/icons/taxonomy-typ-test-light.svg"
-                                alt="" aria-hidden="true" />
+                            <div class="browse__icon-3d" id="taxonomyTypIcon3d" aria-hidden="true"></div>
                         </div>
                         <div class="browse__body">
                             <div class="browse__top">
@@ -190,10 +187,7 @@
                     </div>
                     <div class="browse__card">
                         <div class="browse__icon-wrap">
-                            <img class="browse__icon browse__icon--dark" src="assets/icons/taxonomy-platforma-test.svg"
-                                alt="" aria-hidden="true" />
-                            <img class="browse__icon browse__icon--light"
-                                src="assets/icons/taxonomy-platforma-test-light.svg" alt="" aria-hidden="true" />
+                            <div class="browse__icon-3d" id="taxonomyPlatformaIcon3d" aria-hidden="true"></div>
                         </div>
                         <div class="browse__body">
                             <div class="browse__top">
@@ -210,10 +204,7 @@
                     </div>
                     <div class="browse__card">
                         <div class="browse__icon-wrap">
-                            <img class="browse__icon browse__icon--dark" src="assets/icons/taxonomy-poziom-test.svg"
-                                alt="" aria-hidden="true" />
-                            <img class="browse__icon browse__icon--light"
-                                src="assets/icons/taxonomy-poziom-test-light.svg" alt="" aria-hidden="true" />
+                            <div class="browse__icon-3d" id="taxonomyPoziomIcon3d" aria-hidden="true"></div>
                         </div>
                         <div class="browse__body">
                             <div class="browse__top">
@@ -602,28 +593,16 @@
                     <div class="footer__cta">
                         <div class="footer__cta-graphics" aria-hidden="true">
                             <div class="footer__cta-graphic footer__cta-graphic--1">
-                                <img class="footer__cta-icon footer__cta-icon--dark"
-                                    src="assets/icons/taxonomy-dyscyplina-test.svg" alt="" />
-                                <img class="footer__cta-icon footer__cta-icon--light"
-                                    src="assets/icons/taxonomy-dyscyplina-test-light.svg" alt="" />
+                                <div class="footer__cta-icon-3d" id="footerCtaIcon3d1"></div>
                             </div>
                             <div class="footer__cta-graphic footer__cta-graphic--2">
-                                <img class="footer__cta-icon footer__cta-icon--dark"
-                                    src="assets/icons/taxonomy-typ-test.svg" alt="" />
-                                <img class="footer__cta-icon footer__cta-icon--light"
-                                    src="assets/icons/taxonomy-typ-test-light.svg" alt="" />
+                                <div class="footer__cta-icon-3d" id="footerCtaIcon3d2"></div>
                             </div>
                             <div class="footer__cta-graphic footer__cta-graphic--3">
-                                <img class="footer__cta-icon footer__cta-icon--dark"
-                                    src="assets/icons/footer-cta-green.svg" alt="" />
-                                <img class="footer__cta-icon footer__cta-icon--light"
-                                    src="assets/icons/footer-cta-green-light.svg" alt="" />
+                                <div class="footer__cta-icon-3d" id="footerCtaIcon3d3"></div>
                             </div>
                             <div class="footer__cta-graphic footer__cta-graphic--4">
-                                <img class="footer__cta-icon footer__cta-icon--dark"
-                                    src="assets/icons/footer-cta-heart.svg" alt="" />
-                                <img class="footer__cta-icon footer__cta-icon--light"
-                                    src="assets/icons/footer-cta-heart-light.svg" alt="" />
+                                <div class="footer__cta-icon-3d" id="footerCtaIcon3d4"></div>
                             </div>
                         </div>
                         <div class="footer__cta-content">
@@ -1013,7 +992,16 @@
         import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
 
         function initKeycap3D(containerId, textureUrl, bodyColor, options = {}) {
-            const { interactive = true } = options;
+            const {
+                interactive = true,
+                sizeBoost = 1.8,
+                mobileSizeBoost = sizeBoost,
+                localTilt = false,
+                modelUrl = 'assets/keycap.glb',
+                showIcon = true,
+                materialOverrides = {},
+                modelScale = 1,
+            } = options;
             const container = document.getElementById(containerId);
             if (!container) return;
 
@@ -1030,17 +1018,18 @@
 
             const CAMERA_FOV = 6;
 
-            const SIZE_BOOST = 1.8;
+            // Na mobile rozmiar wraca do sprzed podbicia o 120% — ten sam
+            // breakpoint co CSS (max-width: 760px). Sprawdzane raz przy
+            // starcie (tak samo jak canHover niżej), nie reaktywnie.
+            const isMobileViewport = window.matchMedia('(max-width: 760px)').matches;
+            const SIZE_BOOST = isMobileViewport ? mobileSizeBoost : sizeBoost;
             const SAFETY_SCALE = 1.3 * SIZE_BOOST;
 
             const scene = new THREE.Scene();
             const camera = new THREE.PerspectiveCamera(CAMERA_FOV * SAFETY_SCALE, 1, 1, 5000);
 
-            // Usunięty własny "softbox" environment (dawał małe, punktowe
-            // kolorowe rozbłyski w ODBICIU — nie to, o co chodziło). Prosty,
-            // neutralny RoomEnvironment tylko do podstawowych,
-            // bezbarwnych odbić/highlightów — cały kolor ma teraz pochodzić
-            // z brył w tle (bgGroup niżej), widocznych PRZEZ transmisję.
+            // Neutralny RoomEnvironment (addon three.js) tylko do
+            // podstawowych, bezbarwnych odbić/highlightów.
             const pmremGenerator = new THREE.PMREMGenerator(renderer);
             const envRT = pmremGenerator.fromScene(new RoomEnvironment(), 0.04);
             scene.environment = envRT.texture;
@@ -1090,14 +1079,20 @@
                 // (1.2 vs 1.1) niż poprzednio, żeby zabarwienie było mocniejsze
                 // i nie "znikało" pod jasnym tłem (blade na białym tle mimo
                 // że OK na czarnym — kontrast z otoczeniem robi różnicę).
-                attenuationColor: new THREE.Color(0x0937ff),
+                attenuationColor: new THREE.Color(bodyColor),
                 attenuationDistance: 1.1,
                 // RoomEnvironment (three.js addon) symuluje jasne studio z
                 // jasnymi ścianami — to ŹRÓDŁO ŚWIATŁA NIEZALEŻNE od moich
                 // scenowych lights (dlatego przyciemnianie keyLight/fillLight
                 // nic nie dawało). envMapIntensity skaluje TYLKO wkład tego
                 // konkretnego źródła.
-                envMapIntensity: 0.18
+                envMapIntensity: 0.07,
+                // Kształty inne niż płaski keycap (np. zaokrąglone/wypukłe
+                // bryły) mogą łapać ostry connect ODBLASK na dużo większej
+                // części widocznej powierzchni niż płaski top keycapa —
+                // stąd możliwość nadpisania roughness/clearcoat per model
+                // zamiast zmieniania wspólnych domyślnych wartości.
+                ...materialOverrides,
             });
 
             function addIcon(topY, footprint) {
@@ -1118,9 +1113,39 @@
             }
 
             const loader = new GLTFLoader();
-            loader.load('assets/keycap.glb', function (gltf) {
+            loader.load(modelUrl, function (gltf) {
                 const model = gltf.scene;
                 model.traverse(c => { if (c.isMesh) { c.material = bodyMat; } });
+
+                // Niektóre eksporty (np. zapomniane "Apply Scale" w Blenderze)
+                // zostawiają UKRYTY, zagnieżdżony transform skalujący (np.
+                // 0.01) na node'ie-rodzicu mesha — sam mesh i model.scale
+                // wyglądają na "normalne" (1,1,1), a mimo to realny rozmiar w
+                // świecie jest 100x inny niż sugerują lokalne współrzędne
+                // wierzchołków. thickness/attenuationDistance materiału są
+                // dostrojone dla keycap.glb w konwencji "1 jednostka lokalna =
+                // 1 jednostka świata" — bez takiego zagnieżdżonego
+                // przeskalowania. Jeśli je zignorować, efektywna "grubość
+                // szkła" wychodzi bliska zeru (albo absurdalnie duża przy
+                // odwrotnym błędzie) niezależnie od czegokolwiek innego w
+                // materiale (dokładnie to działo się z platforma-model.glb).
+                // Naprawiamy to u ŹRÓDŁA: mierzymy REALNĄ skumulowaną skalę
+                // świata pierwszego mesha i znosimy ją na korzeniu modelu,
+                // więc dowolny przyszły plik automatycznie normalizuje się do
+                // tej samej konwencji, niezależnie od tego, jak dokładnie
+                // ktoś go wyeksportuje.
+                model.updateWorldMatrix(true, true);
+                let firstMesh = null;
+                model.traverse(c => { if (c.isMesh && !firstMesh) firstMesh = c; });
+                if (firstMesh) {
+                    const worldScale = new THREE.Vector3();
+                    firstMesh.matrixWorld.decompose(new THREE.Vector3(), new THREE.Quaternion(), worldScale);
+                    const avgScale = (worldScale.x + worldScale.y + worldScale.z) / 3;
+                    if (avgScale > 0 && Math.abs(avgScale - 1) > 0.001) {
+                        model.scale.multiplyScalar(1 / avgScale);
+                        model.updateMatrixWorld(true);
+                    }
+                }
 
                 const box = new THREE.Box3().setFromObject(model);
                 const center = box.getCenter(new THREE.Vector3());
@@ -1128,12 +1153,26 @@
                 model.position.sub(center);
                 keyGroup.add(model);
                 footprint = Math.max(size.x, size.z);
-                addIcon(size.y / 2, footprint);
+                if (showIcon) addIcon(size.y / 2, footprint);
 
                 const maxDim = Math.max(size.x, size.y, size.z);
                 const halfFovRad = THREE.MathUtils.degToRad(CAMERA_FOV / 2);
                 const SAFE_MARGIN = 1.2;
-                const dist = (maxDim / 2) / Math.tan(halfFovRad) * SAFE_MARGIN;
+                // Auto-dopasowanie kamery normalizuje POZORNY rozmiar do
+                // maxDim bryły — modele o realnej głębokości bliskiej
+                // szerokości (np. bryła w kształcie krzyża/jacka, w
+                // przeciwieństwie do płaskiego keycapa) wypadają mniejsze na
+                // ekranie niż keycap mimo identycznego auto-fit, bo kamera
+                // cofa się bardziej, żeby zmieścić niewidoczną głębokość.
+                // modelScale to świadome dodatkowe powiększenie PO fit-cie,
+                // per model — celowo przybliżamy KAMERĘ (dzieląc dist), NIE
+                // skalujemy samego mesha: skalowanie mesha psułoby kalibrację
+                // thickness/attenuationDistance (dokładnie ten sam mechanizm,
+                // co bug ze zignorowanym zagnieżdżonym transformem wyżej,
+                // tylko w drugą stronę — za dużo efektywnej "grubości szkła"
+                // zamiast za mało, co przy tym materiale renderuje się jako
+                // niemal całkowita przezroczystość zamiast koloru).
+                const dist = (maxDim / 2) / Math.tan(halfFovRad) * SAFE_MARGIN / modelScale;
                 const elevRad = THREE.MathUtils.degToRad(0);
                 camera.position.set(0, dist * Math.sin(elevRad), dist * Math.cos(elevRad));
                 camera.lookAt(0, 0, 0);
@@ -1161,9 +1200,38 @@
             let mouseX = 0, mouseY = 0;
             let curTiltX = 0, curTiltY = 0;
 
+            // localTilt: zamiast globalnej pozycji kursora względem całego
+            // okna (przez co wszystkie instancje na stronie przechylały się
+            // IDENTYCZNIE, niezależnie od tego gdzie faktycznie jest mysz),
+            // liczymy pozycję względem ŚRODKA TEGO KONTENERA — reaguje tylko
+            // bryła, nad którą/blisko której faktycznie jest kursor, z
+            // płynnym zanikiem do zera poza zasięgiem. Hero zostaje przy
+            // starym, globalnym zachowaniu.
+            //
+            // Dwa różne promienie, bo użycie jednego i tego samego do obu
+            // rzeczy naraz (kierunek ORAZ zanik) matematycznie tłumiło
+            // maksymalny efekt do ~25% MAX_TILT (iloczyn dwóch wyrazów
+            // rosnących w przeciwne strony ma szczyt w połowie promienia, nie
+            // na jego krawędzi) — stąd "ledwo widoczny" efekt. TILT_SENSITIVITY
+            // (mały) daje PEŁNE wychylenie już przy niewielkim przesunięciu od
+            // środka; TILT_FALLOFF_RADIUS (duży) tylko wygasza to do zera,
+            // gdy kursor jest daleko od kafelka.
+            const TILT_SENSITIVITY = 90;
+            const TILT_FALLOFF_RADIUS = 320;
+
             function onPointerMove(e) {
-                mouseX = (e.clientX / window.innerWidth) * 2 - 1;
-                mouseY = (e.clientY / window.innerHeight) * 2 - 1;
+                if (localTilt) {
+                    const rect = container.getBoundingClientRect();
+                    const dx = e.clientX - (rect.left + rect.width / 2);
+                    const dy = e.clientY - (rect.top + rect.height / 2);
+                    const dist = Math.sqrt(dx * dx + dy * dy);
+                    const falloff = Math.max(0, 1 - dist / TILT_FALLOFF_RADIUS);
+                    mouseX = falloff * Math.max(-1, Math.min(1, dx / TILT_SENSITIVITY));
+                    mouseY = falloff * Math.max(-1, Math.min(1, dy / TILT_SENSITIVITY));
+                } else {
+                    mouseX = (e.clientX / window.innerWidth) * 2 - 1;
+                    mouseY = (e.clientY / window.innerHeight) * 2 - 1;
+                }
             }
             window.addEventListener('mousemove', onPointerMove);
             window.addEventListener('mouseleave', () => { mouseX = 0; mouseY = 0; });
@@ -1310,6 +1378,9 @@
                 });
             }
 
+            // Losowy offset fazy — bez tego wszystkie instancje na stronie
+            // (te same stałe 1.1 i amplituda) unosiłyby się idealnie w takt.
+            const idlePhaseOffset = Math.random() * Math.PI * 2;
             const clock = new THREE.Clock();
             function animate() {
                 requestAnimationFrame(animate);
@@ -1333,7 +1404,7 @@
                         if (pt >= 1) { pressPhase = 'idle'; pressAmount = 0; }
                     }
 
-                    const idleFloat = Math.sin(t * 1.1) * 3;
+                    const idleFloat = Math.sin(t * 1.1 + idlePhaseOffset) * 20;
                     const pressDrop = pressAmount * (footprint * 0.37);
                     keyGroup.position.y = idleFloat;
 
@@ -1344,8 +1415,33 @@
             animate();
         }
 
-        initKeycap3D('heroIcon3d', 'assets/hero-icon-texture.png', '#2247e6');
-        initKeycap3D('taxonomyIcon3d', 'assets/hero-icon-texture.png', '#2247e6', { interactive: false });
+        initKeycap3D('heroIcon3d', 'assets/hero-icon-texture.png', '#0937ff', { mobileSizeBoost: 1.5 });
+        initKeycap3D('taxonomyIcon3d', 'assets/taxonomy-dyscyplina-3d-texture.png', '#429efa', { interactive: false, localTilt: true });
+        initKeycap3D('taxonomyTypIcon3d', 'assets/taxonomy-typ-3d-texture.png', '#c60aff', { interactive: false, localTilt: true });
+        initKeycap3D('taxonomyPlatformaIcon3d', 'assets/taxonomy-platforma-3d-texture.png', '#33f2a7', {
+            interactive: false,
+            localTilt: true,
+            modelUrl: 'assets/platforma-model.glb',
+            showIcon: false,
+            modelScale: 1.6,
+        });
+        initKeycap3D('taxonomyPoziomIcon3d', 'assets/taxonomy-poziom-3d-texture.png', '#ffd60a', { interactive: false, localTilt: true });
+
+        // Te same modele/tekstury/kolory co w kafelkach taksonomii wyżej —
+        // podmienia płaskie SVG w tle sekcji "Nowe hasła pojawiają się
+        // regularnie" (pozycja/skala/obrót/opacity nadal sterowane przez
+        // istniejącą animację scrollową GSAP na .footer__cta-graphic, patrz
+        // setupFooterCtaGraphics — bez zmian).
+        initKeycap3D('footerCtaIcon3d1', 'assets/taxonomy-dyscyplina-3d-texture.png', '#429efa', { interactive: false, localTilt: true });
+        initKeycap3D('footerCtaIcon3d2', 'assets/taxonomy-typ-3d-texture.png', '#c60aff', { interactive: false, localTilt: true });
+        initKeycap3D('footerCtaIcon3d3', 'assets/taxonomy-platforma-3d-texture.png', '#33f2a7', {
+            interactive: false,
+            localTilt: true,
+            modelUrl: 'assets/platforma-model.glb',
+            showIcon: false,
+            modelScale: 1.6,
+        });
+        initKeycap3D('footerCtaIcon3d4', 'assets/taxonomy-poziom-3d-texture.png', '#ffd60a', { interactive: false, localTilt: true });
     </script>
 
     <script>

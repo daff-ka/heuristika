@@ -741,6 +741,17 @@ body {
   background: var(--card-hover-bg);
 }
 
+/* W light mode --card-hover-bg (rgba na białym tle) wychodzi JAŚNIEJSZY niż
+   domyślny --surface, więc "podświetlenie" na hover wizualnie odwrotne do
+   oczekiwanego — zamieniamy, który token jest domyślny, a który na hover. */
+:root[data-theme="light"] .browse__card {
+  background: var(--card-hover-bg);
+}
+
+:root[data-theme="light"] .browse__card:hover {
+  background: var(--surface);
+}
+
 .browse__icon-wrap {
   display: flex;
   flex: 1 0 0;
@@ -905,8 +916,8 @@ body {
   }
 
   .browse__icon-3d {
-    width: 68px;
-    height: 69px;
+    width: 54px;
+    height: 55px;
   }
 
   .browse__body {
@@ -1323,6 +1334,27 @@ body {
   width: 100%;
   height: 100%;
   object-fit: contain;
+}
+
+/* Ta sama bryła 3D co w kafelkach taksonomii — kontener wypełnia box
+   .footer__cta-graphic--N (60-70px), canvas jest wewnątrz powiększony
+   (SAFETY_SCALE w initKeycap3D) i wycentrowany, tak jak w .browse__icon-3d
+   i .hero__icon--3d. Skalowanie/pozycję/obrót całości nadal steruje GSAP
+   na RODZICU (.footer__cta-graphic) — bez zmian w tej animacji scrollowej. */
+.footer__cta-icon-3d {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+
+.footer__cta-icon-3d canvas {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: auto;
+  height: auto;
+  display: block;
 }
 
 .footer__cta-icon--light {
@@ -2074,6 +2106,10 @@ body {
   .hero {
     min-height: 420px;
     padding-top: 135px;
+  }
+
+  .hero .hero__icon--3d canvas {
+    transform: translate(-50%, calc(-50% - 40px));
   }
 
   .hero__title-break {
