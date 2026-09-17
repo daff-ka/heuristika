@@ -1001,6 +1001,7 @@
                 showIcon = true,
                 materialOverrides = {},
                 modelScale = 1,
+                modelRotation = null,
             } = options;
             const container = document.getElementById(containerId);
             if (!container) return;
@@ -1117,6 +1118,15 @@
                 const model = gltf.scene;
                 model.traverse(c => { if (c.isMesh) { c.material = bodyMat; } });
 
+                // Niektóre modele są w Blenderze zorientowane inaczej niż
+                // keycap.glb (np. leżą na boku zamiast "kapslem" do góry) —
+                // modelRotation koryguje to PRZED pomiarem bounding boxa,
+                // więc kamera i nakładka z ikoną (niżej) automatycznie
+                // dopasowują się do poprawionej orientacji.
+                if (modelRotation) {
+                    model.rotation.set(modelRotation.x || 0, modelRotation.y || 0, modelRotation.z || 0);
+                }
+
                 // Niektóre eksporty (np. zapomniane "Apply Scale" w Blenderze)
                 // zostawiają UKRYTY, zagnieżdżony transform skalujący (np.
                 // 0.01) na node'ie-rodzicu mesha — sam mesh i model.scale
@@ -1160,22 +1170,23 @@
                 const SAFE_MARGIN = 1.2;
                 // Auto-dopasowanie kamery normalizuje POZORNY rozmiar do
                 // maxDim bryły — modele o realnej głębokości bliskiej
-                // szerokości (np. bryła w kształcie krzyża/jacka, w
-                // przeciwieństwie do płaskiego keycapa) wypadają mniejsze na
-                // ekranie niż keycap mimo identycznego auto-fit, bo kamera
-                // cofa się bardziej, żeby zmieścić niewidoczną głębokość.
-                // modelScale to świadome dodatkowe powiększenie PO fit-cie,
-                // per model — celowo przybliżamy KAMERĘ (dzieląc dist), NIE
-                // skalujemy samego mesha: skalowanie mesha psułoby kalibrację
-                // thickness/attenuationDistance (dokładnie ten sam mechanizm,
-                // co bug ze zignorowanym zagnieżdżonym transformem wyżej,
-                // tylko w drugą stronę — za dużo efektywnej "grubości szkła"
-                // zamiast za mało, co przy tym materiale renderuje się jako
-                // niemal całkowita przezroczystość zamiast koloru).
-                const dist = (maxDim / 2) / Math.tan(halfFovRad) * SAFE_MARGIN / modelScale;
+                // szerokości (np. bryła w kształcie krzyża/jacka albo krążek
+                // torusa, w przeciwieństwie do płaskiego keycapa) wypadają
+                // mniejsze na ekranie niż keycap mimo identycznego auto-fit,
+                // bo kamera cofa się bardziej, żeby zmieścić niewidoczną
+                // głębokość.
+                const dist = (maxDim / 2) / Math.tan(halfFovRad) * SAFE_MARGIN;
                 const elevRad = THREE.MathUtils.degToRad(0);
                 camera.position.set(0, dist * Math.sin(elevRad), dist * Math.cos(elevRad));
                 camera.lookAt(0, 0, 0);
+
+                // modelScale to dodatkowe, czyste powiększenie — węższy FOV
+                // przy tym samym dystansie (nie zmienia proporcji/perspektywy
+                // bryły, tylko jej pozorny rozmiar na ekranie).
+                if (modelScale !== 1) {
+                    camera.fov = camera.fov / modelScale;
+                    camera.updateProjectionMatrix();
+                }
 
                 keyGroup.scale.setScalar(1.3 * SIZE_BOOST);
 
@@ -1415,33 +1426,122 @@
             animate();
         }
 
-        initKeycap3D('heroIcon3d', 'assets/hero-icon-texture.png', '#0937ff', { mobileSizeBoost: 1.5 });
-        initKeycap3D('taxonomyIcon3d', 'assets/taxonomy-dyscyplina-3d-texture.png', '#429efa', { interactive: false, localTilt: true });
-        initKeycap3D('taxonomyTypIcon3d', 'assets/taxonomy-typ-3d-texture.png', '#c60aff', { interactive: false, localTilt: true });
+        initKeycap3D('heroIcon3d', 'assets/hero-icon-texture.png', '#0937ff', {
+            mobileSizeBoost: 1.5,
+            materialOverrides: {
+                color: 0x5675ff,
+                metalness: 1,
+                roughness: 0.35,
+                transmission: 0,
+                clearcoat: 0,
+                envMapIntensity: 2.2,
+            },
+        });
+        initKeycap3D('taxonomyIcon3d', 'assets/taxonomy-dyscyplina-3d-texture.png', '#429efa', {
+            interactive: false,
+            localTilt: true,
+            materialOverrides: {
+                metalness: 1,
+                roughness: 0.06,
+                transmission: 0,
+                clearcoat: 0,
+                envMapIntensity: 3,
+            },
+        });
+        initKeycap3D('taxonomyTypIcon3d', 'assets/taxonomy-typ-3d-texture.png', '#c60aff', {
+            interactive: false,
+            localTilt: true,
+            materialOverrides: {
+                color: 0xc60aff,
+                metalness: 1,
+                roughness: 0.06,
+                transmission: 0,
+                clearcoat: 0,
+                envMapIntensity: 3,
+            },
+        });
         initKeycap3D('taxonomyPlatformaIcon3d', 'assets/taxonomy-platforma-3d-texture.png', '#33f2a7', {
             interactive: false,
             localTilt: true,
             modelUrl: 'assets/platforma-model.glb',
             showIcon: false,
             modelScale: 1.6,
+            materialOverrides: {
+                metalness: 1,
+                roughness: 0.06,
+                transmission: 0,
+                clearcoat: 0,
+                envMapIntensity: 3,
+            },
         });
-        initKeycap3D('taxonomyPoziomIcon3d', 'assets/taxonomy-poziom-3d-texture.png', '#ffd60a', { interactive: false, localTilt: true });
+        initKeycap3D('taxonomyPoziomIcon3d', 'assets/taxonomy-poziom-3d-texture.png', '#ffd60a', {
+            interactive: false,
+            localTilt: true,
+            materialOverrides: {
+                color: 0xb87333,
+                metalness: 1,
+                roughness: 0.4,
+                transmission: 0,
+                clearcoat: 0,
+                envMapIntensity: 2.2,
+            },
+        });
 
         // Te same modele/tekstury/kolory co w kafelkach taksonomii wyżej —
         // podmienia płaskie SVG w tle sekcji "Nowe hasła pojawiają się
         // regularnie" (pozycja/skala/obrót/opacity nadal sterowane przez
         // istniejącą animację scrollową GSAP na .footer__cta-graphic, patrz
         // setupFooterCtaGraphics — bez zmian).
-        initKeycap3D('footerCtaIcon3d1', 'assets/taxonomy-dyscyplina-3d-texture.png', '#429efa', { interactive: false, localTilt: true });
-        initKeycap3D('footerCtaIcon3d2', 'assets/taxonomy-typ-3d-texture.png', '#c60aff', { interactive: false, localTilt: true });
+        initKeycap3D('footerCtaIcon3d1', 'assets/taxonomy-dyscyplina-3d-texture.png', '#429efa', {
+            interactive: false,
+            localTilt: true,
+            materialOverrides: {
+                color: 0x5675ff,
+                metalness: 1,
+                roughness: 0.35,
+                transmission: 0,
+                clearcoat: 0,
+                envMapIntensity: 2.2,
+            },
+        });
+        initKeycap3D('footerCtaIcon3d2', 'assets/taxonomy-typ-3d-texture.png', '#c60aff', {
+            interactive: false,
+            localTilt: true,
+            materialOverrides: {
+                color: 0xc60aff,
+                metalness: 1,
+                roughness: 0.06,
+                transmission: 0,
+                clearcoat: 0,
+                envMapIntensity: 3,
+            },
+        });
         initKeycap3D('footerCtaIcon3d3', 'assets/taxonomy-platforma-3d-texture.png', '#33f2a7', {
             interactive: false,
             localTilt: true,
             modelUrl: 'assets/platforma-model.glb',
             showIcon: false,
             modelScale: 1.6,
+            materialOverrides: {
+                metalness: 1,
+                roughness: 0.06,
+                transmission: 0,
+                clearcoat: 0,
+                envMapIntensity: 3,
+            },
         });
-        initKeycap3D('footerCtaIcon3d4', 'assets/taxonomy-poziom-3d-texture.png', '#ffd60a', { interactive: false, localTilt: true });
+        initKeycap3D('footerCtaIcon3d4', 'assets/taxonomy-poziom-3d-texture.png', '#ffd60a', {
+            interactive: false,
+            localTilt: true,
+            materialOverrides: {
+                color: 0xb87333,
+                metalness: 1,
+                roughness: 0.4,
+                transmission: 0,
+                clearcoat: 0,
+                envMapIntensity: 2.2,
+            },
+        });
     </script>
 
     <script>
