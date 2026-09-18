@@ -1002,6 +1002,7 @@
                 materialOverrides = {},
                 modelScale = 1,
                 modelRotation = null,
+                idleFloatAmplitude = 20,
             } = options;
             const container = document.getElementById(containerId);
             if (!container) return;
@@ -1103,7 +1104,7 @@
                 // color przyciemnia teksturę (mnoży się z jej pikselami) —
                 // sama tekstura to biały rysunek, MeshBasicMaterial ignoruje
                 // oświetlenie i pokazuje ją w pełnej jasności, stąd "ostro".
-                const iconMat = new THREE.MeshBasicMaterial({ map: texture, color: 0xb8b8b8, transparent: true, depthWrite: false });
+                const iconMat = new THREE.MeshBasicMaterial({ map: texture, color: 0xffffff, transparent: true, depthWrite: false });
                 const iconSize = footprint * 0.45;
 
                 const iconGeo = new THREE.PlaneGeometry(iconSize, iconSize);
@@ -1138,7 +1139,7 @@
                 // przeskalowania. Jeśli je zignorować, efektywna "grubość
                 // szkła" wychodzi bliska zeru (albo absurdalnie duża przy
                 // odwrotnym błędzie) niezależnie od czegokolwiek innego w
-                // materiale (dokładnie to działo się z platforma-model.glb).
+                // materiale (dokładnie to działo się z spinner.glb).
                 // Naprawiamy to u ŹRÓDŁA: mierzymy REALNĄ skumulowaną skalę
                 // świata pierwszego mesha i znosimy ją na korzeniu modelu,
                 // więc dowolny przyszły plik automatycznie normalizuje się do
@@ -1415,7 +1416,7 @@
                         if (pt >= 1) { pressPhase = 'idle'; pressAmount = 0; }
                     }
 
-                    const idleFloat = Math.sin(t * 1.1 + idlePhaseOffset) * 20;
+                    const idleFloat = Math.sin(t * 1.1 + idlePhaseOffset) * idleFloatAmplitude;
                     const pressDrop = pressAmount * (footprint * 0.37);
                     keyGroup.position.y = idleFloat;
 
@@ -1437,18 +1438,19 @@
                 envMapIntensity: 2.2,
             },
         });
-        initKeycap3D('taxonomyIcon3d', 'assets/taxonomy-dyscyplina-3d-texture.png', '#429efa', {
+        initKeycap3D('taxonomyIcon3d', 'assets/taxonomy-dyscyplina-tile-icon.png', '#429efa', {
             interactive: false,
             localTilt: true,
             materialOverrides: {
+                color: 0x5675ff,
                 metalness: 1,
-                roughness: 0.06,
+                roughness: 0.35,
                 transmission: 0,
                 clearcoat: 0,
-                envMapIntensity: 3,
+                envMapIntensity: 2.2,
             },
         });
-        initKeycap3D('taxonomyTypIcon3d', 'assets/taxonomy-typ-3d-texture.png', '#c60aff', {
+        initKeycap3D('taxonomyTypIcon3d', 'assets/taxonomy-typ-tile-icon.png', '#c60aff', {
             interactive: false,
             localTilt: true,
             materialOverrides: {
@@ -1463,10 +1465,8 @@
         initKeycap3D('taxonomyPlatformaIcon3d', 'assets/taxonomy-platforma-3d-texture.png', '#33f2a7', {
             interactive: false,
             localTilt: true,
-            modelUrl: 'assets/platforma-model.glb',
-            showIcon: false,
-            modelScale: 1.6,
             materialOverrides: {
+                color: 0x4cd98a,
                 metalness: 1,
                 roughness: 0.06,
                 transmission: 0,
@@ -1474,7 +1474,7 @@
                 envMapIntensity: 3,
             },
         });
-        initKeycap3D('taxonomyPoziomIcon3d', 'assets/taxonomy-poziom-3d-texture.png', '#ffd60a', {
+        initKeycap3D('taxonomyPoziomIcon3d', 'assets/taxonomy-poziom-tile-icon.png', '#ffd60a', {
             interactive: false,
             localTilt: true,
             materialOverrides: {
@@ -1492,9 +1492,10 @@
         // regularnie" (pozycja/skala/obrót/opacity nadal sterowane przez
         // istniejącą animację scrollową GSAP na .footer__cta-graphic, patrz
         // setupFooterCtaGraphics — bez zmian).
-        initKeycap3D('footerCtaIcon3d1', 'assets/taxonomy-dyscyplina-3d-texture.png', '#429efa', {
+        initKeycap3D('footerCtaIcon3d1', 'assets/heart.png', '#429efa', {
             interactive: false,
             localTilt: true,
+            idleFloatAmplitude: 40,
             materialOverrides: {
                 color: 0x5675ff,
                 metalness: 1,
@@ -1507,10 +1508,14 @@
         initKeycap3D('footerCtaIcon3d2', 'assets/taxonomy-typ-3d-texture.png', '#c60aff', {
             interactive: false,
             localTilt: true,
+            modelUrl: 'assets/helix.glb',
+            showIcon: false,
+            idleFloatAmplitude: 40,
+            modelRotation: { x: Math.PI / 2, y: 0, z: 0 },
             materialOverrides: {
-                color: 0xc60aff,
+                color: 0xd4af37,
                 metalness: 1,
-                roughness: 0.06,
+                roughness: 0.2,
                 transmission: 0,
                 clearcoat: 0,
                 envMapIntensity: 3,
@@ -1519,9 +1524,10 @@
         initKeycap3D('footerCtaIcon3d3', 'assets/taxonomy-platforma-3d-texture.png', '#33f2a7', {
             interactive: false,
             localTilt: true,
-            modelUrl: 'assets/platforma-model.glb',
+            modelUrl: 'assets/spinner.glb',
             showIcon: false,
             modelScale: 1.6,
+            idleFloatAmplitude: 40,
             materialOverrides: {
                 metalness: 1,
                 roughness: 0.06,
@@ -1533,6 +1539,7 @@
         initKeycap3D('footerCtaIcon3d4', 'assets/taxonomy-poziom-3d-texture.png', '#ffd60a', {
             interactive: false,
             localTilt: true,
+            idleFloatAmplitude: 40,
             materialOverrides: {
                 color: 0xb87333,
                 metalness: 1,
