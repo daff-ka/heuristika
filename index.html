@@ -1003,6 +1003,11 @@
                 modelScale = 1,
                 modelRotation = null,
                 idleFloatAmplitude = 20,
+                skipAutoScaleNormalize = false,
+                edgeGlow = null,
+                colorRamp = null,
+                colorCycle = null,
+                hoverMaterialSwap = null,
             } = options;
             const container = document.getElementById(containerId);
             if (!container) return;
@@ -1097,6 +1102,57 @@
                 ...materialOverrides,
             });
 
+            // colorRamp: miesza dwa "wykończenia" (kolor + roughness) na
+            // JEDNYM materiale wg tego, jak bardzo normalna powierzchni
+            // wskazuje "do góry" (obiektowa oś Y) — góra klawisza wychodzi
+            // jak niebieska stal, boki jak neutralny chrom, z płynnym
+            // przejściem między nimi. Bez tego trzeba by dzielić model na
+            // dwa materiały/mesh'e — tu wystarczy dopisać kawałek shadera do
+            // istniejącego MeshPhysicalMaterial przez onBeforeCompile.
+            if (colorRamp) {
+                const rampColorTop = new THREE.Color(colorRamp.colorTop ?? 0x5675ff);
+                const rampColorBottom = new THREE.Color(colorRamp.colorBottom ?? 0xffffff);
+                const rampRoughTop = colorRamp.roughnessTop ?? bodyMat.roughness;
+                const rampRoughBottom = colorRamp.roughnessBottom ?? bodyMat.roughness;
+                bodyMat.onBeforeCompile = (shader) => {
+                    shader.uniforms.rampColorTop = { value: rampColorTop };
+                    shader.uniforms.rampColorBottom = { value: rampColorBottom };
+                    shader.uniforms.rampRoughTop = { value: rampRoughTop };
+                    shader.uniforms.rampRoughBottom = { value: rampRoughBottom };
+                    shader.vertexShader = shader.vertexShader
+                        .replace('#include <common>', '#include <common>\nvarying float vRampT;')
+                        .replace('#include <beginnormal_vertex>', '#include <beginnormal_vertex>\nvRampT = clamp(objectNormal.y * 0.5 + 0.5, 0.0, 1.0);');
+                    shader.fragmentShader = shader.fragmentShader
+                        .replace('#include <common>', '#include <common>\nvarying float vRampT;\nuniform vec3 rampColorTop;\nuniform vec3 rampColorBottom;\nuniform float rampRoughTop;\nuniform float rampRoughBottom;')
+                        .replace('#include <color_fragment>', '#include <color_fragment>\ndiffuseColor.rgb *= mix( rampColorBottom, rampColorTop, vRampT );')
+                        .replace('#include <roughnessmap_fragment>', '#include <roughnessmap_fragment>\nroughnessFactor = mix( rampRoughBottom, rampRoughTop, vRampT );');
+                };
+                bodyMat.customProgramCacheKey = () => `ramp-${rampColorTop.getHexString()}-${rampColorBottom.getHexString()}-${rampRoughTop}-${rampRoughBottom}`;
+            }
+
+            // colorCycle: to samo, ale w CZASIE, nie w przestrzeni — co
+            // `period` sekund materiał płynnie oscyluje między dwoma
+            // wykończeniami (np. chrom <-> niebieska stal). To zwykłe
+            // właściwości MeshPhysicalMaterial (color/roughness/
+            // envMapIntensity), więc bez customowego shadera — po prostu
+            // nadpisywane co ramkę w animate() poniżej.
+            const cycleColorA = colorCycle ? new THREE.Color(colorCycle.colorA ?? 0xffffff) : null;
+            const cycleColorB = colorCycle ? new THREE.Color(colorCycle.colorB ?? 0x5675ff) : null;
+            const cycleMixColor = colorCycle ? new THREE.Color() : null;
+
+            // hoverMaterialSwap: domyślnie jedno wykończenie (np. niebieska
+            // stal), po najechaniu kursorem na kontener płynnie (nie
+            // skokowo) przechodzi w drugie (np. chrom) i wraca po zjechaniu.
+            const swapColorDefault = hoverMaterialSwap ? new THREE.Color(hoverMaterialSwap.colorDefault ?? 0x5675ff) : null;
+            const swapColorHover = hoverMaterialSwap ? new THREE.Color(hoverMaterialSwap.colorHover ?? 0xffffff) : null;
+            const swapMixColor = hoverMaterialSwap ? new THREE.Color() : null;
+            let isHovering = false;
+            let hoverSwapT = 0;
+            if (hoverMaterialSwap) {
+                container.addEventListener('mouseenter', () => { isHovering = true; });
+                container.addEventListener('mouseleave', () => { isHovering = false; });
+            }
+
             function addIcon(topY, footprint) {
                 const texture = new THREE.TextureLoader().load(textureUrl);
                 texture.magFilter = THREE.NearestFilter;
@@ -1145,10 +1201,17 @@
                 // więc dowolny przyszły plik automatycznie normalizuje się do
                 // tej samej konwencji, niezależnie od tego, jak dokładnie
                 // ktoś go wyeksportuje.
+                // skipAutoScaleNormalize: dla plików, gdzie transform node'a
+                // (np. scale 200 na meshu) jest CELOWY — np. eksport bez
+                // "Apply Scale" po ręcznym przeskalowaniu w Blenderze do
+                // rozmiaru zgodnego z innymi modelami — a nie zapomnianym
+                // błędem. Bez tego przełącznika normalizacja niżej
+                // bezwarunkowo zniesie tę skalę do 1, przywracając
+                // pierwotny (za mały) rozmiar mesha.
                 model.updateWorldMatrix(true, true);
                 let firstMesh = null;
                 model.traverse(c => { if (c.isMesh && !firstMesh) firstMesh = c; });
-                if (firstMesh) {
+                if (firstMesh && !skipAutoScaleNormalize) {
                     const worldScale = new THREE.Vector3();
                     firstMesh.matrixWorld.decompose(new THREE.Vector3(), new THREE.Quaternion(), worldScale);
                     const avgScale = (worldScale.x + worldScale.y + worldScale.z) / 3;
@@ -1163,6 +1226,61 @@
                 const size = box.getSize(new THREE.Vector3());
                 model.position.sub(center);
                 keyGroup.add(model);
+
+                // edgeGlow: udawany "bevel" bez zmiany geometrii — model ma
+                // tylko kilka płaskich trójkątów bez fazowanych krawędzi;
+                // prawdziwy bevel wymaga nowych wierzchołków (robi się to w
+                // Blenderze). Tutaj dokładamy fresnel-poświatę na krawędziach
+                // widzianych "z boku" (grazing angle) — nakładka tej samej
+                // geometrii, odwrotnej strony, addytywnie, żeby optycznie
+                // podświetlić kanty jak realny bevel łapiący światło.
+                if (edgeGlow) {
+                    const glowColor = new THREE.Color(edgeGlow.color ?? 0xffffff);
+                    const power = edgeGlow.power ?? 2.5;
+                    const intensity = edgeGlow.intensity ?? 0.6;
+                    const meshesForGlow = [];
+                    model.traverse(c => { if (c.isMesh) meshesForGlow.push(c); });
+                    meshesForGlow.forEach(c => {
+                        {
+                            const glowMat = new THREE.ShaderMaterial({
+                                uniforms: {
+                                    glowColor: { value: glowColor },
+                                    power: { value: power },
+                                    intensity: { value: intensity },
+                                },
+                                vertexShader: `
+                                    varying vec3 vNormalW;
+                                    varying vec3 vViewDirW;
+                                    void main() {
+                                        vNormalW = normalize(normalMatrix * normal);
+                                        vec4 mvPosition = modelViewMatrix * vec4(position, 1.0);
+                                        vViewDirW = normalize(-mvPosition.xyz);
+                                        gl_Position = projectionMatrix * mvPosition;
+                                    }
+                                `,
+                                fragmentShader: `
+                                    varying vec3 vNormalW;
+                                    varying vec3 vViewDirW;
+                                    uniform vec3 glowColor;
+                                    uniform float power;
+                                    uniform float intensity;
+                                    void main() {
+                                        float fresnel = pow(1.0 - max(dot(normalize(vNormalW), normalize(vViewDirW)), 0.0), power);
+                                        gl_FragColor = vec4(glowColor * fresnel * intensity, fresnel * intensity);
+                                    }
+                                `,
+                                transparent: true,
+                                depthWrite: false,
+                                blending: THREE.AdditiveBlending,
+                                side: THREE.FrontSide,
+                            });
+                            const glowMesh = new THREE.Mesh(c.geometry, glowMat);
+                            glowMesh.scale.setScalar(1.06);
+                            c.add(glowMesh);
+                        }
+                    });
+                }
+
                 footprint = Math.max(size.x, size.z);
                 if (showIcon) addIcon(size.y / 2, footprint);
 
@@ -1421,6 +1539,30 @@
                     keyGroup.position.y = idleFloat;
 
                     keyGroup.position.z = -pressDrop;
+
+                    if (colorCycle) {
+                        const cyclePhase = (Math.sin(t * (2 * Math.PI / colorCycle.period)) + 1) / 2;
+                        cycleMixColor.copy(cycleColorA).lerp(cycleColorB, cyclePhase);
+                        bodyMat.color.copy(cycleMixColor);
+                        if (colorCycle.roughnessA !== undefined) {
+                            bodyMat.roughness = colorCycle.roughnessA + (colorCycle.roughnessB - colorCycle.roughnessA) * cyclePhase;
+                        }
+                        if (colorCycle.envMapIntensityA !== undefined) {
+                            bodyMat.envMapIntensity = colorCycle.envMapIntensityA + (colorCycle.envMapIntensityB - colorCycle.envMapIntensityA) * cyclePhase;
+                        }
+                    }
+
+                    if (hoverMaterialSwap) {
+                        hoverSwapT += ((isHovering ? 1 : 0) - hoverSwapT) * 0.12;
+                        swapMixColor.copy(swapColorDefault).lerp(swapColorHover, hoverSwapT);
+                        bodyMat.color.copy(swapMixColor);
+                        if (hoverMaterialSwap.roughnessDefault !== undefined) {
+                            bodyMat.roughness = hoverMaterialSwap.roughnessDefault + (hoverMaterialSwap.roughnessHover - hoverMaterialSwap.roughnessDefault) * hoverSwapT;
+                        }
+                        if (hoverMaterialSwap.envMapIntensityDefault !== undefined) {
+                            bodyMat.envMapIntensity = hoverMaterialSwap.envMapIntensityDefault + (hoverMaterialSwap.envMapIntensityHover - hoverMaterialSwap.envMapIntensityDefault) * hoverSwapT;
+                        }
+                    }
                 }
                 renderer.render(scene, camera);
             }
@@ -1430,12 +1572,17 @@
         initKeycap3D('heroIcon3d', 'assets/hero-icon-texture.png', '#0937ff', {
             mobileSizeBoost: 1.5,
             materialOverrides: {
-                color: 0x5675ff,
                 metalness: 1,
-                roughness: 0.35,
                 transmission: 0,
                 clearcoat: 0,
-                envMapIntensity: 2.2,
+            },
+            hoverMaterialSwap: {
+                colorDefault: 0x5675ff,
+                colorHover: 0xffffff,
+                roughnessDefault: 0.35,
+                roughnessHover: 0.06,
+                envMapIntensityDefault: 2.2,
+                envMapIntensityHover: 3,
             },
         });
         initKeycap3D('taxonomyIcon3d', 'assets/taxonomy-dyscyplina-tile-icon.png', '#429efa', {
@@ -1508,6 +1655,9 @@
         initKeycap3D('footerCtaIcon3d2', 'assets/taxonomy-typ-3d-texture.png', '#c60aff', {
             interactive: false,
             localTilt: true,
+            // pyramid.glb wyłączony na razie (nie widać było bevel-glow) —
+            // wraca helix.glb. Konfiguracja pyramid.glb (skipAutoScaleNormalize,
+            // edgeGlow) zostawiona w historii/pamięci, do niej wrócimy.
             modelUrl: 'assets/helix.glb',
             showIcon: false,
             idleFloatAmplitude: 40,
