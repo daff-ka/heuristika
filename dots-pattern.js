@@ -4,7 +4,11 @@
 
     let width, height, dpr;
 
-    const PATTERN_SCALE = window.matchMedia('(max-width: 760px)').matches ? 0.75 : 1;
+    // Płaskie 0.75 na <=760px nie starczało dla wąskich telefonów — względem
+    // 375px viewportu ten sam wzór wychodzi proporcjonalnie znacznie większy
+    // niż na desktopie. Skalujemy więc ciągle względem szerokości okna,
+    // z podłogą 0.55, żeby nie robić komórek/czcionki absurdalnie małych.
+    const PATTERN_SCALE = Math.max(0.55, Math.min(1, window.innerWidth / 1000));
     const CELL_X = 42 * PATTERN_SCALE;
     const CELL_Y = 42 * PATTERN_SCALE;
     const FONT_SIZE = 24 * PATTERN_SCALE;
