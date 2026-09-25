@@ -658,9 +658,182 @@
                 el.addEventListener('click', closeMenu);
             });
 
+            // Klik poza obszarem rozwiniętego menu (na mobile) — zamyka je.
+            // Nasłuch na 'pointerdown', nie 'click', żeby zamknąć menu ZANIM
+            // ewentualny inny element pod spodem obsłuży swój własny klik
+            // (click odpala się dopiero po pointerup, więc np. link pod menu
+            // zdążyłby "przebić się" jeszcze z menu otwartym).
+            document.addEventListener('pointerdown', (e) => {
+                if (nav.classList.contains('is-open') && !nav.contains(e.target)) {
+                    closeMenu();
+                }
+            });
+
             window.addEventListener('resize', () => {
                 if (window.innerWidth > 760) closeMenu();
             });
+        })();
+    </script>
+
+    <script>
+        // Poświata na ramce nav — SVG <rect> z zaokrągleniem (rx), obrysowany
+        // radialGradient zamiast prostego prostokątnego paska nałożonego na
+        // górną krawędź. Stroke leży NA tej samej zaokrąglonej ścieżce co
+        // kontener, więc naturalnie podąża za łukiem w rogach (żadnego
+        // marginesu/maski potrzebnego — to była łatka na zły fundament).
+        // Gradient śledzi kursor w czasie rzeczywistym (lerp przez rAF) od
+        // momentu wjechania nim w .nav, widoczny nad wszystkim pod myszą.
+        (function () {
+            const nav = document.querySelector('.nav');
+            if (!nav) return;
+
+            const svgNS = 'http://www.w3.org/2000/svg';
+            const RADIUS = 12; // musi zgadzać się z border-radius .nav w CSS
+            const STROKE_WIDTH = 1;
+            const GLOW_RADIUS = 160; // promień radialGradientu = "połowa namiotu"
+
+            const svg = document.createElementNS(svgNS, 'svg');
+            svg.setAttribute('class', 'nav-glow-svg');
+            svg.setAttribute('aria-hidden', 'true');
+
+            const defs = document.createElementNS(svgNS, 'defs');
+            const gradId = 'nav-glow-gradient';
+            const gradient = document.createElementNS(svgNS, 'radialGradient');
+            gradient.setAttribute('id', gradId);
+            gradient.setAttribute('gradientUnits', 'userSpaceOnUse');
+            gradient.setAttribute('cy', '0');
+            gradient.setAttribute('r', String(GLOW_RADIUS));
+
+            const stop1 = document.createElementNS(svgNS, 'stop');
+            stop1.setAttribute('offset', '0%');
+            stop1.style.stopColor = 'var(--ink)';
+            const stop2 = document.createElementNS(svgNS, 'stop');
+            stop2.setAttribute('offset', '100%');
+            stop2.style.stopColor = 'var(--ink)';
+            stop2.style.stopOpacity = '0';
+            gradient.append(stop1, stop2);
+            defs.appendChild(gradient);
+
+            // Maska: biała (widoczna) tuż przy górnej krawędzi, gaśnie do
+            // czarnej (niewidoczna) w połowie wysokości .nav (patrz resize()
+            // — y2 liczone jako h/2, nie sztywna stała) — tak jak w
+            // referencji efekt nie "spływa" po bokach pigułki, tylko zostaje
+            // przy górnej krawędzi i płynnie znika wchodząc w boczne krawędzie,
+            // zamiast twardo się urywać.
+            const maskId = 'nav-glow-mask';
+            const maskFadeId = 'nav-glow-mask-fade';
+            const mask = document.createElementNS(svgNS, 'mask');
+            mask.setAttribute('id', maskId);
+            mask.setAttribute('maskUnits', 'userSpaceOnUse');
+            const maskGradient = document.createElementNS(svgNS, 'linearGradient');
+            maskGradient.setAttribute('id', maskFadeId);
+            maskGradient.setAttribute('x1', '0');
+            maskGradient.setAttribute('y1', '0');
+            maskGradient.setAttribute('x2', '0');
+            maskGradient.setAttribute('gradientUnits', 'userSpaceOnUse');
+            const maskStop1 = document.createElementNS(svgNS, 'stop');
+            maskStop1.setAttribute('offset', '0%');
+            maskStop1.style.stopColor = '#fff';
+            const maskStop2 = document.createElementNS(svgNS, 'stop');
+            maskStop2.setAttribute('offset', '100%');
+            maskStop2.style.stopColor = '#000';
+            maskGradient.append(maskStop1, maskStop2);
+            const maskRect = document.createElementNS(svgNS, 'rect');
+            maskRect.setAttribute('x', '0');
+            maskRect.setAttribute('y', '0');
+            maskRect.setAttribute('fill', `url(#${maskFadeId})`);
+            mask.append(maskGradient, maskRect);
+            defs.appendChild(mask);
+
+            // Ścieżka (nie <rect>) celowo OTWARTA na dole — lewy bok w górę,
+            // przez oba górne rogi, przez górną krawędź, w dół prawym bokiem.
+            // Bez dolnej krawędzi i bez dolnych rogów, więc animowana
+            // poświata nigdy tam nie dotrze (naturalny stroke <rect>
+            // obejmowałby cały obwód, w tym dół). Maska dodatkowo gasi ją na
+            // bokach, więc realnie widoczna jest tylko na górnej krawędzi.
+            const path = document.createElementNS(svgNS, 'path');
+            path.setAttribute('fill', 'none');
+            path.setAttribute('stroke', `url(#${gradId})`);
+            path.setAttribute('stroke-width', String(STROKE_WIDTH));
+            path.setAttribute('stroke-linecap', 'round');
+            path.setAttribute('mask', `url(#${maskId})`);
+
+            svg.append(defs, path);
+            nav.appendChild(svg);
+
+            function resize() {
+                const w = nav.clientWidth;
+                const h = nav.clientHeight;
+                svg.setAttribute('viewBox', `0 0 ${w} ${h}`);
+                maskGradient.setAttribute('y2', String(h / 2));
+                maskRect.setAttribute('width', String(w));
+                maskRect.setAttribute('height', String(h));
+                const inset = STROKE_WIDTH / 2;
+                const r = Math.max(0, RADIUS - inset);
+                const d = `M ${inset} ${h - inset}` +
+                    ` L ${inset} ${inset + r}` +
+                    ` A ${r} ${r} 0 0 1 ${inset + r} ${inset}` +
+                    ` L ${w - inset - r} ${inset}` +
+                    ` A ${r} ${r} 0 0 1 ${w - inset} ${inset + r}` +
+                    ` L ${w - inset} ${h - inset}`;
+                path.setAttribute('d', d);
+            }
+            resize();
+            window.addEventListener('resize', resize);
+            // .nav zmienia szerokość płynną transition (is-scrolled) — ResizeObserver
+            // łapie te zmiany klatka po klatce, nie tylko na resize okna.
+            if (typeof ResizeObserver !== 'undefined') {
+                new ResizeObserver(resize).observe(nav);
+            }
+
+            let targetX = 0;
+            let currentX = 0;
+            let active = false;
+
+            nav.addEventListener('mousemove', (e) => {
+                const boundRect = nav.getBoundingClientRect();
+                targetX = Math.min(Math.max(e.clientX - boundRect.left, 0), boundRect.width);
+                if (!active) {
+                    active = true;
+                    currentX = targetX;
+                    nav.classList.add('is-glowing');
+                }
+            });
+
+            nav.addEventListener('mouseleave', () => {
+                active = false;
+                nav.classList.remove('is-glowing');
+            });
+
+            function raf() {
+                currentX += (targetX - currentX) * 0.25;
+                gradient.setAttribute('cx', String(currentX));
+                requestAnimationFrame(raf);
+            }
+            raf();
+        })();
+    </script>
+
+    <script>
+        // Nav startuje SZERSZY (1600px), a po przewinięciu strony w dół
+        // zwęża się do 1320px (klasa .is-scrolled, patrz CSS) — bez
+        // żadnego związku z hoverem, tylko pozycja scrolla. Powrót do
+        // szerokiego następuje przy samej górnej krawędzi strony.
+        // Lenis wygładza scroll przez lerp (nie natywny window.scrollY) —
+        // liczony jest z opóźnieniem względem faktycznego celu scrolla, więc
+        // pod samą górną krawędzią window.scrollY "dojeżdża" do 0 zauważalnie
+        // wolniej niż realny zamiar użytkownika. lenis.targetScroll to cel
+        // scrolla ZANIM się do niego wygładzi, więc reaguje bez tej zwłoki.
+        (function () {
+            const nav = document.querySelector('.nav');
+            if (!nav) return;
+            const THRESHOLD = 2;
+            function sync() {
+                const y = window.lenis ? window.lenis.targetScroll : window.scrollY;
+                nav.classList.toggle('is-scrolled', y > THRESHOLD);
+            }
+            sync();
+            window.addEventListener('scroll', sync, { passive: true });
         })();
     </script>
 
@@ -703,13 +876,22 @@
             const preloader = document.getElementById('preloader');
 
             function revealHeroIntro() {
+                // Bez "y"/"scale" na .hero__icon/.hero__eyebrow/.hero__title/
+                // .hero__copy/.hero__search — te same właściwości na tych
+                // samych elementach kontroluje też heroIconParallaxTween/
+                // heroTextParallaxTween (scroll-linked). Dwa systemy walczące
+                // o tę samą właściwość w tym samym momencie (GSAP nadpisuje
+                // "from" drugiego tweena) dawało widoczny nagły skok —
+                // dokładnie ten sam problem co wcześniej naprawiony dla
+                // .nav.js-intro. Samo opacity nie koliduje z niczym, więc
+                // oba systemy mogą ruszyć od razu, bez sztucznego opóźnienia.
                 gsap.timeline({ defaults: { ease: 'power3.out', duration: 0.8 } })
-                    .fromTo('.nav.js-intro', { opacity: 0, y: -16 }, { opacity: 1, y: 0 })
-                    .fromTo('.hero__icon.js-intro', { opacity: 0, y: 16, scale: 0.85 }, { opacity: 1, y: 0, scale: 1, duration: 0.9 }, '-=0.5')
-                    .fromTo('.hero__eyebrow.js-intro', { opacity: 0, y: 16 }, { opacity: 1, y: 0 }, '-=0.55')
-                    .fromTo('.hero__title.js-intro', { opacity: 0, y: 24 }, { opacity: 1, y: 0 }, '-=0.5')
-                    .fromTo('.hero__copy.js-intro', { opacity: 0, y: 24 }, { opacity: 1, y: 0 }, '-=0.55')
-                    .fromTo('.hero__search.js-intro', { opacity: 0, y: 16 }, { opacity: 1, y: 0 }, '-=0.5');
+                    .fromTo('.nav.js-intro', { opacity: 0 }, { opacity: 1 })
+                    .fromTo('.hero__icon.js-intro', { opacity: 0 }, { opacity: 1, duration: 0.9 }, '-=0.5')
+                    .fromTo('.hero__eyebrow.js-intro', { opacity: 0 }, { opacity: 1 }, '-=0.55')
+                    .fromTo('.hero__title.js-intro', { opacity: 0 }, { opacity: 1 }, '-=0.5')
+                    .fromTo('.hero__copy.js-intro', { opacity: 0 }, { opacity: 1 }, '-=0.55')
+                    .fromTo('.hero__search.js-intro', { opacity: 0 }, { opacity: 1 }, '-=0.5');
             }
 
             if (typeof gsap === 'undefined') {
@@ -783,7 +965,7 @@
                     });
                 });
 
-                const heroStartViewportPct = window.matchMedia('(max-width: 760px)').matches ? 60 : 45;
+                const heroStartViewportPct = window.matchMedia('(max-width: 760px)').matches ? 80 : 70;
 
                 let heroShrinkTween = null;
                 function createHeroShrinkTween() {
@@ -815,6 +997,76 @@
                             }
                         });
                 }
+                // Paralaksa: tekst hero (eyebrow/title/copy/search) dostaje
+                // DODATKOWE przesunięcie w górę, ponad naturalny scroll —
+                // efektywnie scrolluje się szybciej niż reszta strony, więc
+                // bryła 3D (której ten tween NIE dotyczy, porusza się tylko
+                // naturalnym tempem scrolla) wizualnie zostaje w viewporcie
+                // dłużej, a tekst "podjeżdża pod nią". .hero__icon--3d ma
+                // już z CSS position:relative + z-index:1 (stacking context),
+                // więc tekst (bez z-index, statyczny) automatycznie renderuje
+                // się POD nią przy nachodzeniu — bez dodatkowych zmian CSS.
+                let heroTextParallaxTween = null;
+                function createHeroTextParallaxTween() {
+                    if (heroTextParallaxTween) {
+                        if (heroTextParallaxTween.scrollTrigger) heroTextParallaxTween.scrollTrigger.kill();
+                        heroTextParallaxTween.kill();
+                    }
+                    const textEls = document.querySelectorAll(
+                        '.hero__eyebrow, .hero__title, .hero__copy, .hero__search'
+                    );
+                    if (!textEls.length) return;
+                    heroTextParallaxTween = gsap.fromTo(textEls,
+                        { y: 0 },
+                        {
+                            y: -400,
+                            ease: 'none',
+                            scrollTrigger: {
+                                trigger: '.hero__marker',
+                                start: `-35% ${heroStartViewportPct}%`,
+                                end: '90% 20%',
+                                scrub: 0.9,
+                            }
+                        });
+                }
+
+                // Bryła 3D dostaje WŁASNY, PRZECIWNY tween: lekko w DÓŁ (+130px,
+                // czyli pod prąd naturalnemu scrollowi w górę) i powiększenie do
+                // 150% — to jeszcze bardziej wydłuża czas, kiedy zostaje w
+                // viewporcie względem szybciej znikającego tekstu. Cel to
+                // #heroIcon3d (kontener), nie <canvas> w środku — canvas ma
+                // WŁASNY transform (wycentrowanie), więc transformacje się
+                // składają zamiast nadpisywać jedna drugą.
+                let heroIconParallaxTween = null;
+                function createHeroIconParallaxTween() {
+                    if (heroIconParallaxTween) {
+                        if (heroIconParallaxTween.scrollTrigger) heroIconParallaxTween.scrollTrigger.kill();
+                        heroIconParallaxTween.kill();
+                    }
+                    const iconEl = document.getElementById('heroIcon3d');
+                    if (!iconEl) return;
+                    heroIconParallaxTween = gsap.fromTo(iconEl,
+                        { y: 0, scale: 1 },
+                        {
+                            y: 600,
+                            scale: 1.5,
+                            ease: 'none',
+                            // Bez tego canvas renderowałby dalej w rozdzielczości
+                            // liczonej z niepowiększonego kontenera, a sam CSS
+                            // transform:scale() rozciągałby gotowy bitmap —
+                            // stąd rozmycie przy większych wartościach scale.
+                            onUpdate: function () {
+                                iconEl.__setRenderScale?.(gsap.getProperty(iconEl, 'scale'));
+                            },
+                            scrollTrigger: {
+                                trigger: '.hero__marker',
+                                start: `-35% ${heroStartViewportPct}%`,
+                                end: '90% 20%',
+                                scrub: 0.9,
+                            }
+                        });
+                }
+
                 // Hero-shrink tylko na desktopie. Na mobile ta sama scroll-linked
                 // animacja non-stop kolidowała z inputem wyszukiwania (natywny
                 // scroll od klawiatury systemowej ją odpalał) — kilka kolejnych
@@ -822,9 +1074,13 @@
                 // blur/visualViewport, w różnych kombinacjach) za każdym razem
                 // psuło coś gorszego niż naprawiało, więc na mobile jej po
                 // prostu nie ma. Desktop nie ma problemu z klawiaturą systemową,
-                // więc tam działa bez żadnych ograniczeń, tak jak zawsze.
+                // więc tam działa bez żadnych ograniczeń, tak jak zawsze. Ta sama
+                // ostrożność dotyczy paralaksy tekstu (ten sam typ scroll-linked
+                // tweena), więc leci w tym samym warunku.
                 if (!window.matchMedia('(max-width: 760px)').matches) {
                     createHeroShrinkTween();
+                    createHeroTextParallaxTween();
+                    createHeroIconParallaxTween();
                     window.addEventListener('heuristika:themechange', createHeroShrinkTween);
                 }
 
@@ -1052,8 +1308,19 @@
             rimLight.position.set(180, 150, -220);
             scene.add(rimLight);
 
+            // spinGroup OPAKOWUJE keyGroup i dostaje TYLKO obrót od scrolla
+            // (patrz scrollSpin niżej) — jako NAJBARDZIEJ zewnętrzna
+            // transformacja w hierarchii, obrót wokół jej osi Y zawsze
+            // wygląda jak czysty "obrót na talerzu" w przestrzeni widza,
+            // odsłaniający tył bryły, niezależnie od tego jak keyGroup w
+            // środku jest już przechylony (FACE_TILT_X + tilt myszki).
+            // Ustawianie tego bezpośrednio na keyGroup.rotation.y kolidowało
+            // z Euler XYZ (keyGroup ma już rotation.x = FACE_TILT_X), więc
+            // wizualnie kręciło w złej osi zamiast pokazywać tył.
+            const spinGroup = new THREE.Group();
+            scene.add(spinGroup);
             const keyGroup = new THREE.Group();
-            scene.add(keyGroup);
+            spinGroup.add(keyGroup);
             let modelReady = false;
             let footprint = 200;
 
@@ -1312,15 +1579,42 @@
                 modelReady = true;
             });
 
+            // extraRenderScale: gdy kontener jest dodatkowo powiększany przez
+            // CSS transform:scale() z zewnątrz (patrz heroIconParallaxTween),
+            // sam canvas nadal renderuje w rozdzielczości liczonej z
+            // NIEPRZESKalowanego clientWidth/Height — CSS wtedy rozciąga
+            // gotowy bitmap, stąd rozmycie przy większych skalach. Wywołanie
+            // container.__setRenderScale(N) (patrz index.html, hero) każe
+            // canvasowi renderować w N razy większej rozdzielczości (drugi
+            // argument setSize=false, więc jego WŁASNY rozmiar CSS/layout
+            // się nie zmienia — tylko realna liczba pikseli w buforze).
+            let extraRenderScale = 1;
             function resize() {
                 const w = (container.clientWidth || 87) * SAFETY_SCALE;
                 const h = (container.clientHeight || 89) * SAFETY_SCALE;
                 camera.aspect = w / h;
                 camera.updateProjectionMatrix();
-                renderer.setSize(w, h);
+                if (extraRenderScale > 1) {
+                    renderer.setSize(w * extraRenderScale, h * extraRenderScale, false);
+                } else {
+                    renderer.setSize(w, h, true);
+                }
             }
             window.addEventListener('resize', resize);
             resize();
+            // Podczas scrubowanego scrolla to wywołanie leci na KAŻDĄ klatkę
+            // scrolla, a renderer.setSize() za każdym razem realokuje
+            // bufory WebGL — kosztowna operacja. Zaokrąglenie do 0.1 i
+            // pomijanie wywołania, gdy się nie zmieniło, eliminuje zacinanie
+            // ("dziwne skoki") bez zauważalnej różnicy w jakości.
+            let lastAppliedRenderScale = 1;
+            container.__setRenderScale = function (factor) {
+                const rounded = Math.round(Math.max(1, factor) * 10) / 10;
+                if (rounded === lastAppliedRenderScale) return;
+                lastAppliedRenderScale = rounded;
+                extraRenderScale = rounded;
+                resize();
+            };
 
             renderer.render(scene, camera);
             container.appendChild(renderer.domElement);
@@ -1329,6 +1623,31 @@
             const FACE_TILT_X = Math.PI / 2;
             let mouseX = 0, mouseY = 0;
             let curTiltX = 0, curTiltY = 0;
+
+            // Obrót o 180° sterowany scrollem, ustawiany na spinGroup (patrz
+            // wyżej), NIE na keyGroup — patrz animate(): spinGroup.rotation.y
+            // = scrollSpin.y, całkowicie osobno od tiltu myszki.
+            // Ten sam zakres triggera co heroTextParallaxTween/heroIconParallaxTween
+            // (patrz index.html, blok z heroStartViewportPct) — WCZEŚNIEJ ten
+            // obrót miał swój OSOBNY, dużo krótszy zakres (document.body,
+            // +=500px), więc kończył się (180°) daleko przed tym, jak bryła w
+            // ogóle skończyła rosnąć/zjeżdżać w dół — stąd "brak pełnego
+            // obrotu" w dalszej części scrolla, obrót był już dawno na 100%.
+            // Ten sam zakres = obrót postępuje razem z resztą, do samego końca.
+            const scrollSpin = { y: 0 };
+            if (options.scrollSpin && typeof gsap !== 'undefined' && typeof ScrollTrigger !== 'undefined') {
+                const spinStartPct = window.matchMedia('(max-width: 760px)').matches ? 80 : 70;
+                gsap.to(scrollSpin, {
+                    y: Math.PI * 2,
+                    ease: 'none',
+                    scrollTrigger: {
+                        trigger: '.hero__marker',
+                        start: `-35% ${spinStartPct}%`,
+                        end: '90% 20%',
+                        scrub: 0.6,
+                    },
+                });
+            }
 
             // localTilt: zamiast globalnej pozycji kursora względem całego
             // okna (przez co wszystkie instancje na stronie przechylały się
@@ -1522,6 +1841,7 @@
 
                     keyGroup.rotation.x = FACE_TILT_X - curTiltX;
                     keyGroup.rotation.y = curTiltY;
+                    spinGroup.rotation.y = scrollSpin.y;
 
                     const now = performance.now();
                     if (pressPhase === 'down') {
@@ -1571,6 +1891,7 @@
 
         initKeycap3D('heroIcon3d', 'assets/hero-icon-texture.png', '#0937ff', {
             mobileSizeBoost: 1.5,
+            scrollSpin: true,
             materialOverrides: {
                 metalness: 1,
                 transmission: 0,

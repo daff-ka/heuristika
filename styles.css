@@ -53,7 +53,7 @@
   --surface: #eaeaea;
   --bg2: #ececec;
 
-  --glass-bg: #ffffff;
+  --glass-bg: rgba(255, 255, 255, 0.55);
   --glass-hover-bg: #fafafa;
   --glass-border: rgba(0, 0, 0, 0.08);
   --overlay-strong: rgba(255, 255, 255, 0.95);
@@ -146,27 +146,47 @@ body {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 20px 40px;
+  padding: 14px 16px;
   gap: 32px;
-  width: 100%;
   position: fixed;
-  top: 0;
-  left: 0;
+  top: 16px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: calc(100% - 32px);
+  max-width: 1600px;
   z-index: 3;
   background: var(--glass-bg);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  border-bottom: 1px solid var(--glass-border);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid var(--glass-border);
+  border-radius: 12px;
+  overflow: hidden;
   box-shadow: 0 6px 24px rgba(0, 0, 0, 0.14);
+  transition: max-width 0.45s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.3s ease,
+    box-shadow 0.3s ease, background-color 0.25s ease, color 0.25s ease;
 }
 
-.nav-left,
+/* Zwężenie NIE na hover — na SCROLL (patrz JS, klasa .is-scrolled
+   dodawana/zdejmowana wg window.scrollY). Strona startuje z szerszym
+   nav (1600px), po przewinięciu zwęża się do 1320px. Wyśrodkowany
+   (left:50% + translateX się nie zmienia), więc zwęża się symetrycznie
+   bez ruchu/przeskoku pozycji. */
+.nav.is-scrolled {
+  max-width: 1320px;
+}
+
 .nav-right {
   display: flex;
   align-items: center;
 }
 
+/* Wg referencji z Figmy (node 464:1289): linki nawigacji stoją tuż przy
+   logo po LEWEJ, nie wycentrowane na środku paska. .nav-left grupuje
+   brand + nav-links jednym flexem zamiast rozbijać je grid-em na
+   osobne kolumny. */
 .nav-left {
+  display: flex;
+  align-items: center;
   gap: 42px;
 }
 
@@ -219,6 +239,7 @@ body {
 }
 
 .nav-link {
+  position: relative;
   color: var(--ink);
   text-decoration: none;
   font-family: "Geist", "Inter", sans-serif;
@@ -239,6 +260,31 @@ body {
   font-size: 15px;
 }
 
+/* Poświata na ramce .nav jako prawdziwy SVG stroke po zaokrąglonym
+   prostokącie (patrz index.html), nie prosty prostokątny pasek nałożony
+   na górną krawędź. Prosty pasek zawsze miał niedopasowanie geometrii
+   w rogach (łuk border-radius vs prosta krawędź paska — stąd wcześniejsze
+   "notche"/przycięcia bez względu na margines). Stroke wzdłuż tej samej
+   zaokrąglonej ścieżki co kontener naturalnie podąża za łukiem, bez
+   żadnego sztucznego marginesu czy maski. radialGradient śledzi kursor
+   (cx aktualizowany w JS, lerp przez rAF) i sam gaśnie z odległością —
+   przy zbliżaniu się do rogu naturalnie idzie w dół po łuku, zamiast
+   urywać się na prostej krawędzi. */
+.nav-glow-svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.25s ease;
+  z-index: 1;
+}
+
+.nav.is-glowing .nav-glow-svg {
+  opacity: 1;
+}
+
 .nav-right {
   gap: 16px;
 }
@@ -254,6 +300,10 @@ body {
   width: 32px;
   height: 32px;
   padding: 8px;
+}
+
+.nav .icon-button {
+  position: relative;
 }
 
 .theme-toggle {
@@ -277,7 +327,13 @@ body {
   position: relative;
   min-height: 100svh;
   min-height: 100dvh;
-  overflow: hidden;
+  /* overflow:hidden ZDJĘTE — przy skalowaniu (200%) i przesuwaniu bryły 3D
+     w dół (patrz heroIconParallaxTween w index.html) obcinało ją na
+     krawędzi .hero. Gdy wracamy do heroShrinkTween (zaokrąglona,
+     "kurcząca się karta"), trzeba to przemyśleć od nowa — np. przenieść
+     ten clip na osobny wrapper dla samego .hero__video, żeby nie ciął
+     bryły 3D. */
+  overflow: visible;
   display: flex;
 
   flex-direction: column;
@@ -1434,6 +1490,7 @@ body {
 }
 
 .nav-right .footer__subscribe {
+  position: relative;
   padding: 8px 12px;
   font-size: 12.5px;
 
@@ -2055,9 +2112,26 @@ body {
   }
 
   .nav {
+    display: flex;
     flex-wrap: wrap;
+    justify-content: space-between;
     row-gap: 20px;
-    padding: 16px 20px;
+    padding: 14px 18px;
+    top: 12px;
+    left: 12px;
+    right: 12px;
+    transform: none;
+    width: auto;
+    max-width: none;
+    border-radius: 12px;
+  }
+
+  /* Bez zwężania na scroll na mobile — width:auto z left/right insetami
+     i tak rządzi rozmiarem; .is-scrolled ma WYŻSZĄ specyficzność niż
+     samo .nav, więc bez tego nadpisania wygrałby max-width:1320px z
+     bazowej reguły nawet w tym media query. */
+  .nav.is-scrolled {
+    max-width: none;
   }
 
   .nav-left {
@@ -2082,7 +2156,9 @@ body {
   }
 
   .nav.is-open {
-    background: var(--overlay-strong);
+    background: var(--bg);
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
     row-gap: 32px;
   }
 
@@ -2216,7 +2292,7 @@ body {
 
 .katalog__container {
   width: 100%;
-  max-width: 1400px;
+  max-width: 1600px;
   margin: 0 auto;
   padding-left: 40px;
   padding-right: 40px;
