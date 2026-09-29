@@ -1121,83 +1121,6 @@ body {
   transition: background-color 0.2s ease, border-color 0.2s ease;
 }
 
-/* Mini-podgląd sidebara zamiast płaskiej ikony — 1:1 z Figmy (node 355:9379
-   desktop / 359:10125 mobile). Pozycja/rozmiar w px z referencyjnej szerokości
-   karty (426.67px, dokładnie taka jak nasza 3-kolumnowa karta desktopowa),
-   stąd brak potrzeby przeliczania na %. Celowo WYCHODZI poza wysokość boxa
-   (174px) i jest przycinana przez overflow:hidden — to zamierzony efekt
-   "podglądu", nie cała lista widoczna na raz. */
-.featured__card-illustration {
-  position: absolute;
-  /* Wyśrodkowane przez left:50%+transform (nie stały px z Figmy) — nasza karta
-     bywa szersza/węższa niż referencyjna ramka (426.67px desktop / 328px
-     mobile), a stały lewy offset psuł wyśrodkowanie przy innej szerokości. */
-  left: 50%;
-  top: 35.5px;
-  transform: translateX(-50%);
-  width: 340px;
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-  padding: 14px;
-  background: var(--bg);
-  border: 1px solid var(--border);
-  border-radius: 10px;
-  overflow: hidden;
-}
-
-.featured__card-illustration-label {
-  margin: 0;
-  color: var(--ink-tertiary);
-  font-family: "Geist Mono", monospace;
-  font-size: 10px;
-  letter-spacing: 0.5px;
-  white-space: nowrap;
-}
-
-.featured__card-illustration-rows {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-  width: 100%;
-}
-
-.featured__card-illustration-row {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 7px 8px;
-  border-radius: 6px;
-  width: 100%;
-}
-
-.featured__card-illustration-row--active {
-  background: var(--bg2);
-}
-
-.featured__card-illustration-row-icon {
-  flex-shrink: 0;
-  width: 16px;
-  height: 16px;
-  color: var(--ink-secondary);
-}
-
-.featured__card-illustration-row--active .featured__card-illustration-row-icon {
-  color: var(--ink);
-}
-
-.featured__card-illustration-row-text {
-  margin: 0;
-  color: var(--ink-secondary);
-  font-family: "Geist", sans-serif;
-  font-size: 12.5px;
-}
-
-.featured__card-illustration-row--active .featured__card-illustration-row-text {
-  color: var(--ink);
-  font-weight: 600;
-}
-
 .featured__card-icon-img {
   display: block;
   max-height: 96px;
@@ -1297,45 +1220,6 @@ body {
     max-height: none;
     width: 80px;
     height: auto;
-  }
-
-  /* Mniejsza wersja mini-podglądu — 1:1 z node 359:10125 (mobile, ramka
-     328px), ta sama proporcja 0.729 co reszta wymiarów w tym node.
-     top zmniejszony z 29px na 14px: przy tej skali cała ilustracja
-     (label + 5 wierszy) ma ~157px wysokości, a box ma 174px — przy top:29
-     ostatni wiersz ("Settings") wychodził 12px poza box i był ucinany przez
-     overflow:hidden. Na mobile (w odróżnieniu od desktopu) cały mini-podgląd
-     ma być widoczny w całości, bez efektu "podglądu"/przycięcia. */
-  .featured__card-illustration {
-    top: 28px;
-    width: min(248px, calc(100% - 80px));
-    gap: 8.75px;
-    padding: 10.2px;
-    border-radius: 7.3px;
-  }
-
-  .featured__card-illustration-label {
-    font-size: 7.3px;
-    letter-spacing: 0.36px;
-  }
-
-  .featured__card-illustration-rows {
-    gap: 1.5px;
-  }
-
-  .featured__card-illustration-row {
-    gap: 7.3px;
-    padding: 5.1px 5.8px;
-    border-radius: 4.4px;
-  }
-
-  .featured__card-illustration-row-icon {
-    width: 11.7px;
-    height: 11.7px;
-  }
-
-  .featured__card-illustration-row-text {
-    font-size: 9.1px;
   }
 
   .featured__card-content {
@@ -2464,6 +2348,258 @@ body {
 
   .entry__scale {
     grid-template-columns: 1fr;
+  }
+}
+
+/* ---------- Wpis: LCP – filmstrip i rozkład czasu ---------- */
+
+.entry__lcp-strip {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
+  width: 100%;
+}
+
+.entry__lcp-frame {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 0;
+}
+
+.entry__lcp-time,
+.entry__lcp-event {
+  margin: 0;
+  color: var(--ink-tertiary);
+  font-family: "Geist Mono", monospace;
+  font-size: 10px;
+  line-height: 1.4;
+}
+
+.entry__lcp-time {
+  font-size: 10.5px;
+}
+
+.entry__lcp-frame--lcp .entry__lcp-time,
+.entry__lcp-frame--lcp .entry__lcp-event {
+  color: var(--badge-blue-fg);
+}
+
+.entry__lcp-screen {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  height: 100px;
+  padding: 8px;
+  overflow: hidden;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--bg);
+}
+
+.entry__lcp-frame--lcp .entry__lcp-screen {
+  border-color: var(--badge-blue-fg);
+}
+
+.entry__lcp-line {
+  display: block;
+  flex-shrink: 0;
+  width: 100%;
+  height: 4px;
+  border-radius: 2px;
+  background: var(--ink-secondary);
+}
+
+.entry__lcp-line--nav {
+  width: 40%;
+  height: 3px;
+  background: var(--border-strong);
+}
+
+.entry__lcp-line--title {
+  width: 70%;
+  height: 6px;
+  border-radius: 3px;
+  background: var(--ink);
+}
+
+.entry__lcp-media {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  height: 42px;
+  border: 1px solid var(--badge-blue-border);
+  border-radius: 3px;
+  background: var(--badge-blue-bg);
+}
+
+.entry__lcp-media--empty {
+  border: 1px dashed var(--border-strong);
+  background: transparent;
+}
+
+.entry__lcp-media--lcp {
+  outline: 1.5px dashed var(--badge-blue-fg);
+  outline-offset: -1.5px;
+}
+
+.entry__lcp-tag {
+  padding: 2px 5px;
+  border-radius: 3px;
+  background: var(--badge-blue-fg);
+  color: var(--bg);
+  font-family: "Geist Mono", monospace;
+  font-size: 8.5px;
+  font-weight: 500;
+}
+
+/* Oś 0–4,5 s: pozycje markerów i progów liczone w % (--at) z tej skali. */
+.entry__lcp-axis {
+  position: relative;
+  width: 100%;
+  height: 46px;
+  margin-top: 18px;
+}
+
+.entry__lcp-zones {
+  position: absolute;
+  top: 18px;
+  left: 0;
+  right: 0;
+  display: grid;
+  grid-template-columns: 55.56fr 33.33fr 11.11fr;
+  gap: 2px;
+}
+
+.entry__lcp-zone {
+  height: 4px;
+  border-radius: 2px;
+}
+
+.entry__lcp-zone--good { background: var(--badge-green-fg); }
+.entry__lcp-zone--mid { background: var(--badge-amber-fg); }
+.entry__lcp-zone--poor { background: var(--danger-fg); }
+
+.entry__lcp-marker,
+.entry__lcp-tick {
+  position: absolute;
+  left: var(--at);
+  color: var(--ink-tertiary);
+  font-family: "Geist Mono", monospace;
+  font-size: 10px;
+  line-height: 1;
+  transform: translateX(-50%);
+  white-space: nowrap;
+}
+
+.entry__lcp-marker {
+  top: 0;
+}
+
+.entry__lcp-marker::after {
+  content: "";
+  position: absolute;
+  top: 14px;
+  left: 50%;
+  width: 1px;
+  height: 8px;
+  background: currentColor;
+}
+
+.entry__lcp-marker--lcp {
+  color: var(--badge-blue-fg);
+  font-weight: 500;
+}
+
+.entry__lcp-tick {
+  top: 30px;
+}
+
+.entry__lcp-tick--start {
+  transform: none;
+}
+
+.entry__lcp-axis + .entry__fig-caption,
+.entry__lcp-parts + .entry__fig-caption {
+  margin-top: 6px;
+}
+
+.entry__lcp-parts {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  width: 100%;
+  margin-top: 28px;
+  padding: 16px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--bg);
+}
+
+.entry__lcp-bar {
+  display: flex;
+  gap: 2px;
+  height: 10px;
+  overflow: hidden;
+  border-radius: 5px;
+}
+
+.entry__lcp-seg {
+  flex: 0 0 calc(var(--w) - 1.5px);
+  background: var(--seg);
+}
+
+.entry__lcp-seg--ttfb { --seg: var(--badge-blue-fg); }
+.entry__lcp-seg--delay { --seg: var(--badge-violet-fg); }
+.entry__lcp-seg--load { --seg: var(--badge-green-fg); }
+.entry__lcp-seg--render { --seg: var(--badge-amber-fg); }
+
+.entry__lcp-legend {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.entry__lcp-item {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+}
+
+.entry__lcp-item-title {
+  display: flex;
+  gap: 6px;
+  margin: 0;
+  color: var(--ink);
+  font-family: "Geist", sans-serif;
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 1.3;
+}
+
+.entry__lcp-dot {
+  flex-shrink: 0;
+  width: 6px;
+  height: 6px;
+  margin-top: 4px;
+  border-radius: 50%;
+  background: var(--seg);
+}
+
+.entry__lcp-item-text {
+  margin: 0;
+  color: var(--ink-secondary);
+  font-family: "Geist", sans-serif;
+  font-size: 11.5px;
+  line-height: 1.5;
+}
+
+@media (max-width: 760px) {
+  .entry__lcp-strip,
+  .entry__lcp-legend {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
 

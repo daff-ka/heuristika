@@ -1,0 +1,419 @@
+<html lang="pl">
+
+<head>
+    <script>
+        (function () {
+            try {
+                var stored = localStorage.getItem('heuristika-theme');
+                var theme = stored || (window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark');
+                document.documentElement.setAttribute('data-theme', theme);
+            } catch (e) {
+                document.documentElement.setAttribute('data-theme', 'dark');
+            }
+        })();
+    </script>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>LCP: kiedy użytkownik widzi treść – Heuristika</title>
+    <link rel="icon" type="image/svg+xml" href="assets/favicon.svg" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600&family=Geist+Mono:wght@400;500&family=Inter:wght@400;500;600;700&family=BBH+Bartle:wght@400&display=swap"
+        rel="stylesheet" />
+    <link rel="stylesheet" href="styles.css" />
+    <script src="https://t.contentsquare.net/uxa/f290fd08d66fb.js" defer></script>
+</head>
+
+<body>
+    <canvas id="dots"></canvas>
+    <div class="page">
+        <div class="shell">
+            <nav class="nav" aria-label="Top navigation">
+                <div class="nav-left">
+                    <a href="index.html" class="brand" aria-label="Heuristika home">
+                        <svg class="brand-icon" viewBox="0 0 20 17.32" fill="none" aria-hidden="true">
+                            <path d="M10 0L20 17.32H0L10 0Z" fill="currentColor" />
+                        </svg>
+                        <span class="brand-title">Heuristika</span>
+                    </a>
+                    <div class="nav-links" id="navLinks">
+                        <a href="katalog.html" class="nav-link">Katalog</a>
+                        <a href="o-projekcie.html" class="nav-link nav-link--small">O projekcie</a>
+                    </div>
+                </div>
+
+                <div class="nav-right">
+                    <button type="button" class="icon-button theme-toggle" id="themeToggle"
+                        aria-label="Przełącz tryb jasny/ciemny" aria-pressed="false">
+                        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                            <path d="M8 2V4" stroke="currentColor" stroke-width="1.33333" stroke-linecap="round"
+                                stroke-linejoin="round" />
+                            <path d="M8 12V14" stroke="currentColor" stroke-width="1.33333" stroke-linecap="round"
+                                stroke-linejoin="round" />
+                            <path d="M2 8H4" stroke="currentColor" stroke-width="1.33333" stroke-linecap="round"
+                                stroke-linejoin="round" />
+                            <path d="M12 8H14" stroke="currentColor" stroke-width="1.33333" stroke-linecap="round"
+                                stroke-linejoin="round" />
+                            <path d="M3.73333 3.73333L5.2 5.2" stroke="currentColor" stroke-width="1.33333"
+                                stroke-linecap="round" stroke-linejoin="round" />
+                            <path d="M10.8 10.8L12.2667 12.2667" stroke="currentColor" stroke-width="1.33333"
+                                stroke-linecap="round" stroke-linejoin="round" />
+                            <path d="M3.73333 12.2667L5.2 10.8" stroke="currentColor" stroke-width="1.33333"
+                                stroke-linecap="round" stroke-linejoin="round" />
+                            <path d="M10.8 5.2L12.2667 3.73333" stroke="currentColor" stroke-width="1.33333"
+                                stroke-linecap="round" stroke-linejoin="round" />
+                            <circle cx="8" cy="8" r="1.66667" stroke="currentColor" stroke-width="1.33333" />
+                        </svg>
+                    </button>
+                    <button type="button" class="footer__subscribe">
+                        <svg class="footer__subscribe-icon" width="16" height="16" viewBox="0 0 16 16" fill="none"
+                            aria-hidden="true">
+                            <path d="M6.667 4.667V3.334H10.667V4.667L12.667 10.667H4.667L6.667 4.667Z"
+                                stroke="currentColor" stroke-width="1.333" stroke-linecap="round"
+                                stroke-linejoin="round" />
+                            <circle cx="8" cy="11.8" r="0.8" fill="currentColor" />
+                        </svg>
+                        Subskrybuj
+                    </button>
+                </div>
+
+                <button type="button" class="nav-toggle" aria-label="Otwórz menu" aria-expanded="false"
+                    aria-controls="navLinks">
+                    <svg class="nav-toggle-icon" viewBox="0 0 20 16" width="20" height="16" fill="none"
+                        aria-hidden="true">
+                        <path d="M1 1H19" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" />
+                        <path d="M1 8H19" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" />
+                        <path d="M1 15H19" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" />
+                    </svg>
+                </button>
+            </nav>
+            <div class="divider"></div>
+
+            <main class="entry">
+                <article class="entry-card">
+                    <div class="entry__heading-group">
+                        <p class="entry__eyebrow">Largest Contentful Paint</p>
+                        <h1 class="entry__title">LCP: kiedy użytkownik widzi treść</h1>
+                    </div>
+                    <p class="entry__lead">LCP mówi, kiedy użytkownik widzi główną treść strony – zwykle
+                        zdjęcie w hero albo duży nagłówek. To jedna z trzech metryk Core Web Vitals i ta, na
+                        którą projektant ma największy wpływ, zanim ktokolwiek napisze linijkę kodu.</p>
+
+                    <div class="entry__taxonomy">
+                        <span class="about__badge about__badge--blue">
+                            <svg width="6" height="6" viewBox="0 0 6 6" aria-hidden="true">
+                                <circle cx="3" cy="3" r="3" fill="currentColor" />
+                            </svg>
+                            Web Development
+                        </span>
+                        <span class="about__badge about__badge--violet">
+                            <svg width="6" height="6" viewBox="0 0 6 6" aria-hidden="true">
+                                <circle cx="3" cy="3" r="3" fill="currentColor" />
+                            </svg>
+                            Termin
+                        </span>
+                        <span class="about__badge about__badge--green">
+                            <svg width="6" height="6" viewBox="0 0 6 6" aria-hidden="true">
+                                <circle cx="3" cy="3" r="3" fill="currentColor" />
+                            </svg>
+                            Web
+                        </span>
+                        <span class="about__badge about__badge--amber">
+                            <svg width="21" height="5" viewBox="0 0 21 5" aria-hidden="true">
+                                <circle cx="2.5" cy="2.5" r="2.5" fill="currentColor" />
+                                <circle cx="10.5" cy="2.5" r="2.5" fill="currentColor" />
+                                <circle cx="18.5" cy="2.5" r="2.5" fill="var(--badge-amber-border)" />
+                            </svg>
+                            Średni
+                        </span>
+                    </div>
+
+                    <div class="divider"></div>
+
+                    <div class="entry__tldr-wrap">
+                        <div class="entry__tldr-bar"></div>
+                        <div class="entry__tldr-col">
+                            <p class="entry__tldr-label">TL;DR</p>
+                            <p class="entry__tldr-text">LCP (Largest Contentful Paint) to czas od wejścia na stronę
+                                do wyrenderowania największego elementu nad foldem: obrazu, wideo albo bloku tekstu.
+                                Google uznaje za dobry wynik do 2,5 s, a powyżej 4 s za słaby. Liczy się 75. percentyl
+                                prawdziwych wizyt, czyli dane z terenu, a nie wynik z Lighthouse na Twoim MacBooku.
+                                W przeciwieństwie do zdarzenia load LCP odpowiada na pytanie, które zadaje sobie
+                                użytkownik: „czy to już się załadowało?”. Na 73% stron mobilnych elementem LCP jest
+                                obraz, najczęściej zdjęcie w hero. To, co projektujesz nad foldem, przekłada się więc
+                                wprost na wynik.</p>
+                        </div>
+                    </div>
+
+                    <h2 class="entry__heading">Kiedy stosować</h2>
+                    <p class="entry__copy">LCP ma znaczenie wszędzie tam, gdzie ktoś ląduje z zewnątrz: landing
+                        z kampanii, artykuł z Google, karta produktu, listing. Najwięcej da się ugrać jeszcze na
+                        etapie makiety, bo to projektant decyduje, co będzie największym elementem nad foldem.
+                        Duży nagłówek renderuje się szybciej niż zdjęcie na całą szerokość, a zdjęcie szybciej niż
+                        wideo w tle. Uważaj na animacje wejścia: element z <code>opacity: 0</code> nie jest brany
+                        pod uwagę, więc fade-in od zera albo
+                        <a href="wpis-preloader.html" class="entry__inline-link">preloader</a> przesuwają LCP na
+                        moment, w którym treść faktycznie się pokaże. Pamiętaj też, czego LCP nie mierzy:
+                        responsywności na kliknięcia (od tego jest <a href="#" class="entry__inline-link">INP</a>)
+                        i skaczącego layoutu (<a href="#" class="entry__inline-link">CLS</a>).</p>
+
+                    <h2 class="entry__heading">Best practices</h2>
+                    <div class="entry__dodont">
+                        <div class="entry__dodont-card">
+                            <div class="entry__dodont-row">
+                                <svg class="entry__dodont-label--do" width="6" height="6" viewBox="0 0 6 6"
+                                    aria-hidden="true">
+                                    <circle cx="3" cy="3" r="3" fill="currentColor" />
+                                </svg>
+                                <p class="entry__dodont-label entry__dodont-label--do">Rób</p>
+                            </div>
+                            <p class="entry__dodont-text">Obraz z hero wstaw w HTML jako zwykły
+                                <code>&lt;img&gt;</code> z <code>fetchpriority="high"</code>. Przeglądarka znajdzie
+                                go od razu w kodzie strony i pobierze przed resztą zasobów.</p>
+                        </div>
+                        <div class="entry__dodont-card">
+                            <div class="entry__dodont-row">
+                                <svg class="entry__dodont-label--dont" width="6" height="6" viewBox="0 0 6 6"
+                                    aria-hidden="true">
+                                    <circle cx="3" cy="3" r="3" fill="currentColor" />
+                                </svg>
+                                <p class="entry__dodont-label entry__dodont-label--dont">Nie rób</p>
+                            </div>
+                            <p class="entry__dodont-text">Nie dawaj <code>loading="lazy"</code> na obrazy nad foldem.
+                                Lazy loading opóźnia właśnie ten element, który liczy się do LCP, a mimo to robi tak
+                                wciąż 16% stron mobilnych.</p>
+                        </div>
+                    </div>
+                    <div class="entry__dodont">
+                        <div class="entry__dodont-card">
+                            <div class="entry__dodont-row">
+                                <svg class="entry__dodont-label--do" width="6" height="6" viewBox="0 0 6 6"
+                                    aria-hidden="true">
+                                    <circle cx="3" cy="3" r="3" fill="currentColor" />
+                                </svg>
+                                <p class="entry__dodont-label entry__dodont-label--do">Rób</p>
+                            </div>
+                            <p class="entry__dodont-text">Projektuj hero z myślą o wadze: zdjęcie przycięte do
+                                realnego rozmiaru na ekranie, w AVIF lub WebP, albo mocny nagłówek zamiast wideo
+                                w tle.</p>
+                        </div>
+                        <div class="entry__dodont-card">
+                            <div class="entry__dodont-row">
+                                <svg class="entry__dodont-label--dont" width="6" height="6" viewBox="0 0 6 6"
+                                    aria-hidden="true">
+                                    <circle cx="3" cy="3" r="3" fill="currentColor" />
+                                </svg>
+                                <p class="entry__dodont-label entry__dodont-label--dont">Nie rób</p>
+                            </div>
+                            <p class="entry__dodont-text">Nie ładuj zdjęcia z hero wyłącznie przez
+                                <code>background-image</code> w CSS albo JavaScript bez <code>preload</code>.
+                                Przeglądarka odkryje je dopiero po pobraniu stylów czy skryptu, a ten problem ma 35%
+                                stron mobilnych.</p>
+                        </div>
+                    </div>
+
+                    <h2 class="entry__heading">Ilustracja / przykład</h2>
+                    <div class="entry__illustration">
+                        <div class="entry__lcp-strip" aria-hidden="true">
+                            <div class="entry__lcp-frame">
+                                <p class="entry__lcp-time">0,4 s</p>
+                                <div class="entry__lcp-screen">
+                                    <span class="entry__lcp-line entry__lcp-line--nav"></span>
+                                    <span class="entry__lcp-media entry__lcp-media--empty"></span>
+                                </div>
+                                <p class="entry__lcp-event">FCP · pierwsza treść</p>
+                            </div>
+                            <div class="entry__lcp-frame">
+                                <p class="entry__lcp-time">1,2 s</p>
+                                <div class="entry__lcp-screen">
+                                    <span class="entry__lcp-line entry__lcp-line--nav"></span>
+                                    <span class="entry__lcp-media entry__lcp-media--empty"></span>
+                                    <span class="entry__lcp-line entry__lcp-line--title"></span>
+                                    <span class="entry__lcp-line"></span>
+                                </div>
+                                <p class="entry__lcp-event">tekst gotowy</p>
+                            </div>
+                            <div class="entry__lcp-frame entry__lcp-frame--lcp">
+                                <p class="entry__lcp-time">2,1 s</p>
+                                <div class="entry__lcp-screen">
+                                    <span class="entry__lcp-line entry__lcp-line--nav"></span>
+                                    <span class="entry__lcp-media entry__lcp-media--lcp"><span
+                                            class="entry__lcp-tag">LCP</span></span>
+                                    <span class="entry__lcp-line entry__lcp-line--title"></span>
+                                    <span class="entry__lcp-line"></span>
+                                </div>
+                                <p class="entry__lcp-event">LCP · największy element</p>
+                            </div>
+                            <div class="entry__lcp-frame">
+                                <p class="entry__lcp-time">3,8 s</p>
+                                <div class="entry__lcp-screen">
+                                    <span class="entry__lcp-line entry__lcp-line--nav"></span>
+                                    <span class="entry__lcp-media"></span>
+                                    <span class="entry__lcp-line entry__lcp-line--title"></span>
+                                    <span class="entry__lcp-line"></span>
+                                </div>
+                                <p class="entry__lcp-event">load · koniec ładowania</p>
+                            </div>
+                        </div>
+
+                        <div class="entry__lcp-axis" aria-hidden="true">
+                            <div class="entry__lcp-zones">
+                                <span class="entry__lcp-zone entry__lcp-zone--good"></span>
+                                <span class="entry__lcp-zone entry__lcp-zone--mid"></span>
+                                <span class="entry__lcp-zone entry__lcp-zone--poor"></span>
+                            </div>
+                            <span class="entry__lcp-marker" style="--at: 8.89%">FCP</span>
+                            <span class="entry__lcp-marker entry__lcp-marker--lcp" style="--at: 46.67%">LCP</span>
+                            <span class="entry__lcp-marker" style="--at: 84.44%">load</span>
+                            <span class="entry__lcp-tick entry__lcp-tick--start" style="--at: 0%">0 s</span>
+                            <span class="entry__lcp-tick" style="--at: 55.56%">2,5 s</span>
+                            <span class="entry__lcp-tick" style="--at: 88.89%">4 s</span>
+                        </div>
+                        <p class="entry__fig-caption">FIG. 1 – FILMSTRIP ŁADOWANIA: FCP, LCP I LOAD</p>
+                        <p class="entry__illustration-desc">Od 2,1 s do 3,8 s na ekranie nic się już nie zmienia,
+                            bo przeglądarka dociąga tylko zasoby poniżej foldu. Dlatego o tym, czy strona „jest
+                            gotowa”, lepiej mówi LCP niż load. Kolorowy pas pod osią to progi: zielony do 2,5 s,
+                            żółty do 4 s, czerwony powyżej.</p>
+
+                        <div class="entry__lcp-parts">
+                            <div class="entry__lcp-bar" aria-hidden="true">
+                                <span class="entry__lcp-seg entry__lcp-seg--ttfb" style="--w: 40%"></span>
+                                <span class="entry__lcp-seg entry__lcp-seg--delay" style="--w: 10%"></span>
+                                <span class="entry__lcp-seg entry__lcp-seg--load" style="--w: 40%"></span>
+                                <span class="entry__lcp-seg entry__lcp-seg--render" style="--w: 10%"></span>
+                            </div>
+                            <div class="entry__lcp-legend">
+                                <div class="entry__lcp-item">
+                                    <p class="entry__lcp-item-title"><span
+                                            class="entry__lcp-dot entry__lcp-seg--ttfb"></span>TTFB · ~40%</p>
+                                    <p class="entry__lcp-item-text">Czas odpowiedzi serwera: hosting, CDN, cache.</p>
+                                </div>
+                                <div class="entry__lcp-item">
+                                    <p class="entry__lcp-item-title"><span
+                                            class="entry__lcp-dot entry__lcp-seg--delay"></span>Opóźnienie zasobu ·
+                                        &lt;10%</p>
+                                    <p class="entry__lcp-item-text">Ile przeglądarka czeka, zanim w ogóle zacznie pobierać
+                                        obraz: HTML, <code>fetchpriority</code>, <code>preload</code>.</p>
+                                </div>
+                                <div class="entry__lcp-item">
+                                    <p class="entry__lcp-item-title"><span
+                                            class="entry__lcp-dot entry__lcp-seg--load"></span>Pobieranie · ~40%</p>
+                                    <p class="entry__lcp-item-text">Waga pliku: wymiary, format, kompresja.</p>
+                                </div>
+                                <div class="entry__lcp-item">
+                                    <p class="entry__lcp-item-title"><span
+                                            class="entry__lcp-dot entry__lcp-seg--render"></span>Opóźnienie renderu
+                                        · &lt;10%</p>
+                                    <p class="entry__lcp-item-text">Blokujący CSS i JS, animacje wejścia, renderowanie po
+                                        stronie klienta.</p>
+                                </div>
+                            </div>
+                        </div>
+                        <p class="entry__fig-caption">FIG. 2 – Z CZEGO SKŁADA SIĘ CZAS LCP</p>
+                        <p class="entry__illustration-desc">Tak według web.dev wygląda budżet dobrze
+                            zoptymalizowanej strony. Dwie środkowe części to zwykle decyzje projektowe: jak obraz
+                            trafia na stronę i ile waży.</p>
+                    </div>
+
+                    <div class="entry__note">
+                        <div class="entry__note-col">
+                            <p class="entry__note-label">NOTATKI</p>
+                            <ul class="entry__note-list">
+                                <li class="entry__note-item">
+                                    <a href="https://web.dev/articles/lcp" target="_blank" rel="noopener noreferrer"
+                                        class="entry__note-link">web.dev – Largest Contentful Paint</a>
+                                    – definicja i progi: do 2,5 s dobrze, powyżej 4 s słabo, liczone na 75.
+                                    percentylu wizyt. Kandydatem na LCP może być <code>&lt;img&gt;</code>, obraz
+                                    w SVG, <code>&lt;video&gt;</code>, tło z <code>url()</code> albo blok tekstu.
+                                    Pomijane są elementy z <code>opacity: 0</code>, tła na cały ekran i placeholdery
+                                    o niskiej zawartości. Starsze miary, takie jak load czy DOMContentLoaded,
+                                    zastąpiono, bo słabo oddawały to, co faktycznie widzi użytkownik.
+                                </li>
+                                <li class="entry__note-item">
+                                    <a href="https://web.dev/articles/optimize-lcp" target="_blank"
+                                        rel="noopener noreferrer" class="entry__note-link">web.dev – Optimize
+                                        LCP</a>
+                                    – rozbija LCP na cztery etapy: TTFB, opóźnienie zasobu, pobieranie i opóźnienie
+                                    renderu, z docelowym podziałem mniej więcej 40 / &lt;10 / 40 / &lt;10%.
+                                    Najważniejsze zalecenia: <code>fetchpriority="high"</code> dla obrazu LCP,
+                                    <code>preload</code> dla zasobów wskazanych dopiero w CSS lub JS, element LCP
+                                    obecny w pierwotnym HTML i nigdy <code>loading="lazy"</code>.
+                                </li>
+                                <li class="entry__note-item">
+                                    <a href="https://almanac.httparchive.org/en/2024/performance" target="_blank"
+                                        rel="noopener noreferrer" class="entry__note-link">HTTP Archive – Web
+                                        Almanac 2024</a>
+                                    – dobre LCP ma 59% stron mobilnych i 74% desktopowych. Na 73% stron mobilnych
+                                    elementem LCP jest obraz: 16% z nich ładuje go leniwie, tylko 15% daje mu
+                                    <code>fetchpriority="high"</code>, a na 35% przeglądarka nie znajdzie go
+                                    w pierwotnym HTML. Najwięcej czasu strony tracą nie na samo pobieranie, tylko na
+                                    czekanie, zanim pobieranie się zacznie.
+                                </li>
+                                <li class="entry__note-item">
+                                    <a href="https://web.dev/case-studies/vodafone" target="_blank"
+                                        rel="noopener noreferrer" class="entry__note-link">web.dev – Vodafone case
+                                        study</a>
+                                    (2021) – test A/B dwóch landingów różniących się wyłącznie optymalizacjami Web
+                                    Vitals. Szybszy o 31% LCP przełożył się na 8% wyższą sprzedaż, 15% lepszy
+                                    lead-to-visit i 11% lepszy cart-to-visit.
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <h2 class="entry__heading">Powiązane hasła</h2>
+                    <div class="entry__related">
+                        <a href="#" class="entry__related-link">Core Web Vitals</a>
+                        <a href="#" class="entry__related-link">First Contentful Paint</a>
+                        <a href="#" class="entry__related-link">INP</a>
+                        <a href="#" class="entry__related-link">CLS</a>
+                        <a href="wpis-preloader.html" class="entry__related-link">Preloader</a>
+                        <a href="#" class="entry__related-link">Perceived performance</a>
+                    </div>
+
+                    <div class="divider"></div>
+
+                    <div class="entry__footer-meta">
+                        <p>Źródła: web.dev, HTTP Archive Web Almanac 2024</p>
+                        <p>Opublikowane · wrz 2026</p>
+                    </div>
+                </article>
+            </main>
+
+            <div class="divider"></div>
+            <footer class="footer__bottom">
+                <p class="footer__copyright">© 2026 Heuristika – Osobista Biblioteka Projektanta</p>
+                <nav class="footer__links">
+                    <a href="katalog.html" class="footer__link">Katalog</a>
+                    <a href="o-projekcie.html" class="footer__link">O projekcie</a>
+                </nav>
+            </footer>
+        </div>
+    </div>
+
+    <script src="dots-pattern.js"></script>
+
+    <script src="nav.js"></script>
+
+    <script>
+        (function () {
+            const btn = document.getElementById('themeToggle');
+            if (!btn) return;
+            const root = document.documentElement;
+
+            function sync() {
+                btn.setAttribute('aria-pressed', String(root.getAttribute('data-theme') === 'light'));
+            }
+            sync();
+
+            btn.addEventListener('click', () => {
+                const next = root.getAttribute('data-theme') === 'light' ? 'dark' : 'light';
+                root.setAttribute('data-theme', next);
+                try { localStorage.setItem('heuristika-theme', next); } catch (e) { }
+                sync();
+            });
+        })();
+    </script>
+</body>
+</html>
