@@ -160,31 +160,8 @@
 
     <script src="dots-pattern.js"></script>
 
-    <script>
-        (function () {
-            const nav = document.querySelector('.nav');
-            const toggle = document.querySelector('.nav-toggle');
-            if (!nav || !toggle) return;
-
-            function closeMenu() {
-                nav.classList.remove('is-open');
-                toggle.setAttribute('aria-expanded', 'false');
-            }
-
-            toggle.addEventListener('click', () => {
-                const isOpen = nav.classList.toggle('is-open');
-                toggle.setAttribute('aria-expanded', String(isOpen));
-            });
-
-            nav.querySelectorAll('.nav-links a, .nav-right button').forEach((el) => {
-                el.addEventListener('click', closeMenu);
-            });
-
-            window.addEventListener('resize', () => {
-                if (window.innerWidth > 760) closeMenu();
-            });
-        })();
-    </script>
+    <script src="nav.js"></script>
+    <script src="card-glow.js"></script>
 
     <script>
         (function () {
@@ -208,51 +185,22 @@
 
     <script>
         (function () {
-            // Te same 6 kart co w sekcji "Ostatnio dodane" na stronie głównej —
-            // jedna realna treść (Etykiety ikon w menu) + 5 placeholderów
-            // (href="#"), 1:1 skopiowane, żeby katalog i homepage się nie rozjeżdżały.
+            // Te same wpisy co w sekcji "Ostatnio dodane" na stronie głównej —
+            // tylko te, które mają własną podstronę, od najnowszego.
             const KATALOG_ENTRIES = [
+                {
+                    title: 'Preloader: pokazywać czy nie?',
+                    desc: 'Pełnoekranowy ekran ładowania – dobra praktyka czy zasłona na wolną stronę?',
+                    tags: { dyscyplina: 'UX Design', typ: 'Wzorzec', platforma: 'Web + Mobile', poziom: 'Średni' },
+                    url: 'wpis-preloader.html',
+                    icon: 'entry-hourglass',
+                },
                 {
                     title: 'Etykiety ikon w menu',
                     desc: 'Czy ikona w nawigacji powinna mieć etykietę tekstową, czy wystarczy sam symbol?',
                     tags: { dyscyplina: 'UI Design', typ: 'Wzorzec', platforma: 'Desktop + Mobile', poziom: 'Łatwy' },
                     url: 'wpis-etykiety-ikon.html',
                     icon: 'illustration',
-                },
-                {
-                    title: 'Card sorting',
-                    desc: 'Grupowanie treści wg mentalnych modeli użytkowników.',
-                    tags: { dyscyplina: 'UX Research', typ: 'Metoda', platforma: 'Web + Mobile', poziom: 'Średni' },
-                    url: '#',
-                    icon: 'entry-5',
-                },
-                {
-                    title: 'Reset vs Confirm',
-                    desc: 'Konkretny przypadek: panel „Skróty klawiszowe” w macOS.',
-                    tags: { dyscyplina: 'UI Design', typ: 'Wzorzec', platforma: 'Desktop + Mobile', poziom: 'Średni' },
-                    url: '#',
-                    icon: 'entry-u',
-                },
-                {
-                    title: 'Delete vs Confirm',
-                    desc: 'Konkretny przypadek: alert „Erase All Content and Settings” w macOS/iOS.',
-                    tags: { dyscyplina: 'UI Design', typ: 'Wzorzec', platforma: 'Desktop + Mobile', poziom: 'Trudny' },
-                    url: '#',
-                    icon: 'entry-heart',
-                },
-                {
-                    title: 'Desirable Friction',
-                    desc: 'Kiedy warto celowo utrudnić interakcję, zamiast ją ułatwiać.',
-                    tags: { dyscyplina: 'UI Design', typ: 'Wzorzec', platforma: 'Desktop + Mobile', poziom: 'Łatwy' },
-                    url: '#',
-                    icon: 'entry-f',
-                },
-                {
-                    title: 'Card sorting',
-                    desc: 'Grupowanie treści wg mentalnych modeli użytkowników.',
-                    tags: { dyscyplina: 'UX Research', typ: 'Metoda', platforma: 'Web + Mobile', poziom: 'Średni' },
-                    url: '#',
-                    icon: 'entry-4',
                 },
             ];
 
@@ -550,7 +498,10 @@
                 const start = (currentPage - 1) * PAGE_SIZE;
                 const pageItems = filtered.slice(start, start + PAGE_SIZE);
 
-                resultCountEl.textContent = filtered.length === 1 ? '1 wynik' : `${filtered.length} wyników`;
+                // Polska odmiana: 1 wynik, 2–4 wyniki (poza 12–14), reszta wyników.
+                const n = filtered.length;
+                const few = n % 10 >= 2 && n % 10 <= 4 && (n % 100 < 12 || n % 100 > 14);
+                resultCountEl.textContent = n === 1 ? '1 wynik' : `${n} ${few ? 'wyniki' : 'wyników'}`;
                 gridEl.innerHTML = pageItems.map(cardHtml).join('');
                 emptyEl.classList.toggle('is-visible', filtered.length === 0);
                 renderPagination(totalPages);

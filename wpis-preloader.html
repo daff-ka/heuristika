@@ -1,0 +1,436 @@
+<html lang="pl">
+
+<head>
+    <script>
+        (function () {
+            try {
+                var stored = localStorage.getItem('heuristika-theme');
+                var theme = stored || (window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark');
+                document.documentElement.setAttribute('data-theme', theme);
+            } catch (e) {
+                document.documentElement.setAttribute('data-theme', 'dark');
+            }
+        })();
+    </script>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Preloader: pokazywać czy nie? – Heuristika</title>
+    <link rel="icon" type="image/svg+xml" href="assets/favicon.svg" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600&family=Geist+Mono:wght@400;500&family=Inter:wght@400;500;600;700&family=BBH+Bartle:wght@400&display=swap"
+        rel="stylesheet" />
+    <link rel="stylesheet" href="styles.css" />
+    <script src="https://t.contentsquare.net/uxa/f290fd08d66fb.js" defer></script>
+</head>
+
+<body>
+    <canvas id="dots"></canvas>
+    <div class="page">
+        <div class="shell">
+            <nav class="nav" aria-label="Top navigation">
+                <div class="nav-left">
+                    <a href="index.html" class="brand" aria-label="Heuristika home">
+                        <svg class="brand-icon" viewBox="0 0 20 17.32" fill="none" aria-hidden="true">
+                            <path d="M10 0L20 17.32H0L10 0Z" fill="currentColor" />
+                        </svg>
+                        <span class="brand-title">Heuristika</span>
+                    </a>
+                    <div class="nav-links" id="navLinks">
+                        <a href="katalog.html" class="nav-link">Katalog</a>
+                        <a href="o-projekcie.html" class="nav-link nav-link--small">O projekcie</a>
+                    </div>
+                </div>
+
+                <div class="nav-right">
+                    <button type="button" class="icon-button theme-toggle" id="themeToggle"
+                        aria-label="Przełącz tryb jasny/ciemny" aria-pressed="false">
+                        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                            <path d="M8 2V4" stroke="currentColor" stroke-width="1.33333" stroke-linecap="round"
+                                stroke-linejoin="round" />
+                            <path d="M8 12V14" stroke="currentColor" stroke-width="1.33333" stroke-linecap="round"
+                                stroke-linejoin="round" />
+                            <path d="M2 8H4" stroke="currentColor" stroke-width="1.33333" stroke-linecap="round"
+                                stroke-linejoin="round" />
+                            <path d="M12 8H14" stroke="currentColor" stroke-width="1.33333" stroke-linecap="round"
+                                stroke-linejoin="round" />
+                            <path d="M3.73333 3.73333L5.2 5.2" stroke="currentColor" stroke-width="1.33333"
+                                stroke-linecap="round" stroke-linejoin="round" />
+                            <path d="M10.8 10.8L12.2667 12.2667" stroke="currentColor" stroke-width="1.33333"
+                                stroke-linecap="round" stroke-linejoin="round" />
+                            <path d="M3.73333 12.2667L5.2 10.8" stroke="currentColor" stroke-width="1.33333"
+                                stroke-linecap="round" stroke-linejoin="round" />
+                            <path d="M10.8 5.2L12.2667 3.73333" stroke="currentColor" stroke-width="1.33333"
+                                stroke-linecap="round" stroke-linejoin="round" />
+                            <circle cx="8" cy="8" r="1.66667" stroke="currentColor" stroke-width="1.33333" />
+                        </svg>
+                    </button>
+                    <button type="button" class="footer__subscribe">
+                        <svg class="footer__subscribe-icon" width="16" height="16" viewBox="0 0 16 16" fill="none"
+                            aria-hidden="true">
+                            <path d="M6.667 4.667V3.334H10.667V4.667L12.667 10.667H4.667L6.667 4.667Z"
+                                stroke="currentColor" stroke-width="1.333" stroke-linecap="round"
+                                stroke-linejoin="round" />
+                            <circle cx="8" cy="11.8" r="0.8" fill="currentColor" />
+                        </svg>
+                        Subskrybuj
+                    </button>
+                </div>
+
+                <button type="button" class="nav-toggle" aria-label="Otwórz menu" aria-expanded="false"
+                    aria-controls="navLinks">
+                    <svg class="nav-toggle-icon" viewBox="0 0 20 16" width="20" height="16" fill="none"
+                        aria-hidden="true">
+                        <path d="M1 1H19" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" />
+                        <path d="M1 8H19" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" />
+                        <path d="M1 15H19" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" />
+                    </svg>
+                </button>
+            </nav>
+            <div class="divider"></div>
+
+            <main class="entry">
+                <article class="entry-card">
+                    <div class="entry__heading-group">
+                        <p class="entry__eyebrow">Preloader: show it or not?</p>
+                        <h1 class="entry__title">Preloader: pokazywać czy nie?</h1>
+                    </div>
+                    <p class="entry__lead">Pełnoekranowy ekran ładowania z logo i spinnerem – dobra praktyka czy
+                        zasłona na wolną stronę? Kiedy wskaźnik ładowania realnie pomaga użytkownikowi, a kiedy sam
+                        staje się kolejnym opóźnieniem?</p>
+
+                    <div class="entry__taxonomy">
+                        <span class="about__badge about__badge--blue">
+                            <svg width="6" height="6" viewBox="0 0 6 6" aria-hidden="true">
+                                <circle cx="3" cy="3" r="3" fill="currentColor" />
+                            </svg>
+                            UX Design
+                        </span>
+                        <span class="about__badge about__badge--violet">
+                            <svg width="6" height="6" viewBox="0 0 6 6" aria-hidden="true">
+                                <circle cx="3" cy="3" r="3" fill="currentColor" />
+                            </svg>
+                            Wzorzec
+                        </span>
+                        <span class="about__badge about__badge--green">
+                            <svg width="6" height="6" viewBox="0 0 6 6" aria-hidden="true">
+                                <circle cx="3" cy="3" r="3" fill="currentColor" />
+                            </svg>
+                            Web + Mobile
+                        </span>
+                        <span class="about__badge about__badge--amber">
+                            <svg width="21" height="5" viewBox="0 0 21 5" aria-hidden="true">
+                                <circle cx="2.5" cy="2.5" r="2.5" fill="currentColor" />
+                                <circle cx="10.5" cy="2.5" r="2.5" fill="currentColor" />
+                                <circle cx="18.5" cy="2.5" r="2.5" fill="var(--badge-amber-border)" />
+                            </svg>
+                            Średni
+                        </span>
+                    </div>
+
+                    <div class="divider"></div>
+
+                    <div class="entry__tldr-wrap">
+                        <div class="entry__tldr-bar"></div>
+                        <div class="entry__tldr-col">
+                            <p class="entry__tldr-label">TL;DR</p>
+                            <p class="entry__tldr-text">Klasyczny preloader, który zasłania całą stronę, dopóki nie
+                                załaduje się wszystko, to na stronach z treścią zwykle antywzorzec. Niczego nie
+                                przyspiesza, a przesuwa moment, w którym użytkownik widzi pierwszą treść. Jeśli
+                                ukrywa ją przez <code>opacity: 0</code>, pogarsza też
+                                <a href="#" class="entry__inline-link">LCP</a>, bo przeglądarka nie liczy
+                                niewidocznych elementów. Dobra praktyka to nie odpowiedź „preloader tak / nie”, tylko
+                                dobór wskaźnika do długości oczekiwania. Poniżej ok. 1 s nie pokazuj nic. Przy 1–10 s
+                                użyj skeletonu, gdy ładuje się cała strona, albo lokalnego spinnera, gdy ładuje się
+                                jeden moduł. Powyżej 10 s pokaż pasek postępu z procentami. Najpierw jednak skróć samo
+                                ładowanie.</p>
+                        </div>
+                    </div>
+
+                    <h2 class="entry__heading">Kiedy stosować</h2>
+                    <p class="entry__copy">Pełnoekranowy ekran ładowania ma sens tylko wtedy, gdy bez wstępnego
+                        załadowania nie da się pokazać niczego użytecznego, a ładowanie realnie trwa kilka lub
+                        kilkanaście sekund: gra w przeglądarce, edytor 3D, konfigurator w WebGL, ciężka aplikacja
+                        typu Figma. Wtedy nie jest ozdobnikiem, tylko
+                        <a href="#" class="entry__inline-link">informacją o stanie systemu</a>: mówi, co się
+                        dzieje i ile jeszcze to potrwa, najlepiej w procentach. Na stronach z treścią, takich jak
+                        landing, blog, sklep czy portfolio, zrezygnuj z niego. Liczy się czas do pierwszej treści,
+                        więc renderuj progresywnie: najpierw układ i tekst, potem obrazy. Jeśli fragment strony
+                        ładuje się dłużej niż ok. 1 s, pokaż skeleton dokładnie tam, gdzie pojawi się treść.
+                        Poniżej tego progu wskaźnik tylko rozprasza. Nielsen wskazuje 1 s jako
+                        <a href="https://www.nngroup.com/articles/response-times-3-important-limits/"
+                            target="_blank" rel="noopener noreferrer" class="entry__inline-link">granicę
+                            płynności myślenia</a>, a interfejs odpowiadający w czasie krótszym niż ok. 400 ms
+                        utrzymuje zaangażowanie
+                        (<a href="#" class="entry__inline-link">Doherty Threshold</a>).</p>
+
+                    <h2 class="entry__heading">Best practices</h2>
+                    <div class="entry__dodont">
+                        <div class="entry__dodont-card">
+                            <div class="entry__dodont-row">
+                                <svg class="entry__dodont-label--do" width="6" height="6" viewBox="0 0 6 6"
+                                    aria-hidden="true">
+                                    <circle cx="3" cy="3" r="3" fill="currentColor" />
+                                </svg>
+                                <p class="entry__dodont-label entry__dodont-label--do">Rób</p>
+                            </div>
+                            <p class="entry__dodont-text">Dobieraj wskaźnik do czasu oczekiwania: poniżej 1 s nic,
+                                przy 1–10 s skeleton (cała strona) lub spinner (pojedynczy moduł), powyżej 10 s
+                                pasek postępu z %.</p>
+                        </div>
+                        <div class="entry__dodont-card">
+                            <div class="entry__dodont-row">
+                                <svg class="entry__dodont-label--dont" width="6" height="6" viewBox="0 0 6 6"
+                                    aria-hidden="true">
+                                    <circle cx="3" cy="3" r="3" fill="currentColor" />
+                                </svg>
+                                <p class="entry__dodont-label entry__dodont-label--dont">Nie rób</p>
+                            </div>
+                            <p class="entry__dodont-text">Nie zasłaniaj całej strony preloaderem czekającym na
+                                <code>window.onload</code>. Użytkownik czeka wtedy na zasoby, których jeszcze nie
+                                potrzebuje: obrazy pod foldem, fonty, skrypty analityczne.</p>
+                        </div>
+                    </div>
+                    <div class="entry__dodont">
+                        <div class="entry__dodont-card">
+                            <div class="entry__dodont-row">
+                                <svg class="entry__dodont-label--do" width="6" height="6" viewBox="0 0 6 6"
+                                    aria-hidden="true">
+                                    <circle cx="3" cy="3" r="3" fill="currentColor" />
+                                </svg>
+                                <p class="entry__dodont-label entry__dodont-label--do">Rób</p>
+                            </div>
+                            <p class="entry__dodont-text">Pokazuj wskaźnik dopiero po ok. 0,5–1 s oczekiwania,
+                                a gdy już się pojawi, nie chowaj go od razu, żeby nie migał na szybkich łączach.
+                                Szanuj <code>prefers-reduced-motion</code>.</p>
+                        </div>
+                        <div class="entry__dodont-card">
+                            <div class="entry__dodont-row">
+                                <svg class="entry__dodont-label--dont" width="6" height="6" viewBox="0 0 6 6"
+                                    aria-hidden="true">
+                                    <circle cx="3" cy="3" r="3" fill="currentColor" />
+                                </svg>
+                                <p class="entry__dodont-label entry__dodont-label--dont">Nie rób</p>
+                            </div>
+                            <p class="entry__dodont-text">Nie wydłużaj sztucznie preloadera „dla efektu” ani nie
+                                dodawaj intro z logo, którego nie da się pominąć. To czyste opóźnienie, a na mobile
+                                ponad połowa wizyt kończy się porzuceniem, gdy ładowanie trwa dłużej niż 3 s.</p>
+                        </div>
+                    </div>
+
+                    <h2 class="entry__heading">Ilustracja / przykład</h2>
+                    <div class="entry__illustration">
+                        <div class="entry__load-grid" aria-hidden="true">
+                            <div class="entry__load-frame">
+                                <p class="entry__mock-label">PRELOADER NA CAŁY EKRAN</p>
+                                <div class="entry__load-screen">
+                                    <div class="entry__load-page entry__load-anim--late">
+                                        <span class="entry__load-line entry__load-line--nav"></span>
+                                        <span class="entry__load-line entry__load-line--title"></span>
+                                        <span class="entry__load-line"></span>
+                                        <span class="entry__load-line entry__load-line--short"></span>
+                                        <span class="entry__load-media"></span>
+                                    </div>
+                                    <div class="entry__load-cover entry__load-anim--cover">
+                                        <svg class="entry__load-logo" viewBox="0 0 20 17.32" aria-hidden="true">
+                                            <path d="M10 0L20 17.32H0L10 0Z" fill="currentColor" />
+                                        </svg>
+                                        <span class="entry__load-spinner"></span>
+                                    </div>
+                                </div>
+                                <div class="entry__load-track"><span class="entry__load-track-fill"></span></div>
+                                <p class="entry__load-meta">treść: 3,6 s</p>
+                            </div>
+
+                            <div class="entry__load-frame">
+                                <p class="entry__mock-label">SKELETON SCREEN</p>
+                                <div class="entry__load-screen">
+                                    <div class="entry__load-page entry__load-anim--late">
+                                        <span class="entry__load-line entry__load-line--nav"></span>
+                                        <span class="entry__load-line entry__load-line--title"></span>
+                                        <span class="entry__load-line"></span>
+                                        <span class="entry__load-line entry__load-line--short"></span>
+                                        <span class="entry__load-media"></span>
+                                    </div>
+                                    <div class="entry__load-page entry__load-skeleton entry__load-anim--cover">
+                                        <span class="entry__load-line entry__load-line--nav"></span>
+                                        <span class="entry__load-line entry__load-line--title"></span>
+                                        <span class="entry__load-line"></span>
+                                        <span class="entry__load-line entry__load-line--short"></span>
+                                        <span class="entry__load-media"></span>
+                                    </div>
+                                </div>
+                                <div class="entry__load-track"><span class="entry__load-track-fill"></span></div>
+                                <p class="entry__load-meta">układ: od razu · treść: 3,6 s</p>
+                            </div>
+
+                            <div class="entry__load-frame">
+                                <p class="entry__mock-label">RENDER PROGRESYWNY</p>
+                                <div class="entry__load-screen">
+                                    <div class="entry__load-page">
+                                        <span class="entry__load-line entry__load-line--nav"></span>
+                                        <span
+                                            class="entry__load-line entry__load-line--title entry__load-anim--early"></span>
+                                        <span class="entry__load-line entry__load-anim--early"></span>
+                                        <span
+                                            class="entry__load-line entry__load-line--short entry__load-anim--early"></span>
+                                        <span class="entry__load-media entry__load-media--slot">
+                                            <span class="entry__load-media entry__load-anim--late"></span>
+                                            <span class="entry__load-slot-spinner entry__load-anim--cover"><span
+                                                    class="entry__load-spinner entry__load-spinner--sm"></span></span>
+                                        </span>
+                                    </div>
+                                </div>
+                                <div class="entry__load-track"><span class="entry__load-track-fill"></span></div>
+                                <p class="entry__load-meta">tekst: 0,6 s · obraz: 3,6 s</p>
+                            </div>
+                        </div>
+                        <p class="entry__fig-caption">FIG. 1 – TA SAMA STRONA, TRZY STRATEGIE ŁADOWANIA</p>
+                        <p class="entry__illustration-desc">Wszystkie trzy warianty ładują się tak samo długo
+                            (3,6 s). Preloader przez cały ten czas pokazuje tylko logo. Skeleton od pierwszej chwili
+                            pokazuje układ strony. Render progresywny po 0,6 s daje już tekst do czytania, a spinner
+                            zostaje tylko w miejscu obrazu, który jeszcze się pobiera.</p>
+
+                        <div class="entry__scale">
+                            <div class="entry__scale-seg">
+                                <p class="entry__scale-range">&lt; 1 s</p>
+                                <div class="entry__scale-bar entry__scale-bar--none"></div>
+                                <p class="entry__scale-title">Bez wskaźnika</p>
+                                <p class="entry__scale-text">Wskaźnik tylko by mignął i rozproszył. Wystarczy
+                                    natychmiastowa reakcja na kliknięcie.</p>
+                            </div>
+                            <div class="entry__scale-seg entry__scale-seg--wide">
+                                <p class="entry__scale-range">1–10 s</p>
+                                <div class="entry__scale-bar entry__scale-bar--loop"></div>
+                                <p class="entry__scale-title">Skeleton / spinner</p>
+                                <p class="entry__scale-text">Skeleton, gdy ładuje się cała strona. Spinner, gdy
+                                    ładuje się jeden moduł: karta, wideo, wynik wyszukiwania.</p>
+                            </div>
+                            <div class="entry__scale-seg">
+                                <p class="entry__scale-range">&gt; 10 s</p>
+                                <div class="entry__scale-bar entry__scale-bar--progress"></div>
+                                <p class="entry__scale-title">Pasek postępu z %</p>
+                                <p class="entry__scale-text">Użytkownik musi wiedzieć, ile to potrwa i czy warto
+                                    w tym czasie przełączyć się na inne zadanie.</p>
+                            </div>
+                        </div>
+                        <p class="entry__fig-caption">FIG. 2 – RODZAJ WSKAŹNIKA WEDŁUG CZASU OCZEKIWANIA</p>
+                        <p class="entry__illustration-desc">Progi 1 s i 10 s wynikają z granic uwagi opisanych
+                            przez Nielsena. Podział na skeleton, spinner i pasek postępu to rekomendacje NN/g.</p>
+                    </div>
+
+                    <div class="entry__note">
+                        <div class="entry__note-col">
+                            <p class="entry__note-label">NOTATKI</p>
+                            <ul class="entry__note-list">
+                                <li class="entry__note-item">
+                                    <a href="https://www.nngroup.com/articles/response-times-3-important-limits/"
+                                        target="_blank" rel="noopener noreferrer" class="entry__note-link">Nielsen
+                                        Norman Group</a>
+                                    – Jakob Nielsen, „Response Times: The 3 Important Limits”. Klasyczne progi:
+                                    0,1 s to odczucie natychmiastowej reakcji, 1 s to granica, do której myśl
+                                    użytkownika płynie bez przerwy, a 10 s to granica utrzymania uwagi na zadaniu.
+                                    Na nich opiera się dobór wskaźnika ładowania.
+                                </li>
+                                <li class="entry__note-item">
+                                    <a href="https://www.nngroup.com/articles/progress-indicators/" target="_blank"
+                                        rel="noopener noreferrer" class="entry__note-link">NN/g – Progress
+                                        Indicators</a>
+                                    (Katie Sherwin, 2014) – wskaźnik jest potrzebny przy każdej akcji dłuższej niż
+                                    ok. 1 s. Animacja w pętli sprawdza się przy 2–10 s, a powyżej 10 s potrzebny jest
+                                    wskaźnik procentowy. Artykuł przytacza badanie, w którym osoby widzące
+                                    poruszający się pasek postępu były bardziej zadowolone i gotowe czekać średnio
+                                    3 razy dłużej niż te, które nie widziały żadnego wskaźnika.
+                                </li>
+                                <li class="entry__note-item">
+                                    <a href="https://www.nngroup.com/articles/skeleton-screens/" target="_blank"
+                                        rel="noopener noreferrer" class="entry__note-link">NN/g – Skeleton Screens
+                                        101</a>
+                                    (2023) – skeleton zalecany jest przy ładowaniu całej strony, bo zapowiada jej
+                                    układ i zmniejsza obciążenie poznawcze. Spinner pasuje do pojedynczych modułów.
+                                    Poniżej 1 s żaden wskaźnik nie jest potrzebny. Artykuł ostrzega też przed
+                                    skeletonem złożonym z samego nagłówka i stopki: przy dłuższym czekaniu pusty
+                                    ekran wygląda jak awaria.
+                                </li>
+                                <li class="entry__note-item">
+                                    <a href="https://web.dev/articles/lcp" target="_blank" rel="noopener noreferrer"
+                                        class="entry__note-link">web.dev – Largest Contentful Paint</a>
+                                    – dobry wynik LCP to ≤ 2,5 s. Elementy z <code>opacity: 0</code> są pomijane
+                                    w pomiarze, więc preloader, który ukrywa treść do końca ładowania, przesuwa LCP
+                                    na moment jej odsłonięcia. Mierzalnie pogarsza to Core Web Vitals.
+                                </li>
+                                <li class="entry__note-item">
+                                    <a href="https://www.chrisharrison.net/index.php/Research/ProgressBars2"
+                                        target="_blank" rel="noopener noreferrer" class="entry__note-link">Harrison,
+                                        Yeo, Hudson – „Faster Progress Bars”</a>
+                                    (CHI 2010) – sposób animacji zmienia odczuwany czas. Pasek z prążkami
+                                    przesuwającymi się wstecz skracał odczuwany czas trwania o 11%, choć realny czas
+                                    się nie zmieniał. Jeśli już czekamy, forma wskaźnika ma znaczenie.
+                                </li>
+                                <li class="entry__note-item">
+                                    <a href="https://www.thinkwithgoogle.com/_qs/documents/2340/bc22e_The_Need_for_Mobile_Speed_-_FINAL_1.pdf"
+                                        target="_blank" rel="noopener noreferrer" class="entry__note-link">Think with
+                                        Google – The Need for Mobile Speed</a>
+                                    – 53% wizyt na stronach mobilnych kończy się porzuceniem, jeśli ładowanie trwa
+                                    dłużej niż 3 s. Każda sekunda preloadera dodana „dla efektu” wydłuża właśnie ten
+                                    czas.
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <h2 class="entry__heading">Powiązane hasła</h2>
+                    <div class="entry__related">
+                        <a href="#" class="entry__related-link">Visibility of system status</a>
+                        <a href="#" class="entry__related-link">Doherty Threshold</a>
+                        <a href="#" class="entry__related-link">Skeleton screen</a>
+                        <a href="#" class="entry__related-link">Perceived performance</a>
+                        <a href="#" class="entry__related-link">Progressive rendering</a>
+                    </div>
+
+                    <div class="divider"></div>
+
+                    <div class="entry__footer-meta">
+                        <p>Źródła: NN/g, web.dev, Harrison et al. (CHI 2010)</p>
+                        <p>Opublikowane · wrz 2026</p>
+                    </div>
+                </article>
+            </main>
+
+            <div class="divider"></div>
+            <footer class="footer__bottom">
+                <p class="footer__copyright">© 2026 Heuristika – Osobista Biblioteka Projektanta</p>
+                <nav class="footer__links">
+                    <a href="katalog.html" class="footer__link">Katalog</a>
+                    <a href="o-projekcie.html" class="footer__link">O projekcie</a>
+                </nav>
+            </footer>
+        </div>
+    </div>
+
+    <script src="dots-pattern.js"></script>
+
+    <script src="nav.js"></script>
+
+    <script>
+        (function () {
+            const btn = document.getElementById('themeToggle');
+            if (!btn) return;
+            const root = document.documentElement;
+
+            function sync() {
+                btn.setAttribute('aria-pressed', String(root.getAttribute('data-theme') === 'light'));
+            }
+            sync();
+
+            btn.addEventListener('click', () => {
+                const next = root.getAttribute('data-theme') === 'light' ? 'dark' : 'light';
+                root.setAttribute('data-theme', next);
+                try { localStorage.setItem('heuristika-theme', next); } catch (e) { }
+                sync();
+            });
+        })();
+    </script>
+</body>
+</html>

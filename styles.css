@@ -14,7 +14,9 @@
   --glass-border: rgba(255, 255, 255, 0.06);
   --overlay-strong: rgba(7, 7, 10, 0.95);
 
-  --card-hover-bg: var(--glass-hover-bg);
+  /* Kryjący odpowiednik --glass-hover-bg na czarnym tle – półprzezroczysty
+     hover pokazywał pattern z tła przez kartę. */
+  --card-hover-bg: #131313;
 
   --footer-overlay-bg: rgba(10, 10, 10, 0.9);
 
@@ -39,6 +41,9 @@
   --danger-fg: #ff6166;
 
   --pill-hover-bg: #fafafa;
+
+  --nav-glow: var(--ink);
+  --nav-shadow: rgba(0, 0, 0, 0.14);
 }
 
 :root[data-theme="light"] {
@@ -50,7 +55,7 @@
   --ink-subtle: #666666;
   --border: #eaeaea;
   --border-strong: #d4d4d4;
-  --surface: #eaeaea;
+  --surface: #f3f3f3;
   --bg2: #ececec;
 
   --glass-bg: rgba(255, 255, 255, 0.55);
@@ -59,7 +64,7 @@
   --overlay-strong: rgba(255, 255, 255, 0.95);
   --footer-overlay-bg: rgba(255, 255, 255, 0.9);
 
-  --card-hover-bg: rgba(190, 190, 190, 0.15);
+  --card-hover-bg: #ececec;
 
   --overlay-border-soft: rgba(0, 0, 0, 0.12);
   --overlay-bg-soft: rgba(0, 0, 0, 0.04);
@@ -82,6 +87,11 @@
   --danger-fg: #c4351d;
 
   --pill-hover-bg: #1a1a1a;
+
+  /* Poświata (nav + karty wpisów) w jasnym motywie: lekko szara zamiast
+     prawie czarnego --ink. Cień nav zostaje neutralny, jak w dark. */
+  --nav-glow: var(--ink-tertiary);
+  --nav-shadow: rgba(0, 0, 0, 0.14);
 }
 
 * {
@@ -161,7 +171,7 @@ body {
   border: 1px solid var(--glass-border);
   border-radius: 12px;
   overflow: hidden;
-  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.14);
+  box-shadow: 0 6px 24px var(--nav-shadow);
   transition: max-width 0.45s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.3s ease,
     box-shadow 0.3s ease, background-color 0.25s ease, color 0.25s ease;
 }
@@ -790,22 +800,10 @@ body {
 
   background: var(--surface);
   border: 1px solid var(--border);
+  /* Bez :hover – kafelki taksonomii nie są klikalne, więc zmiana tła
+     sugerowałaby akcję, której nie ma. Transition zostaje dla płynnej
+     zmiany motywu. */
   transition: background-color 0.2s ease;
-}
-
-.browse__card:hover {
-  background: var(--card-hover-bg);
-}
-
-/* W light mode --card-hover-bg (rgba na białym tle) wychodzi JAŚNIEJSZY niż
-   domyślny --surface, więc "podświetlenie" na hover wizualnie odwrotne do
-   oczekiwanego — zamieniamy, który token jest domyślny, a który na hover. */
-:root[data-theme="light"] .browse__card {
-  background: var(--card-hover-bg);
-}
-
-:root[data-theme="light"] .browse__card:hover {
-  background: var(--surface);
 }
 
 .browse__icon-wrap {
@@ -1041,26 +1039,72 @@ body {
   width: 100%;
 }
 
+/* Tło i obramowanie jako warstwy tła, żeby poświata leżała DOKŁADNIE
+   w 1px obramowaniu (technika "gradient border"). Wcześniejsza wersja
+   z pseudo-elementem rysowała ją pod obramowaniem (overflow: hidden ucina
+   obszar bordera), co wyglądało na 2px, a maska na całej karcie
+   przemalowywała ją w każdej klatce ruchu myszy.
+   Custom properties są zarejestrowane jako niedziedziczone, więc zmiana
+   --glow-x co klatkę przelicza styl tylko samej karty, nie jej dzieci. */
+@property --card-bg {
+  syntax: "<color>";
+  inherits: false;
+  initial-value: transparent;
+}
+
+@property --glow-a {
+  syntax: "<percentage>";
+  inherits: false;
+  initial-value: 0%;
+}
+
+@property --glow-x {
+  syntax: "<length>";
+  inherits: false;
+  initial-value: 0px;
+}
+
 .featured__card {
   display: flex;
   flex-direction: column;
   gap: 16px;
-  height: 360px;
+  /* min-height zamiast height: dłuższy tytuł (2 linie) wypychał badge poza
+     kartę i overflow: hidden je ucinał. Grid i tak wyrównuje wysokość
+     kart w rzędzie do najwyższej. */
+  min-height: 360px;
   padding-bottom: 24px;
   border-radius: 10px;
-  background: var(--bg);
-  border: 1px solid var(--border);
+  --card-bg: var(--bg);
+  border: 1px solid transparent;
+  background:
+    linear-gradient(var(--card-bg), var(--card-bg)) padding-box,
+    radial-gradient(160px circle at var(--glow-x) 0,
+      color-mix(in srgb, var(--nav-glow) var(--glow-a), transparent),
+      transparent 100%) border-box,
+    linear-gradient(var(--border), var(--border)) border-box;
   text-decoration: none;
   overflow: hidden;
-  transition: background-color 0.2s ease;
+  transition: --card-bg 0.2s ease, --glow-a 0.25s ease;
 }
 
 .featured__card:hover {
-  background: var(--card-hover-bg);
+  --card-bg: var(--card-hover-bg);
+}
+
+@media (hover: hover) {
+  .featured__card:hover {
+    --glow-a: 100%;
+  }
 }
 
 .featured__card:hover .featured__card-icon {
   background: var(--card-hover-bg);
+}
+
+/* W light mode tło hovera (#ececec) zlewa się z --border (#eaeaea),
+   więc divider pod ikoną znikał – na hover przyciemniamy go. */
+:root[data-theme="light"] .featured__card:hover .featured__card-icon {
+  border-bottom-color: var(--border-strong);
 }
 
 .featured__card-icon {
@@ -1074,7 +1118,7 @@ body {
   width: 100%;
   background: var(--surface);
   border-bottom: 1px solid var(--border);
-  transition: background-color 0.2s ease;
+  transition: background-color 0.2s ease, border-color 0.2s ease;
 }
 
 /* Mini-podgląd sidebara zamiast płaskiej ikony — 1:1 z Figmy (node 355:9379
@@ -1479,7 +1523,7 @@ body {
 
 .footer__subscribe:focus-visible {
   outline: none;
-  box-shadow: 0 0 0 3px rgba(0, 112, 242, 0.55);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--badge-blue-fg) 55%, transparent);
 }
 
 .footer__cta .footer__subscribe {
@@ -2104,6 +2148,345 @@ body {
   font-family: "Geist Mono", monospace;
   font-size: 11px;
   letter-spacing: 0.1em;
+}
+
+.entry-card code {
+  padding: 1px 5px;
+  border-radius: 4px;
+  background: var(--bg2);
+  color: var(--ink);
+  font-family: "Geist Mono", monospace;
+  font-size: 0.86em;
+}
+
+/* ---------- Wpis: preloader – ilustracje ładowania ---------- */
+
+/* Jeden wspólny cykl 6 s dla wszystkich trzech ramek, żeby dało się je
+   porównać w tym samym momencie: tekst w wariancie progresywnym pojawia
+   się po 0,6 s (10%), pełna treść po 3,6 s (60%). */
+
+.entry__load-grid {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 16px;
+  width: 100%;
+}
+
+.entry__load-frame {
+  display: flex;
+  flex: 1 1 180px;
+  flex-direction: column;
+  gap: 10px;
+  max-width: 220px;
+  padding: 12px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--bg);
+}
+
+.entry__load-screen {
+  position: relative;
+  height: 150px;
+  overflow: hidden;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--bg);
+}
+
+.entry__load-page {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  padding: 12px;
+}
+
+.entry__load-line {
+  display: block;
+  flex-shrink: 0;
+  width: 100%;
+  height: 5px;
+  border-radius: 3px;
+  background: var(--ink-secondary);
+}
+
+.entry__load-line--nav {
+  width: 35%;
+  height: 4px;
+  margin-bottom: 4px;
+  background: var(--border-strong);
+}
+
+.entry__load-line--title {
+  width: 75%;
+  height: 9px;
+  background: var(--ink);
+}
+
+.entry__load-line--short {
+  width: 55%;
+}
+
+.entry__load-media {
+  display: block;
+  flex: 1;
+  margin-top: 3px;
+  border: 1px solid var(--badge-blue-border);
+  border-radius: 4px;
+  background: var(--badge-blue-bg);
+}
+
+.entry__load-media--slot {
+  position: relative;
+  border: 1px dashed var(--border-strong);
+  background: transparent;
+}
+
+.entry__load-media--slot > .entry__load-media {
+  position: absolute;
+  inset: -1px;
+  margin: 0;
+}
+
+.entry__load-slot-spinner {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.entry__load-skeleton {
+  background: var(--bg);
+}
+
+.entry__load-skeleton .entry__load-line,
+.entry__load-skeleton .entry__load-media {
+  border: 0;
+  background: linear-gradient(90deg, var(--bg2) 0%, var(--border-strong) 50%, var(--bg2) 100%);
+  background-size: 200% 100%;
+  animation: entry-load-shimmer 1.4s linear infinite;
+}
+
+.entry__load-cover {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  background: var(--bg);
+}
+
+.entry__load-logo {
+  width: 22px;
+  height: 19px;
+  color: var(--ink);
+}
+
+.entry__load-spinner {
+  display: block;
+  width: 18px;
+  height: 18px;
+  border: 2px solid var(--border-strong);
+  border-top-color: var(--ink);
+  border-radius: 50%;
+  animation: entry-load-spin 0.8s linear infinite;
+}
+
+.entry__load-spinner--sm {
+  width: 14px;
+  height: 14px;
+}
+
+.entry__load-track {
+  height: 2px;
+  overflow: hidden;
+  border-radius: 1px;
+  background: var(--border);
+}
+
+.entry__load-track-fill {
+  display: block;
+  height: 100%;
+  background: var(--ink-secondary);
+  transform-origin: left center;
+  animation: entry-load-track 6s linear infinite;
+}
+
+.entry__load-meta {
+  margin: 0;
+  color: var(--ink-tertiary);
+  font-family: "Geist Mono", monospace;
+  font-size: 10px;
+}
+
+.entry__load-anim--late {
+  animation: entry-load-late 6s linear infinite;
+}
+
+.entry__load-anim--early {
+  animation: entry-load-early 6s linear infinite;
+}
+
+.entry__load-anim--cover {
+  animation: entry-load-cover 6s linear infinite;
+}
+
+@keyframes entry-load-late {
+  0%, 58% { opacity: 0; }
+  62%, 94% { opacity: 1; }
+  100% { opacity: 0; }
+}
+
+@keyframes entry-load-early {
+  0%, 8% { opacity: 0; }
+  12%, 94% { opacity: 1; }
+  100% { opacity: 0; }
+}
+
+@keyframes entry-load-cover {
+  0%, 58% { opacity: 1; }
+  62%, 94% { opacity: 0; }
+  100% { opacity: 1; }
+}
+
+@keyframes entry-load-track {
+  0% { transform: scaleX(0); }
+  60%, 94% { transform: scaleX(1); }
+  100% { transform: scaleX(0); }
+}
+
+@keyframes entry-load-spin {
+  to { transform: rotate(360deg); }
+}
+
+@keyframes entry-load-shimmer {
+  from { background-position: 100% 0; }
+  to { background-position: -100% 0; }
+}
+
+.entry__scale {
+  display: grid;
+  grid-template-columns: 1fr 1.5fr 1fr;
+  gap: 16px;
+  width: 100%;
+  margin-top: 28px;
+  padding: 16px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--bg);
+}
+
+.entry__scale-seg {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 0;
+}
+
+.entry__scale-range {
+  margin: 0;
+  color: var(--ink-tertiary);
+  font-family: "Geist Mono", monospace;
+  font-size: 10.5px;
+}
+
+.entry__scale-bar {
+  height: 6px;
+  border-radius: 3px;
+  background: var(--bg2);
+}
+
+.entry__scale-bar--none {
+  border: 1px dashed var(--border-strong);
+  background: transparent;
+}
+
+.entry__scale-bar--loop {
+  background: linear-gradient(90deg, var(--bg2) 0%, var(--ink-secondary) 50%, var(--bg2) 100%);
+  background-size: 200% 100%;
+  animation: entry-load-shimmer 1.6s linear infinite;
+}
+
+/* Prążki przesuwające się wstecz – wariant, który w badaniu Harrisona
+   (CHI 2010) skracał odczuwany czas trwania. */
+.entry__scale-bar--progress {
+  position: relative;
+  overflow: hidden;
+}
+
+.entry__scale-bar--progress::before {
+  content: "";
+  position: absolute;
+  inset: 0 35% 0 0;
+  border-radius: 3px;
+  background: repeating-linear-gradient(-45deg,
+      var(--badge-blue-fg) 0 6px,
+      var(--badge-blue-border) 6px 12px);
+  background-size: 17px 100%;
+  animation: entry-load-ribs 0.9s linear infinite;
+}
+
+@keyframes entry-load-ribs {
+  from { background-position: 0 0; }
+  to { background-position: -17px 0; }
+}
+
+.entry__scale-title {
+  margin: 0;
+  color: var(--ink);
+  font-family: "Geist", sans-serif;
+  font-size: 12.5px;
+  font-weight: 600;
+}
+
+.entry__scale-text {
+  margin: 0;
+  color: var(--ink-secondary);
+  font-family: "Geist", sans-serif;
+  font-size: 12px;
+  line-height: 1.55;
+}
+
+.entry__scale + .entry__fig-caption {
+  margin-top: 6px;
+}
+
+@media (max-width: 760px) {
+  .entry__load-frame {
+    flex-basis: 100%;
+    max-width: 260px;
+  }
+
+  .entry__scale {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Bez ruchu: zamrażamy ilustrację w najbardziej wymownym momencie
+   (ok. 1,5 s) – preloader wciąż zasłania stronę, skeleton pokazuje
+   układ, a wariant progresywny ma już tekst i czeka tylko na obraz. */
+@media (prefers-reduced-motion: reduce) {
+  .entry__load-anim--late,
+  .entry__load-anim--early,
+  .entry__load-anim--cover,
+  .entry__load-track-fill,
+  .entry__load-spinner,
+  .entry__load-skeleton .entry__load-line,
+  .entry__load-skeleton .entry__load-media,
+  .entry__scale-bar--loop,
+  .entry__scale-bar--progress::before {
+    animation: none;
+  }
+
+  .entry__load-anim--late { opacity: 0; }
+  .entry__load-anim--early,
+  .entry__load-anim--cover { opacity: 1; }
+  .entry__load-track-fill { transform: scaleX(0.4); }
 }
 
 @media (max-width: 760px) {
