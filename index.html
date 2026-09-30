@@ -1645,7 +1645,7 @@
             let total = 0;
 
             function measure() {
-                total = rect.getTotalLength();
+                try { total = rect.getTotalLength(); } catch (e) { total = 0; }
                 rect.style.strokeDasharray = VISIBLE_LEN + ' ' + Math.max(0, total - VISIBLE_LEN);
                 render(reduceMotion ? VISIBLE_LEN : lastHead);
             }
@@ -1658,8 +1658,17 @@
                 rect.style.strokeDashoffset = (VISIBLE_LEN - head) + 'px';
                 const headDist = ((head % total) + total) % total;
                 const tailDist = ((head - VISIBLE_LEN) % total + total) % total;
-                const p1 = rect.getPointAtLength(tailDist);
-                const p2 = rect.getPointAtLength(headDist);
+                let p1, p2;
+                try {
+                    p1 = rect.getPointAtLength(tailDist);
+                    p2 = rect.getPointAtLength(headDist);
+                } catch (e) {
+                    // Geometria rect pochodzi z CSS (width/height w %), więc
+                    // przy chwilowym rozmiarze 0 ścieżka jest pusta, a "total"
+                    // z poprzedniego measure() jest już nieaktualny.
+                    total = 0;
+                    return;
+                }
                 gradient.setAttribute('x1', p1.x);
                 gradient.setAttribute('y1', p1.y);
                 gradient.setAttribute('x2', p2.x);
@@ -1668,6 +1677,9 @@
 
             measure();
             window.addEventListener('resize', measure);
+            if ('ResizeObserver' in window) {
+                new ResizeObserver(measure).observe(rect.ownerSVGElement);
+            }
             window.addEventListener('load', measure);
             if (document.fonts && document.fonts.ready) {
                 document.fonts.ready.then(measure);
