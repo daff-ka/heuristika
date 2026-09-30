@@ -1,0 +1,544 @@
+<html lang="pl">
+
+<head>
+    <script>
+        (function () {
+            try {
+                var stored = localStorage.getItem('heuristika-theme');
+                var theme = stored || (window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark');
+                document.documentElement.setAttribute('data-theme', theme);
+            } catch (e) {
+                document.documentElement.setAttribute('data-theme', 'dark');
+            }
+        })();
+    </script>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Baner cookies zgodny z wytycznymi EROD – Heuristika</title>
+    <link rel="icon" type="image/svg+xml" href="assets/favicon.svg" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600&family=Geist+Mono:wght@400;500&family=Inter:wght@400;500;600;700&family=BBH+Bartle:wght@400&display=swap"
+        rel="stylesheet" />
+    <link rel="stylesheet" href="styles.css" />
+    <script src="https://t.contentsquare.net/uxa/f290fd08d66fb.js" defer></script>
+    <script type="text/javascript">
+        (function(c,l,a,r,i,t,y){
+            c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
+            t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
+            y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
+        })(window, document, "clarity", "script", "yqdubbd8pd");
+    </script>
+</head>
+
+<body>
+    <canvas id="dots"></canvas>
+    <div class="page">
+        <div class="shell">
+            <nav class="nav" aria-label="Top navigation">
+                <div class="nav-left">
+                    <a href="index.html" class="brand" aria-label="Heuristika home">
+                        <svg class="brand-icon" viewBox="0 0 20 17.32" fill="none" aria-hidden="true">
+                            <path d="M10 0L20 17.32H0L10 0Z" fill="currentColor" />
+                        </svg>
+                        <span class="brand-title">Heuristika</span>
+                    </a>
+                    <div class="nav-links" id="navLinks">
+                        <a href="katalog.html" class="nav-link">Katalog</a>
+                        <a href="o-projekcie.html" class="nav-link nav-link--small">O projekcie</a>
+                    </div>
+                </div>
+
+                <div class="nav-right">
+                    <button type="button" class="icon-button theme-toggle" id="themeToggle"
+                        aria-label="Przełącz tryb jasny/ciemny" aria-pressed="false">
+                        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                            <path d="M8 2V4" stroke="currentColor" stroke-width="1.33333" stroke-linecap="round"
+                                stroke-linejoin="round" />
+                            <path d="M8 12V14" stroke="currentColor" stroke-width="1.33333" stroke-linecap="round"
+                                stroke-linejoin="round" />
+                            <path d="M2 8H4" stroke="currentColor" stroke-width="1.33333" stroke-linecap="round"
+                                stroke-linejoin="round" />
+                            <path d="M12 8H14" stroke="currentColor" stroke-width="1.33333" stroke-linecap="round"
+                                stroke-linejoin="round" />
+                            <path d="M3.73333 3.73333L5.2 5.2" stroke="currentColor" stroke-width="1.33333"
+                                stroke-linecap="round" stroke-linejoin="round" />
+                            <path d="M10.8 10.8L12.2667 12.2667" stroke="currentColor" stroke-width="1.33333"
+                                stroke-linecap="round" stroke-linejoin="round" />
+                            <path d="M3.73333 12.2667L5.2 10.8" stroke="currentColor" stroke-width="1.33333"
+                                stroke-linecap="round" stroke-linejoin="round" />
+                            <path d="M10.8 5.2L12.2667 3.73333" stroke="currentColor" stroke-width="1.33333"
+                                stroke-linecap="round" stroke-linejoin="round" />
+                            <circle cx="8" cy="8" r="1.66667" stroke="currentColor" stroke-width="1.33333" />
+                        </svg>
+                    </button>
+                    <button type="button" class="footer__subscribe">
+                        <svg class="footer__subscribe-icon" width="16" height="16" viewBox="0 0 16 16" fill="none"
+                            aria-hidden="true">
+                            <path d="M6.667 4.667V3.334H10.667V4.667L12.667 10.667H4.667L6.667 4.667Z"
+                                stroke="currentColor" stroke-width="1.333" stroke-linecap="round"
+                                stroke-linejoin="round" />
+                            <circle cx="8" cy="11.8" r="0.8" fill="currentColor" />
+                        </svg>
+                        Subskrybuj
+                    </button>
+                </div>
+
+                <button type="button" class="nav-toggle" aria-label="Otwórz menu" aria-expanded="false"
+                    aria-controls="navLinks">
+                    <svg class="nav-toggle-icon" viewBox="0 0 20 16" width="20" height="16" fill="none"
+                        aria-hidden="true">
+                        <path d="M1 1H19" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" />
+                        <path d="M1 8H19" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" />
+                        <path d="M1 15H19" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" />
+                    </svg>
+                </button>
+            </nav>
+            <div class="divider"></div>
+
+            <main class="entry">
+                <article class="entry-card">
+                    <div class="entry__heading-group">
+                        <p class="entry__eyebrow">Cookie banner · wytyczne EROD</p>
+                        <h1 class="entry__title">Baner cookies zgodny z wytycznymi EROD</h1>
+                    </div>
+                    <p class="entry__lead">Europejska Rada Ochrony Danych (EROD) opisała, które banery cookies organy nadzorcze
+                        uznają za niezgodne z prawem. Prawie każdy z tych zarzutów
+                        dotyczy decyzji projektowej: jakie przyciski są na pierwszym
+                        ekranie, jak wyglądają i ile kliknięć dzieli użytkownika od
+                        odmowy.</p>
+
+                    <div class="entry__taxonomy">
+                        <span class="about__badge about__badge--blue">
+                            <svg width="6" height="6" viewBox="0 0 6 6" aria-hidden="true">
+                                <circle cx="3" cy="3" r="3" fill="currentColor" />
+                            </svg>
+                            UX Design
+                        </span>
+                        <span class="about__badge about__badge--violet">
+                            <svg width="6" height="6" viewBox="0 0 6 6" aria-hidden="true">
+                                <circle cx="3" cy="3" r="3" fill="currentColor" />
+                            </svg>
+                            Wzorzec
+                        </span>
+                        <span class="about__badge about__badge--green">
+                            <svg width="6" height="6" viewBox="0 0 6 6" aria-hidden="true">
+                                <circle cx="3" cy="3" r="3" fill="currentColor" />
+                            </svg>
+                            Web + Mobile
+                        </span>
+                        <span class="about__badge about__badge--amber">
+                            <svg width="21" height="5" viewBox="0 0 21 5" aria-hidden="true">
+                                <circle cx="2.5" cy="2.5" r="2.5" fill="currentColor" />
+                                <circle cx="10.5" cy="2.5" r="2.5" fill="currentColor" />
+                                <circle cx="18.5" cy="2.5" r="2.5" fill="var(--badge-amber-border)" />
+                            </svg>
+                            Średni
+                        </span>
+                    </div>
+
+                    <div class="divider"></div>
+
+                    <div class="entry__tldr-wrap">
+                        <div class="entry__tldr-bar"></div>
+                        <div class="entry__tldr-col">
+                            <p class="entry__tldr-label">TL;DR</p>
+                            <p class="entry__tldr-text">Zapisywanie i odczytywanie informacji na urządzeniu użytkownika – cookies,
+                                <code>localStorage</code>, piksele śledzące,
+                                fingerprinting – wymaga zgody, chyba że jest
+                                niezbędne do usługi, o którą użytkownik prosi.
+                                Mówi o tym art. 5 ust. 3 dyrektywy ePrivacy, w
+                                Polsce art. 399 Prawa komunikacji
+                                elektronicznej. Zgoda musi spełniać wymogi RODO:
+                                ma być dobrowolna, konkretna, świadoma i
+                                jednoznaczna, a wycofać ją ma być równie łatwo,
+                                jak wyrazić. W raporcie Cookie Banner Taskforce
+                                ze stycznia 2023 r. większość europejskich
+                                organów uznała brak przycisku „Odrzuć” na
+                                pierwszej warstwie za naruszenie, a z góry
+                                zaznaczone zgody są niedozwolone od wyroku TSUE
+                                w sprawie Planet49. W skrócie: odmowa ma być tak
+                                samo widoczna i tak samo blisko jak zgoda.</p>
+                        </div>
+                    </div>
+
+                    <h2 class="entry__heading">Kiedy stosować</h2>
+                    <p class="entry__copy">Baner jest potrzebny, gdy strona zapisuje lub odczytuje na urządzeniu coś, bez czego
+                        sama by działała: analitykę, piksele reklamowe Meta czy
+                        LinkedIn, nagrania sesji, osadzone wideo z YouTube, narzędzia do
+                        testów A/B. Te same zasady obowiązują w aplikacjach mobilnych:
+                        SDK analityczne i reklamowe czy odczyt identyfikatora
+                        reklamowego też wymagają zgody, a ekran zgody w aplikacji ocenia
+                        się tak samo jak baner na stronie. Zgody nie potrzebujesz na
+                        cookie sesji logowania, koszyk, wybrany język ani na
+                        zapamiętanie decyzji z samego banera. Pułapka jest w słowie
+                        „cookies”: wytyczne EROD 2/2023 obejmują też piksele, linki z
+                        identyfikatorem i fingerprinting, więc „nie używamy cookies” nie
+                        zwalnia z banera. Działa to też w drugą stronę: jeśli wszystko,
+                        czego używasz, jest niezbędne, nie pokazuj banera wcale, bo
+                        każdy zbędny baner uczy ludzi klikać „Akceptuj” bez czytania.
+                        Uważaj też na cookie wall: blokadę treści do czasu zgody EROD
+                        uznaje za zgodę niedobrowolną, a model „zgoda albo płać” oceniła
+                        krytycznie w opinii 08/2024 dotyczącej dużych platform.</p>
+
+                    <h2 class="entry__heading">Best practices</h2>
+                    <div class="entry__dodont">
+                        <div class="entry__dodont-card">
+                            <div class="entry__dodont-row">
+                                <svg class="entry__dodont-label--do" width="6" height="6" viewBox="0 0 6 6"
+                                    aria-hidden="true">
+                                    <circle cx="3" cy="3" r="3" fill="currentColor" />
+                                </svg>
+                                <p class="entry__dodont-label entry__dodont-label--do">Rób</p>
+                            </div>
+                            <p class="entry__dodont-text">Na pierwszej warstwie postaw „Odrzuć wszystkie” obok „Akceptuj wszystkie”,
+                                najlepiej w tym samym rozmiarze, kolorze i wadze
+                                tekstu. Wybór kategorii schowaj pod trzecim
+                                przyciskiem „Ustawienia”.</p>
+                        </div>
+                        <div class="entry__dodont-card">
+                            <div class="entry__dodont-row">
+                                <svg class="entry__dodont-label--dont" width="6" height="6" viewBox="0 0 6 6"
+                                    aria-hidden="true">
+                                    <circle cx="3" cy="3" r="3" fill="currentColor" />
+                                </svg>
+                                <p class="entry__dodont-label entry__dodont-label--dont">Nie rób</p>
+                            </div>
+                            <p class="entry__dodont-text">Nie chowaj odmowy w drugiej warstwie ani w linku wplecionym w akapit. Jeśli
+                                zgoda to jedno kliknięcie, a odmowa pięć, zgoda
+                                nie jest dobrowolna.</p>
+                        </div>
+                    </div>
+                    <div class="entry__dodont">
+                        <div class="entry__dodont-card">
+                            <div class="entry__dodont-row">
+                                <svg class="entry__dodont-label--do" width="6" height="6" viewBox="0 0 6 6"
+                                    aria-hidden="true">
+                                    <circle cx="3" cy="3" r="3" fill="currentColor" />
+                                </svg>
+                                <p class="entry__dodont-label entry__dodont-label--do">Rób</p>
+                            </div>
+                            <p class="entry__dodont-text">W ustawieniach zostaw włączoną na stałe tylko kategorię „Niezbędne”, z opisem,
+                                do czego służy. Resztę użytkownik włącza sam.</p>
+                        </div>
+                        <div class="entry__dodont-card">
+                            <div class="entry__dodont-row">
+                                <svg class="entry__dodont-label--dont" width="6" height="6" viewBox="0 0 6 6"
+                                    aria-hidden="true">
+                                    <circle cx="3" cy="3" r="3" fill="currentColor" />
+                                </svg>
+                                <p class="entry__dodont-label entry__dodont-label--dont">Nie rób</p>
+                            </div>
+                            <p class="entry__dodont-text">Nie zaznaczaj przełączników z góry i nie opieraj reklam czy analityki na
+                                „prawnie uzasadnionym interesie”. Nie wrzucaj
+                                też narzędzi marketingowych do kategorii
+                                „Niezbędne”.</p>
+                        </div>
+                    </div>
+                    <div class="entry__dodont">
+                        <div class="entry__dodont-card">
+                            <div class="entry__dodont-row">
+                                <svg class="entry__dodont-label--do" width="6" height="6" viewBox="0 0 6 6"
+                                    aria-hidden="true">
+                                    <circle cx="3" cy="3" r="3" fill="currentColor" />
+                                </svg>
+                                <p class="entry__dodont-label entry__dodont-label--do">Rób</p>
+                            </div>
+                            <p class="entry__dodont-text">Zostaw stały powrót do ustawień: małą ikonę w rogu ekranu albo link w stopce.
+                                Wycofanie zgody ma zająć tyle samo co jej
+                                wyrażenie.</p>
+                        </div>
+                        <div class="entry__dodont-card">
+                            <div class="entry__dodont-row">
+                                <svg class="entry__dodont-label--dont" width="6" height="6" viewBox="0 0 6 6"
+                                    aria-hidden="true">
+                                    <circle cx="3" cy="3" r="3" fill="currentColor" />
+                                </svg>
+                                <p class="entry__dodont-label entry__dodont-label--dont">Nie rób</p>
+                            </div>
+                            <p class="entry__dodont-text">Nie traktuj przewijania strony, dalszego klikania ani zamknięcia banera jako
+                                zgody. Zgoda to wyraźne działanie, a nie brak
+                                sprzeciwu.</p>
+                        </div>
+                    </div>
+                    <h2 class="entry__heading">Szara strefa: wyróżniona zgoda, drugorzędna odmowa</h2>
+                    <p class="entry__copy">Częsty układ w gotowych banerach to wypełniony przycisk „Akceptuj” i obok „Odrzuć” z
+                        samym obrysem albo w formie tekstu. Taskforce EROD nie
+                        przesądza, że to niedozwolone. Uznał, że nie da się narzucić
+                        jednego standardu kolorów i kontrastu, więc każdy baner trzeba
+                        ocenić indywidualnie, a granicą jest to, czy wybór nie jest
+                        oczywiście wprowadzający w błąd. Jeden taki przypadek raport
+                        podaje wprost: przycisk odmowy o tak niskim kontraście, że tekst
+                        jest praktycznie nieczytelny. Drugorzędne „Odrzuć” w tym samym
+                        rzędzie, podobnej wielkości i z czytelnym tekstem zwykle się
+                        więc obroni. Im słabiej jednak odmowa jest widoczna – mniejsza
+                        czcionka, szary tekst na szarym tle, link zamiast przycisku –
+                        tym bliżej do zwodniczego wzorca, który wytyczne 03/2022
+                        nazywają stirring. Część krajowych organów idzie dalej niż EROD:
+                        francuski CNIL zaleca, żeby przyciski „Tout accepter” i „Tout
+                        refuser” były na tym samym poziomie i w tym samym formacie.
+                        Jeśli projektujesz dla użytkowników z całej UE, bezpieczniej
+                        przyjąć ten wyższy próg i nadać obu przyciskom ten sam styl.
+                        „Ustawienia” mogą pozostać drugorzędne.</p>
+
+                    <div class="entry__illustration">
+                        <div class="entry__ck-pair">
+                            <div class="entry__ck-col entry__ck-col--warn">
+                                <p class="entry__ck-head">Szara strefa – zwykle dopuszczalne</p>
+                                <div class="entry__ck-screen" aria-hidden="true">
+                                    <span class="entry__ck-line entry__ck-line--nav"></span>
+                                    <span class="entry__ck-media"></span>
+                                    <span class="entry__ck-line"></span>
+                                    <span class="entry__ck-line entry__ck-line--soft"></span>
+                                    <div class="entry__ck-banner">
+                                        <p class="entry__ck-banner-title">Szanujemy Twoją prywatność</p>
+                                        <p class="entry__ck-banner-text">Używamy cookies do analityki i reklam.
+                                            Możesz się zgodzić, odmówić albo wybrać kategorie.</p>
+                                        <div class="entry__ck-buttons entry__ck-buttons--tight">
+                                            <span class="entry__ck-mark entry__ck-btn entry__ck-btn--ghost">Odrzuć
+                                                wszystkie<span class="entry__ck-pin">1</span></span>
+                                            <span class="entry__ck-mark entry__ck-btn entry__ck-btn--accent">Akceptuj
+                                                wszystkie<span class="entry__ck-pin">2</span></span>
+                                        </div>
+                                        <span class="entry__ck-btn entry__ck-btn--ghost">Ustawienia</span>
+                                    </div>
+                                </div>
+                                <ul class="entry__ck-legend">
+                                    <li><span class="entry__ck-pin" aria-hidden="true">1</span>„Odrzuć” jest na pierwszej warstwie, ma ten sam rozmiar i czytelny tekst.</li>
+                                    <li><span class="entry__ck-pin" aria-hidden="true">2</span>Wypełniony przycisk zgody nadal przyciąga wzrok, dlatego to szara strefa, a nie wzorzec.</li>
+                                </ul>
+                            </div>
+                            <div class="entry__ck-col">
+                                <p class="entry__ck-head">Poza granicą – odmowa nieczytelna</p>
+                                <div class="entry__ck-screen" aria-hidden="true">
+                                    <span class="entry__ck-line entry__ck-line--nav"></span>
+                                    <span class="entry__ck-media"></span>
+                                    <span class="entry__ck-line"></span>
+                                    <span class="entry__ck-line entry__ck-line--soft"></span>
+                                    <div class="entry__ck-banner">
+                                        <p class="entry__ck-banner-title">Szanujemy Twoją prywatność</p>
+                                        <p class="entry__ck-banner-text">Używamy cookies do analityki i reklam.
+                                            Możesz się zgodzić, odmówić albo wybrać kategorie.</p>
+                                        <div class="entry__ck-buttons entry__ck-buttons--tight">
+                                            <span class="entry__ck-mark entry__ck-btn entry__ck-btn--faint">Odrzuć
+                                                wszystkie<span class="entry__ck-pin">1</span></span>
+                                            <span class="entry__ck-btn entry__ck-btn--accent">Akceptuj
+                                                wszystkie</span>
+                                        </div>
+                                        <span class="entry__ck-btn entry__ck-btn--ghost">Ustawienia</span>
+                                    </div>
+                                </div>
+                                <ul class="entry__ck-legend">
+                                    <li><span class="entry__ck-pin" aria-hidden="true">1</span>Tekst odmowy prawie zlewa się z tłem, jest mniejszy i bez obrysu. Taki kontrast Taskforce uznaje za oczywiście wprowadzający w błąd.</li>
+                                </ul>
+                            </div>
+                        </div>
+                        <p class="entry__fig-caption">FIG. 1 – WYRÓŻNIONA ZGODA: GDZIE KOŃCZY SIĘ SZARA STREFA</p>
+                        <p class="entry__illustration-desc">Oba banery mają „Odrzuć” na pierwszej warstwie. Po lewej odmowa jest mniej widoczna,
+                            ale czytelna – to przypadek oceniany indywidualnie. Po
+                            prawej kontrast jest tak niski, że tekstu prawie nie
+                            widać, i taki przypadek raport Taskforce wprost uznaje
+                            za wprowadzający w błąd. Najbezpieczniej nadać obu
+                            przyciskom ten sam styl, jak w wersji zgodnej na FIG. 2.</p>
+                    </div>
+
+                    <h2 class="entry__heading">Ilustracja / przykład</h2>
+                    <div class="entry__illustration">
+                        <div class="entry__ck-pair">
+                            <div class="entry__ck-col">
+                                <p class="entry__ck-head">Wzorzec kwestionowany</p>
+                                <div class="entry__ck-screen" aria-hidden="true">
+                                    <span class="entry__ck-line entry__ck-line--nav"></span>
+                                    <span class="entry__ck-media"></span>
+                                    <span class="entry__ck-line"></span>
+                                    <span class="entry__ck-line entry__ck-line--soft"></span>
+                                    <div class="entry__ck-banner">
+                                        <p class="entry__ck-banner-title">Szanujemy Twoją prywatność</p>
+                                        <p class="entry__ck-banner-text">Używamy cookies, żeby ulepszać stronę
+                                            i dopasować reklamy. Szczegóły i odmowa w <span
+                                                class="entry__ck-banner-link">ustawieniach</span>.<span
+                                                class="entry__ck-pin">2</span></p>
+                                        <div class="entry__ck-buttons">
+                                            <span class="entry__ck-mark entry__ck-btn entry__ck-btn--accent">Akceptuj
+                                                wszystkie<span class="entry__ck-pin">1</span></span>
+                                            <span class="entry__ck-mark entry__ck-more">Więcej opcji<span
+                                                    class="entry__ck-pin">3</span></span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <ul class="entry__ck-legend">
+                                    <li><span class="entry__ck-pin" aria-hidden="true">1</span>Na pierwszej warstwie nie ma „Odrzuć”, jest tylko zgoda.</li>
+                                    <li><span class="entry__ck-pin" aria-hidden="true">2</span>Odmowa ukryta w linku wplecionym w tekst.</li>
+                                    <li><span class="entry__ck-pin" aria-hidden="true">3</span>„Więcej opcji” mniejsze i słabiej widoczne niż zgoda.</li>
+                                </ul>
+                            </div>
+                            <div class="entry__ck-col entry__ck-col--good">
+                                <p class="entry__ck-head">Wzorzec zgodny</p>
+                                <div class="entry__ck-screen" aria-hidden="true">
+                                    <span class="entry__ck-reopen"><svg width="12" height="12" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="6.5" stroke="currentColor" stroke-width="1.5" /><circle cx="6" cy="6.5" r="1.1" fill="currentColor" /><circle cx="10" cy="9.5" r="1.1" fill="currentColor" /><circle cx="6.5" cy="10.5" r="0.9" fill="currentColor" /></svg></span>
+                                    <span class="entry__ck-line entry__ck-line--nav"></span>
+                                    <span class="entry__ck-media"></span>
+                                    <span class="entry__ck-line"></span>
+                                    <span class="entry__ck-line entry__ck-line--soft"></span>
+                                    <div class="entry__ck-banner">
+                                        <p class="entry__ck-banner-title">Szanujemy Twoją prywatność</p>
+                                        <p class="entry__ck-banner-text">Używamy cookies do analityki i reklam.
+                                            Możesz się zgodzić, odmówić albo wybrać kategorie.</p>
+                                        <div class="entry__ck-buttons">
+                                            <span class="entry__ck-btn">Odrzuć wszystkie</span>
+                                            <span class="entry__ck-btn">Akceptuj wszystkie</span>
+                                        </div>
+                                        <span class="entry__ck-btn entry__ck-btn--ghost">Ustawienia</span>
+                                    </div>
+                                </div>
+                                <ul class="entry__ck-legend">
+                                    <li><span class="entry__ck-pin" aria-hidden="true"><svg width="10" height="10" viewBox="0 0 12 12" fill="none" aria-hidden="true"><path d="M2.5 6.3L5 8.7L9.5 3.6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" /></svg></span>„Odrzuć” i „Akceptuj” mają ten sam rozmiar i kolor.</li>
+                                    <li><span class="entry__ck-pin" aria-hidden="true"><svg width="10" height="10" viewBox="0 0 12 12" fill="none" aria-hidden="true"><path d="M2.5 6.3L5 8.7L9.5 3.6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" /></svg></span>Wybór kategorii jako trzecia, osobna opcja.</li>
+                                    <li><span class="entry__ck-pin" aria-hidden="true"><svg width="10" height="10" viewBox="0 0 12 12" fill="none" aria-hidden="true"><path d="M2.5 6.3L5 8.7L9.5 3.6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" /></svg></span>Ikona w rogu otwiera ustawienia w każdej chwili.</li>
+                                </ul>
+                            </div>
+                        </div>
+                        <p class="entry__fig-caption">FIG. 2 – TEN SAM BANER W DWÓCH WERSJACH</p>
+                        <p class="entry__illustration-desc">Po lewej wzorzec, który EROD opisała jako problematyczny: jedyny wyraźny przycisk to
+                            zgoda, a odmowa czeka w linku i drugiej warstwie. Po
+                            prawej obie decyzje mają ten sam rozmiar i kolor, a
+                            ikona w rogu pozwala zmienić zdanie później.</p>
+
+                        <div class="entry__ck-clicks">
+                            <div class="entry__ck-row">
+                                <p class="entry__ck-row-label">Zgoda (obie wersje)</p>
+                                <div class="entry__ck-chips">
+                                    <span class="entry__ck-chip">Akceptuj wszystkie</span>
+                                    <span class="entry__ck-count">→ 1 klik</span>
+                                </div>
+                            </div>
+                            <div class="entry__ck-row">
+                                <p class="entry__ck-row-label">Odmowa w wersji kwestionowanej</p>
+                                <div class="entry__ck-chips">
+                                    <span class="entry__ck-chip entry__ck-chip--red">Więcej opcji</span>
+                                    <span class="entry__ck-chip entry__ck-chip--red">Analityka</span>
+                                    <span class="entry__ck-chip entry__ck-chip--red">Reklamy</span>
+                                    <span class="entry__ck-chip entry__ck-chip--red">Wideo</span>
+                                    <span class="entry__ck-chip entry__ck-chip--red">Zapisz wybór</span>
+                                    <span class="entry__ck-count entry__ck-count--red">→ 5 kliknięć</span>
+                                </div>
+                            </div>
+                            <div class="entry__ck-row">
+                                <p class="entry__ck-row-label">Odmowa w wersji zgodnej</p>
+                                <div class="entry__ck-chips">
+                                    <span class="entry__ck-chip entry__ck-chip--green">Odrzuć wszystkie</span>
+                                    <span class="entry__ck-count entry__ck-count--green">→ 1 klik</span>
+                                </div>
+                            </div>
+                        </div>
+                        <p class="entry__fig-caption">FIG. 3 – ILE KLIKNIĘĆ DZIELI OD ZGODY, A ILE OD ODMOWY</p>
+                        <p class="entry__illustration-desc">W wersji kwestionowanej przełączniki są zaznaczone z góry, więc odmowa to
+                            odznaczenie każdego z nich i zapis. CNIL ukarała Google
+                            i Facebooka łącznie na 210 mln € właśnie za to, że zgoda
+                            wymagała jednego kliknięcia, a odmowa kilku.</p>
+                    </div>
+
+                    <div class="entry__note">
+                        <div class="entry__note-col">
+                            <p class="entry__note-label">NOTATKI</p>
+                            <ul class="entry__note-list">
+                                <li class="entry__note-item">
+                                    <a href="https://www.edpb.europa.eu/system/files/2023-01/edpb_20230118_report_cookie_banner_taskforce_en.pdf" target="_blank" rel="noopener noreferrer"
+                                        class="entry__note-link">EROD – Cookie Banner Taskforce</a> (styczeń 2023) – wspólne stanowisko organów nadzorczych wobec setek skarg na banery. Opisuje praktyki, które większość organów uznaje za naruszenie: brak „Odrzuć” na pierwszej warstwie, zaznaczone z góry pola, odmowę jako link w tekście, mylące kolory i kontrast przycisków, powoływanie się na prawnie uzasadniony interes, cookies błędnie oznaczone jako niezbędne i brak łatwego sposobu na wycofanie zgody. Kolory ocenia się indywidualnie, ale nie mogą sprawiać, że wybór jest oczywiście wprowadzający w błąd. Taki przypadek raport wskazuje wprost: przycisk odmowy o kontraście tak niskim, że tekst jest nieczytelny.
+                                </li>
+                                <li class="entry__note-item">
+                                    <a href="https://www.edpb.europa.eu/our-work-tools/our-documents/guidelines/guidelines-052020-consent-under-regulation-2016679_en" target="_blank" rel="noopener noreferrer"
+                                        class="entry__note-link">EROD – Wytyczne 05/2020 w sprawie zgody</a> – przewijanie ani dalsze przeglądanie strony nie są zgodą. Cookie wall, czyli dostęp do treści tylko po zgodzie, sprawia, że zgoda nie jest dobrowolna. Wycofanie zgody ma być tak samo łatwe jak jej wyrażenie (art. 7 ust. 3 RODO).
+                                </li>
+                                <li class="entry__note-item">
+                                    <a href="https://www.edpb.europa.eu/our-work-tools/our-documents/guidelines/guidelines-032022-deceptive-design-patterns-social-media_en" target="_blank" rel="noopener noreferrer"
+                                        class="entry__note-link">EROD – Wytyczne 03/2022 o zwodniczych wzorcach projektowych</a> (wersja 2, luty 2023) – napisane dla mediów społecznościowych, ale ich kategorie pasują do banerów: overloading, skipping, stirring, obstructing, fickle i left in the dark.
+                                </li>
+                                <li class="entry__note-item">
+                                    <a href="https://www.edpb.europa.eu/system/files/2024-10/edpb_guidelines_202302_technical_scope_art_53_eprivacydirective_v2_en_0.pdf" target="_blank" rel="noopener noreferrer"
+                                        class="entry__note-link">EROD – Wytyczne 2/2023 o zakresie art. 5 ust. 3 ePrivacy</a> (październik 2024) – obowiązek zgody obejmuje nie tylko cookies, ale też piksele śledzące, linki z identyfikatorem, fingerprinting, część przetwarzania lokalnego i niektóre przypadki śledzenia po adresie IP.
+                                </li>
+                                <li class="entry__note-item">
+                                    <a href="https://www.edpb.europa.eu/our-work-tools/our-documents/opinion-board-art-64/opinion-082024-valid-consent-context-consent-or_en" target="_blank" rel="noopener noreferrer"
+                                        class="entry__note-link">EROD – Opinia 08/2024 o modelach „zgoda albo płać”</a> (kwiecień 2024) – duże platformy, które dają wybór tylko między zgodą na reklamy behawioralne a opłatą, w większości przypadków nie uzyskają ważnej zgody. Powinny zaoferować też darmową wersję bez reklam behawioralnych.
+                                </li>
+                                <li class="entry__note-item">
+                                    <a href="https://curia.europa.eu/juris/liste.jsf?num=C-673/17" target="_blank" rel="noopener noreferrer"
+                                        class="entry__note-link">TSUE – wyrok Planet49 (C-673/17)</a> (październik 2019) – z góry zaznaczone pole wyboru nie jest ważną zgodą na cookies, niezależnie od tego, czy chodzi o dane osobowe.
+                                </li>
+                                <li class="entry__note-item">
+                                    <a href="https://www.cnil.fr/fr/cookies-et-autres-traceurs/regles/cookies/lignes-directrices-modificatives-et-recommandation" target="_blank" rel="noopener noreferrer"
+                                        class="entry__note-link">CNIL – rekomendacja w sprawie cookies</a> (wrzesień 2020) – francuski organ zaleca dwa przyciski, „Tout accepter” i „Tout refuser”, na tym samym poziomie i w tym samym formacie, tak żeby odmowa była możliwa jednym kliknięciem i w tym samym miejscu co zgoda. To wymóg ostrzejszy niż wspólne stanowisko EROD.
+                                </li>
+                                <li class="entry__note-item">
+                                    <a href="https://www.cnil.fr/fr/cookies-la-cnil-sanctionne-google-hauteur-de-150-millions-deuros-et-facebook-hauteur-de-60-millions" target="_blank" rel="noopener noreferrer"
+                                        class="entry__note-link">CNIL – kary dla Google i Facebooka</a> (styczeń 2022) – 150 mln € i 60 mln € za to, że odmowa wymagała kilku kliknięć, a zgoda jednego. W 2023 r. Google dodał przycisk „Zezwól tylko na niezbędne” obok przycisku akceptacji.
+                                </li>
+                                <li class="entry__note-item">
+                                    <a href="https://isap.sejm.gov.pl/isap.nsf/DocDetails.xsp?id=WDU20240001221" target="_blank" rel="noopener noreferrer"
+                                        class="entry__note-link">Prawo komunikacji elektronicznej, art. 399</a> – od 10 listopada 2024 r. zastępuje przepisy Prawa telekomunikacyjnego. Nadzór sprawuje Prezes UKE (kara do 3% przychodu), a gdy w grę wchodzą dane osobowe, także Prezes UODO na podstawie RODO.
+                                </li>
+                                <li class="entry__note-item">
+                                    <a href="https://www.edpb.europa.eu/documents/legislative-opinion/edpb-edps-joint-opinion-22026-on-the-proposal-for-a-regulation-as_en" target="_blank" rel="noopener noreferrer"
+                                        class="entry__note-link">EROD i EDPS – wspólna opinia 2/2026 o Digital Omnibus</a> (luty 2026) – Komisja Europejska zaproponowała w listopadzie 2025 r. przeniesienie zasad dotyczących cookies do RODO (art. 88a) i uznawanie sygnałów wysyłanych przez przeglądarkę (art. 88b). EROD i EDPS poparły cel, zastrzegając wąskie wyjątki. Według relacji z negocjacji Rada UE w maju 2026 r. usunęła art. 88a ze swojego tekstu. Na wrzesień 2026 r. przepisy są w negocjacjach, a obowiązuje art. 5 ust. 3 ePrivacy.
+                                </li>
+                                <li class="entry__note-item">Wpis opisuje stan na wrzesień 2026 r. i nie zastępuje porady prawnej.</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <h2 class="entry__heading">Powiązane hasła</h2>
+                    <div class="entry__related">
+                        <a href="#" class="entry__related-link">Zwodnicze wzorce</a>
+                        <a href="#" class="entry__related-link">Celowe tarcie</a>
+                        <a href="#" class="entry__related-link">Hierarchia przycisków</a>
+                        <a href="#" class="entry__related-link">Consent or pay</a>
+                        <a href="#" class="entry__related-link">Privacy by design</a>
+                    </div>
+
+                    <div class="divider"></div>
+
+                    <div class="entry__footer-meta">
+                        <p>Źródła: EROD, TSUE, CNIL, Prawo komunikacji elektronicznej</p>
+                        <p>Opublikowane · wrz 2026</p>
+                    </div>
+                </article>
+            </main>
+
+            <div class="divider"></div>
+            <footer class="footer__bottom">
+                <p class="footer__copyright">© 2026 Heuristika – Osobista Biblioteka Projektanta</p>
+                <nav class="footer__links">
+                    <a href="katalog.html" class="footer__link">Katalog</a>
+                    <a href="o-projekcie.html" class="footer__link">O projekcie</a>
+                </nav>
+            </footer>
+        </div>
+    </div>
+
+    <script src="dots-pattern.js"></script>
+
+    <script src="nav.js"></script>
+
+    <script>
+        (function () {
+            const btn = document.getElementById('themeToggle');
+            if (!btn) return;
+            const root = document.documentElement;
+
+            function sync() {
+                btn.setAttribute('aria-pressed', String(root.getAttribute('data-theme') === 'light'));
+            }
+            sync();
+
+            btn.addEventListener('click', () => {
+                const next = root.getAttribute('data-theme') === 'light' ? 'dark' : 'light';
+                root.setAttribute('data-theme', next);
+                try { localStorage.setItem('heuristika-theme', next); } catch (e) { }
+                sync();
+            });
+        })();
+    </script>
+</body>
+</html>

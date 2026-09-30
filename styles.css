@@ -2603,6 +2603,328 @@ body {
   }
 }
 
+/* ---------- Wpis: baner cookies – dwie wersje i liczba kliknięć ---------- */
+
+.entry__ck-pair {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 20px;
+  width: 100%;
+  margin-bottom: 18px;
+}
+
+.entry__ck-col {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  min-width: 0;
+  --tone: var(--danger-fg);
+}
+
+.entry__ck-col--good {
+  --tone: var(--badge-green-fg);
+}
+
+.entry__ck-head {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 0;
+  color: var(--tone);
+  font-family: "Geist Mono", monospace;
+  font-size: 11px;
+  font-weight: 500;
+  text-transform: uppercase;
+}
+
+.entry__ck-head::before {
+  content: "";
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: currentColor;
+}
+
+.entry__ck-screen {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-height: 300px;
+  padding: 16px;
+  border: 1px solid color-mix(in srgb, var(--tone) 35%, var(--border));
+  border-radius: 8px;
+  background: var(--bg);
+}
+
+.entry__ck-media {
+  flex-shrink: 0;
+  height: 48px;
+  border-radius: 4px;
+  background: var(--surface);
+}
+
+.entry__ck-line {
+  flex-shrink: 0;
+  width: 60%;
+  height: 5px;
+  border-radius: 2px;
+  background: var(--border-strong);
+}
+
+.entry__ck-line--nav {
+  width: 22%;
+  height: 4px;
+}
+
+.entry__ck-line--soft {
+  width: 74%;
+  height: 4px;
+  background: var(--border);
+}
+
+.entry__ck-banner {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: auto;
+  padding: 14px;
+  border: 1px solid var(--border-strong);
+  border-radius: 8px;
+  background: var(--surface);
+}
+
+.entry__ck-banner-title {
+  margin: 0;
+  color: var(--ink);
+  font-family: "Geist", sans-serif;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.entry__ck-banner-text {
+  margin: 0;
+  color: var(--ink-secondary);
+  font-family: "Geist", sans-serif;
+  font-size: 11px;
+  line-height: 16px;
+}
+
+.entry__ck-banner-link {
+  color: var(--badge-blue-fg);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.entry__ck-buttons {
+  display: flex;
+  align-items: stretch;
+  gap: 14px;
+}
+
+.entry__ck-btn {
+  flex: 1 1 0;
+  min-width: 0;
+  padding: 8px 10px;
+  border: 1px solid transparent;
+  border-radius: 6px;
+  background: var(--ink);
+  color: var(--bg);
+  font-family: "Geist", sans-serif;
+  font-size: 11px;
+  font-weight: 500;
+  text-align: center;
+  white-space: nowrap;
+}
+
+.entry__ck-btn--accent {
+  background: var(--badge-blue-fg);
+}
+
+.entry__ck-btn--ghost {
+  border-color: var(--border-strong);
+  background: transparent;
+  color: var(--ink);
+}
+
+.entry__ck-col--warn {
+  --tone: var(--badge-amber-fg);
+}
+
+.entry__ck-buttons--tight {
+  gap: 8px;
+}
+
+/* Celowo prawie niewidoczne – ilustruje odmowę z zerowym kontrastem. */
+.entry__ck-btn--faint {
+  flex: 0 0 auto;
+  padding: 8px 4px;
+  background: transparent;
+  color: color-mix(in srgb, var(--ink) 16%, var(--surface));
+  font-size: 9px;
+  font-weight: 400;
+}
+
+.entry__ck-more {
+  flex-shrink: 0;
+  align-self: center;
+  color: var(--ink-tertiary);
+  font-family: "Geist", sans-serif;
+  font-size: 9px;
+  white-space: nowrap;
+}
+
+/* Adnotacje leżą na rogu elementu i nie zmieniają układu makiety –
+   baner ma wyglądać jak prawdziwy. */
+.entry__ck-mark {
+  position: relative;
+}
+
+.entry__ck-mark > .entry__ck-pin {
+  position: absolute;
+  top: -9px;
+  right: -9px;
+}
+
+/* Link jest za mały na pinezkę w rogu – kładziemy ją pod spodem. */
+.entry__ck-more.entry__ck-mark > .entry__ck-pin {
+  top: calc(100% + 4px);
+  right: 50%;
+  transform: translateX(50%);
+}
+
+.entry__ck-pin {
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  border: 1px solid color-mix(in srgb, var(--tone) 55%, transparent);
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--tone) 16%, var(--bg));
+  color: var(--tone);
+  font-family: "Geist", sans-serif;
+  font-size: 10px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+}
+
+.entry__ck-pin svg {
+  display: block;
+}
+
+.entry__ck-banner-text .entry__ck-pin {
+  margin-left: 6px;
+  vertical-align: -5px;
+}
+
+.entry__ck-reopen {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border: 1px solid var(--border-strong);
+  border-radius: 50%;
+  background: var(--surface);
+  color: var(--ink-secondary);
+}
+
+.entry__ck-legend {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.entry__ck-legend li {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  color: var(--ink-secondary);
+  font-family: "Geist", sans-serif;
+  font-size: 12px;
+  line-height: 18px;
+}
+
+.entry__ck-clicks {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  max-width: 100%;
+  margin: 28px 0 14px;
+}
+
+.entry__ck-row {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.entry__ck-row-label {
+  margin: 0;
+  color: var(--ink-secondary);
+  font-family: "Geist", sans-serif;
+  font-size: 11px;
+}
+
+.entry__ck-chips {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+}
+
+.entry__ck-chip {
+  padding: 5px 8px;
+  border: 1px solid var(--border-strong);
+  border-radius: 4px;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: "Geist Mono", monospace;
+  font-size: 10px;
+}
+
+.entry__ck-chip--red {
+  border-color: color-mix(in srgb, var(--danger-fg) 35%, var(--bg));
+  background: color-mix(in srgb, var(--danger-fg) 12%, var(--bg));
+  color: var(--danger-fg);
+}
+
+.entry__ck-chip--green {
+  border-color: var(--badge-green-border);
+  background: var(--badge-green-bg);
+  color: var(--badge-green-fg);
+}
+
+.entry__ck-count {
+  color: var(--ink);
+  font-family: "Geist Mono", monospace;
+  font-size: 11px;
+  font-weight: 500;
+}
+
+.entry__ck-count--red { color: var(--danger-fg); }
+.entry__ck-count--green { color: var(--badge-green-fg); }
+
+@media (max-width: 760px) {
+  .entry__ck-pair {
+    grid-template-columns: 1fr;
+    gap: 28px;
+  }
+
+  .entry__ck-screen {
+    min-height: 280px;
+  }
+}
+
 /* Bez ruchu: zamrażamy ilustrację w najbardziej wymownym momencie
    (ok. 1,5 s) – preloader wciąż zasłania stronę, skeleton pokazuje
    układ, a wariant progresywny ma już tekst i czeka tylko na obraz. */
