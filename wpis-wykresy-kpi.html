@@ -1,0 +1,521 @@
+<html lang="pl">
+
+<head>
+    <script>
+        (function () {
+            try {
+                var stored = localStorage.getItem('heuristika-theme');
+                var theme = stored || (window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark');
+                document.documentElement.setAttribute('data-theme', theme);
+            } catch (e) {
+                document.documentElement.setAttribute('data-theme', 'dark');
+            }
+        })();
+    </script>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Wykres słupkowy, kołowy czy pierścieniowy na dashboardzie KPI – Heuristika</title>
+    <link rel="icon" type="image/svg+xml" href="assets/favicon.svg" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600&family=Geist+Mono:wght@400;500&family=Inter:wght@400;500;600;700&family=BBH+Bartle:wght@400&display=swap"
+        rel="stylesheet" />
+    <link rel="stylesheet" href="styles.css" />
+    <script src="https://t.contentsquare.net/uxa/f290fd08d66fb.js" defer></script>
+    <script type="text/javascript">
+        (function(c,l,a,r,i,t,y){
+            c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
+            t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
+            y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
+        })(window, document, "clarity", "script", "yqdubbd8pd");
+    </script>
+</head>
+
+<body>
+    <canvas id="dots"></canvas>
+    <div class="page">
+        <div class="shell">
+            <nav class="nav" aria-label="Top navigation">
+                <div class="nav-left">
+                    <a href="index.html" class="brand" aria-label="Heuristika home">
+                        <svg class="brand-icon" viewBox="0 0 20 17.32" fill="none" aria-hidden="true">
+                            <path d="M10 0L20 17.32H0L10 0Z" fill="currentColor" />
+                        </svg>
+                        <span class="brand-title">Heuristika</span>
+                    </a>
+                    <div class="nav-links" id="navLinks">
+                        <a href="katalog.html" class="nav-link">Katalog</a>
+                        <a href="o-projekcie.html" class="nav-link nav-link--small">O projekcie</a>
+                    </div>
+                </div>
+
+                <div class="nav-right">
+                    <button type="button" class="icon-button theme-toggle" id="themeToggle"
+                        aria-label="Przełącz tryb jasny/ciemny" aria-pressed="false">
+                        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                            <path d="M8 2V4" stroke="currentColor" stroke-width="1.33333" stroke-linecap="round"
+                                stroke-linejoin="round" />
+                            <path d="M8 12V14" stroke="currentColor" stroke-width="1.33333" stroke-linecap="round"
+                                stroke-linejoin="round" />
+                            <path d="M2 8H4" stroke="currentColor" stroke-width="1.33333" stroke-linecap="round"
+                                stroke-linejoin="round" />
+                            <path d="M12 8H14" stroke="currentColor" stroke-width="1.33333" stroke-linecap="round"
+                                stroke-linejoin="round" />
+                            <path d="M3.73333 3.73333L5.2 5.2" stroke="currentColor" stroke-width="1.33333"
+                                stroke-linecap="round" stroke-linejoin="round" />
+                            <path d="M10.8 10.8L12.2667 12.2667" stroke="currentColor" stroke-width="1.33333"
+                                stroke-linecap="round" stroke-linejoin="round" />
+                            <path d="M3.73333 12.2667L5.2 10.8" stroke="currentColor" stroke-width="1.33333"
+                                stroke-linecap="round" stroke-linejoin="round" />
+                            <path d="M10.8 5.2L12.2667 3.73333" stroke="currentColor" stroke-width="1.33333"
+                                stroke-linecap="round" stroke-linejoin="round" />
+                            <circle cx="8" cy="8" r="1.66667" stroke="currentColor" stroke-width="1.33333" />
+                        </svg>
+                    </button>
+                    <button type="button" class="footer__subscribe">
+                        <svg class="footer__subscribe-icon" width="16" height="16" viewBox="0 0 16 16" fill="none"
+                            aria-hidden="true">
+                            <path d="M6.667 4.667V3.334H10.667V4.667L12.667 10.667H4.667L6.667 4.667Z"
+                                stroke="currentColor" stroke-width="1.333" stroke-linecap="round"
+                                stroke-linejoin="round" />
+                            <circle cx="8" cy="11.8" r="0.8" fill="currentColor" />
+                        </svg>
+                        Subskrybuj
+                    </button>
+                </div>
+
+                <button type="button" class="nav-toggle" aria-label="Otwórz menu" aria-expanded="false"
+                    aria-controls="navLinks">
+                    <svg class="nav-toggle-icon" viewBox="0 0 20 16" width="20" height="16" fill="none"
+                        aria-hidden="true">
+                        <path d="M1 1H19" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" />
+                        <path d="M1 8H19" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" />
+                        <path d="M1 15H19" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" />
+                    </svg>
+                </button>
+            </nav>
+            <div class="divider"></div>
+
+            <main class="entry">
+                <article class="entry-card">
+                    <div class="entry__heading-group">
+                        <p class="entry__eyebrow">Bar, pie i donut chart · dashboard KPI</p>
+                        <h1 class="entry__title">Wykres słupkowy, kołowy czy pierścieniowy na dashboardzie KPI</h1>
+                    </div>
+                    <p class="entry__lead">Dashboard z kilkunastoma widgetami czyta się w kilka sekund. W tym czasie
+                        użytkownik ma porównać wartości, zauważyć odstępstwo od celu i ocenić trend. Od wyboru między
+                        wykresem słupkowym, kołowym a pierścieniowym zależy, czy zrobi to jednym spojrzeniem, czy będzie
+                        porównywał kąty i dopasowywał kolory do legendy.</p>
+
+                    <div class="entry__taxonomy">
+                        <span class="about__badge about__badge--blue">
+                            <svg width="6" height="6" viewBox="0 0 6 6" aria-hidden="true">
+                                <circle cx="3" cy="3" r="3" fill="currentColor" />
+                            </svg>
+                            UI Design
+                        </span>
+                        <span class="about__badge about__badge--violet">
+                            <svg width="6" height="6" viewBox="0 0 6 6" aria-hidden="true">
+                                <circle cx="3" cy="3" r="3" fill="currentColor" />
+                            </svg>
+                            Wzorzec
+                        </span>
+                        <span class="about__badge about__badge--green">
+                            <svg width="6" height="6" viewBox="0 0 6 6" aria-hidden="true">
+                                <circle cx="3" cy="3" r="3" fill="currentColor" />
+                            </svg>
+                            Desktop
+                        </span>
+                        <span class="about__badge about__badge--amber">
+                            <svg width="21" height="5" viewBox="0 0 21 5" aria-hidden="true">
+                                <circle cx="2.5" cy="2.5" r="2.5" fill="currentColor" />
+                                <circle cx="10.5" cy="2.5" r="2.5" fill="currentColor" />
+                                <circle cx="18.5" cy="2.5" r="2.5" fill="var(--badge-amber-border)" />
+                            </svg>
+                            Średni
+                        </span>
+                    </div>
+
+                    <div class="divider"></div>
+
+                    <div class="entry__tldr-wrap">
+                        <div class="entry__tldr-bar"></div>
+                        <div class="entry__tldr-col">
+                            <p class="entry__tldr-label">TL;DR</p>
+                            <p class="entry__tldr-text">Ludzie oceniają długość i położenie na wspólnej osi znacznie
+                                dokładniej niż kąt i pole – pokazali to Cleveland i McGill w badaniach z 1984 r. Na
+                                dashboardzie KPI większość pytań brzmi „co jest większe?”, „jak wypadamy względem
+                                celu?” albo „jak zmieniło się to od zeszłego miesiąca?”, więc domyślnym wyborem jest
+                                wykres słupkowy: poziomy, posortowany, z osią od zera i wartością przy słupku. Wykres
+                                kołowy i pierścieniowy mają sens w jednej sytuacji: gdy pokazują udział części w
+                                całości, kategorie są dwie lub trzy, a ich suma to 100%. Z tych dwóch na dashboardzie
+                                lepiej sprawdza się pierścień: jest prawie tak samo czytelny jak koło, a w środku
+                                mieści łączną wartość albo główny wynik. Sam wskaźnik często nie potrzebuje wykresu
+                                wcale – wystarczy duża liczba z porównaniem do poprzedniego okresu lub celu.</p>
+                        </div>
+                    </div>
+
+                    <h2 class="entry__heading">Kiedy stosować</h2>
+                    <p class="entry__copy">Wykres słupkowy sprawdza się wszędzie tam, gdzie widget ma pomóc porównać
+                        wartości: przychód w kanałach sprzedaży, liczbę zgłoszeń w zespołach, czas obsługi w regionach
+                        albo wynik względem celu. Słupki poziome mieszczą długie etykiety kategorii i dobrze znoszą
+                        zmianę szerokości widgetu w siatce dashboardu, a sortowanie od największej wartości daje
+                        ranking bez dodatkowej pracy. Wykres kołowy lub pierścieniowy wybierz tylko wtedy, gdy pytanie
+                        brzmi „jaka część całości?”: udział zamówień z aplikacji, odsetek zgłoszeń zamkniętych w
+                        terminie, podział budżetu na dwie pozycje. Zrezygnuj z niego, gdy kategorii jest więcej niż
+                        trzy, wartości są do siebie zbliżone, chcesz porównać dwa okresy albo wartości nie sumują się
+                        do 100% – na przykład współczynnik konwersji w kanałach. Na desktopie dochodzi jeszcze miejsce:
+                        koło zajmuje kwadrat i zwykle potrzebuje legendy obok, więc w widgecie o szerokości jednej
+                        trzeciej ekranu sam wykres robi się mały, a legenda zabiera resztę. Pierścień ma tu przewagę
+                        nad pełnym kołem, bo wolny środek zastępuje osobny nagłówek z wartością.</p>
+
+                    <h2 class="entry__heading">Best practices</h2>
+                    <div class="entry__dodont">
+                        <div class="entry__dodont-card">
+                            <div class="entry__dodont-row">
+                                <svg class="entry__dodont-label--do" width="6" height="6" viewBox="0 0 6 6"
+                                    aria-hidden="true">
+                                    <circle cx="3" cy="3" r="3" fill="currentColor" />
+                                </svg>
+                                <p class="entry__dodont-label entry__dodont-label--do">Rób</p>
+                            </div>
+                            <p class="entry__dodont-text">Porównanie kategorii pokazuj na poziomych słupkach posortowanych malejąco, z etykietą kategorii po lewej i wartością na końcu słupka. Legenda nie jest wtedy potrzebna.</p>
+                        </div>
+                        <div class="entry__dodont-card">
+                            <div class="entry__dodont-row">
+                                <svg class="entry__dodont-label--dont" width="6" height="6" viewBox="0 0 6 6"
+                                    aria-hidden="true">
+                                    <circle cx="3" cy="3" r="3" fill="currentColor" />
+                                </svg>
+                                <p class="entry__dodont-label entry__dodont-label--dont">Nie rób</p>
+                            </div>
+                            <p class="entry__dodont-text">Nie pokazuj na kole ani na pierścieniu pięciu i więcej kategorii o zbliżonych wartościach. Różnicy między 21% a 24% nie widać w kątach, więc użytkownik i tak szuka liczb w legendzie.</p>
+                        </div>
+                    </div>
+                    <div class="entry__dodont">
+                        <div class="entry__dodont-card">
+                            <div class="entry__dodont-row">
+                                <svg class="entry__dodont-label--do" width="6" height="6" viewBox="0 0 6 6"
+                                    aria-hidden="true">
+                                    <circle cx="3" cy="3" r="3" fill="currentColor" />
+                                </svg>
+                                <p class="entry__dodont-label entry__dodont-label--do">Rób</p>
+                            </div>
+                            <p class="entry__dodont-text">Oś wartości zaczynaj od zera, bo długość słupka musi odpowiadać wartości. Gdy różnice są drobne, a liczy się trend, użyj wykresu liniowego.</p>
+                        </div>
+                        <div class="entry__dodont-card">
+                            <div class="entry__dodont-row">
+                                <svg class="entry__dodont-label--dont" width="6" height="6" viewBox="0 0 6 6"
+                                    aria-hidden="true">
+                                    <circle cx="3" cy="3" r="3" fill="currentColor" />
+                                </svg>
+                                <p class="entry__dodont-label entry__dodont-label--dont">Nie rób</p>
+                            </div>
+                            <p class="entry__dodont-text">Nie stawiaj dwóch kół obok siebie, żeby porównać okresy, i nie używaj efektu 3D ani wysuniętych wycinków. Perspektywa zmienia pozorną wielkość segmentów.</p>
+                        </div>
+                    </div>
+                    <div class="entry__dodont">
+                        <div class="entry__dodont-card">
+                            <div class="entry__dodont-row">
+                                <svg class="entry__dodont-label--do" width="6" height="6" viewBox="0 0 6 6"
+                                    aria-hidden="true">
+                                    <circle cx="3" cy="3" r="3" fill="currentColor" />
+                                </svg>
+                                <p class="entry__dodont-label entry__dodont-label--do">Rób</p>
+                            </div>
+                            <p class="entry__dodont-text">Jeśli pokazujesz udział w całości, wybierz pierścień z łączną wartością lub głównym wynikiem w środku, najwyżej trzy segmenty i podpisy bezpośrednio przy nich. Segmenty ułóż od największego, zaczynając od godziny dwunastej.</p>
+                        </div>
+                        <div class="entry__dodont-card">
+                            <div class="entry__dodont-row">
+                                <svg class="entry__dodont-label--dont" width="6" height="6" viewBox="0 0 6 6"
+                                    aria-hidden="true">
+                                    <circle cx="3" cy="3" r="3" fill="currentColor" />
+                                </svg>
+                                <p class="entry__dodont-label entry__dodont-label--dont">Nie rób</p>
+                            </div>
+                            <p class="entry__dodont-text">Nie rozróżniaj kategorii wyłącznie kolorem. Przy kilku odcieniach trudno je dopasować do legendy, a osoby z zaburzeniami widzenia barw mogą ich nie odróżnić (WCAG 1.4.1).</p>
+                        </div>
+                    </div>
+                    <h2 class="entry__heading">Wykres pierścieniowy: kiedy koło się broni</h2>
+                    <p class="entry__copy">Krytyka wykresów kołowych nie oznacza, że nigdy nie działają. W badaniu
+                        Spence’a i Lewandowsky’ego z 1991 r. uczestnicy oceniali na kole, jaką część całości stanowi
+                        segment, co najmniej tak dokładnie jak na słupkach. Łatwo też rozpoznać charakterystyczne
+                        proporcje: połowę, ćwierć, trzy czwarte. Problem zaczyna się przy porównywaniu segmentów między
+                        sobą i przy większej liczbie kategorii. Wykres pierścieniowy to koło z wyciętym środkiem.
+                        Kosara i Skau w 2016 r. pokazali, że ludzie odczytują koło raczej z pola i długości łuku niż z
+                        kąta, dlatego pierścień jest prawie tak samo czytelny jak pełne koło. Na dashboardzie ma jedną
+                        realną przewagę: w środku mieści łączną wartość albo główny wynik, więc widget nie potrzebuje
+                        osobnej liczby nad wykresem. Nie rozwiązuje jednak problemów koła. Pierścień z pięcioma
+                        segmentami jest tak samo trudny do odczytania jak koło z pięcioma wycinkami, a bardzo cienki
+                        pierścień zostawia do oceny już tylko długość łuku. Praktyczna granica to dwa lub trzy
+                        segmenty, z których jeden wyraźnie dominuje albo przekracza ważny próg. Jeśli widget pokazuje
+                        wynik względem celu, a nie udział w całości, lepszy będzie pasek postępu z zaznaczonym
+                        celem.</p>
+
+                    <div class="entry__illustration">
+                        <div class="entry__ck-pair">
+                            <div class="entry__ck-col">
+                                <p class="entry__ck-head">Pierścień z pięcioma segmentami</p>
+                                <div class="entry__ck-screen entry__ch-screen" aria-hidden="true">
+                                    <p class="entry__ch-title">Zgłoszenia wg kategorii</p>
+                                    <p class="entry__ch-sub">Wrzesień 2026 · 1 240 zgłoszeń</p>
+                                    <div class="entry__ch-row">
+                                        <svg class="entry__ch-chart" viewBox="0 0 128 128">
+                                            <path class="entry__ch-seg entry__ch-seg--1" d="M64 0A64 64 0 0 1 126.87 52.01L114.29 54.41A51.2 51.2 0 0 0 64 12.8Z" />
+                                            <path class="entry__ch-seg entry__ch-seg--2" d="M126.87 52.01A64 64 0 0 1 79.92 125.99L76.73 113.59A51.2 51.2 0 0 0 114.29 54.41Z" />
+                                            <path class="entry__ch-seg entry__ch-seg--3" d="M79.92 125.99A64 64 0 0 1 14.69 104.8L24.55 96.64A51.2 51.2 0 0 0 76.73 113.59Z" />
+                                            <path class="entry__ch-seg entry__ch-seg--4" d="M14.69 104.8A64 64 0 0 1 12.22 26.38L22.58 33.91A51.2 51.2 0 0 0 24.55 96.64Z" />
+                                            <path class="entry__ch-seg entry__ch-seg--5" d="M12.22 26.38A64 64 0 0 1 64 0L64 12.8A51.2 51.2 0 0 0 22.58 33.91Z" />
+                                        </svg>
+                                        <div class="entry__ch-keys-wrap">
+                                            <ul class="entry__ch-keys">
+                                                <li><span class="entry__ch-key entry__ch-seg--1"></span>Logowanie</li>
+                                                <li><span class="entry__ch-key entry__ch-seg--2"></span>Płatności</li>
+                                                <li><span class="entry__ch-key entry__ch-seg--3"></span>Zwroty</li>
+                                                <li><span class="entry__ch-key entry__ch-seg--4"></span>Dostawa</li>
+                                                <li><span class="entry__ch-key entry__ch-seg--5"></span>Inne</li>
+                                            </ul>
+                                            <span class="entry__ck-pin entry__ch-pin entry__ch-pin--keys">2</span>
+                                        </div>
+                                    </div>
+                                    <span class="entry__ck-pin entry__ch-pin" style="left: 71px; top: 125px;">1</span>
+                                    <span class="entry__ck-pin entry__ch-pin" style="left: 128px; top: 72px;">3</span>
+                                </div>
+                                <ul class="entry__ck-legend">
+                                    <li><span class="entry__ck-pin" aria-hidden="true">1</span>Wolny środek nie pomaga porównać segmentów: 24% i 22% wyglądają tak samo.</li>
+                                    <li><span class="entry__ck-pin" aria-hidden="true">2</span>Kategorię trzeba odczytać z legendy, dopasowując pięć kolorów.</li>
+                                    <li><span class="entry__ck-pin" aria-hidden="true">3</span>Cienki pierścień zostawia do oceny już tylko długość łuku.</li>
+                                </ul>
+                            </div>
+                            <div class="entry__ck-col entry__ck-col--good">
+                                <p class="entry__ck-head">Pierścień z dwoma segmentami</p>
+                                <div class="entry__ck-screen entry__ch-screen" aria-hidden="true">
+                                    <p class="entry__ch-title">Zgłoszenia zamknięte w terminie</p>
+                                    <p class="entry__ch-sub">Wrzesień 2026 · cel 80%</p>
+                                    <div class="entry__ch-row">
+                                        <div class="entry__ch-donut">
+                                            <svg class="entry__ch-chart" viewBox="0 0 128 128">
+                                                <path class="entry__ch-seg entry__ch-seg--1" d="M64 0A64 64 0 1 1 6.09 91.25L26.94 81.44A40.96 40.96 0 1 0 64 23.04Z" />
+                                                <path class="entry__ch-seg entry__ch-seg--rest" d="M6.09 91.25A64 64 0 0 1 64 0L64 23.04A40.96 40.96 0 0 0 26.94 81.44Z" />
+                                            </svg>
+                                            <p class="entry__ch-center"><strong>68%</strong>w terminie</p>
+                                        </div>
+                                        <ul class="entry__ch-keys">
+                                            <li><span class="entry__ch-key entry__ch-seg--1"></span><strong>68%</strong>w terminie</li>
+                                            <li><span class="entry__ch-key entry__ch-seg--rest"></span><strong>32%</strong>po terminie</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                                <ul class="entry__ck-legend">
+                                    <li><span class="entry__ck-pin" aria-hidden="true"><svg width="10" height="10" viewBox="0 0 12 12" fill="none" aria-hidden="true"><path d="M2.5 6.3L5 8.7L9.5 3.6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" /></svg></span>Wynik stoi w środku, więc widget nie potrzebuje osobnej liczby.</li>
+                                    <li><span class="entry__ck-pin" aria-hidden="true"><svg width="10" height="10" viewBox="0 0 12 12" fill="none" aria-hidden="true"><path d="M2.5 6.3L5 8.7L9.5 3.6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" /></svg></span>Dwa segmenty: proporcję widać bez legendy.</li>
+                                    <li><span class="entry__ck-pin" aria-hidden="true"><svg width="10" height="10" viewBox="0 0 12 12" fill="none" aria-hidden="true"><path d="M2.5 6.3L5 8.7L9.5 3.6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" /></svg></span>Podpisy z wartościami stoją przy wykresie.</li>
+                                </ul>
+                            </div>
+                        </div>
+                        <p class="entry__fig-caption">FIG. 1 – WYKRES PIERŚCIENIOWY: PIĘĆ SEGMENTÓW CZY DWA</p>
+                        <p class="entry__illustration-desc">Po lewej pierścień z pięcioma kategoriami o zbliżonych
+                            wartościach: wolny środek nie pomaga, a kolejność segmentów trzeba odczytać z legendy. Po
+                            prawej pierścień odpowiada na jedno pytanie – jaka część zgłoszeń została zamknięta w
+                            terminie – a wynik stoi w środku.</p>
+                    </div>
+
+                    <h2 class="entry__heading">Ilustracja / przykład</h2>
+                    <div class="entry__illustration">
+                        <div class="entry__ck-pair">
+                            <div class="entry__ck-col">
+                                <p class="entry__ck-head">Wykres kołowy – pięć kanałów</p>
+                                <div class="entry__ck-screen entry__ch-screen" aria-hidden="true">
+                                    <p class="entry__ch-title">Przychód wg kanału</p>
+                                    <p class="entry__ch-sub">Wrzesień 2026 · 412 tys. zł</p>
+                                    <div class="entry__ch-row">
+                                        <svg class="entry__ch-chart" viewBox="0 0 128 128">
+                                            <path class="entry__ch-seg entry__ch-seg--1" d="M64 64L64 0A64 64 0 0 1 125.99 48.08Z" />
+                                            <path class="entry__ch-seg entry__ch-seg--2" d="M64 64L125.99 48.08A64 64 0 0 1 110.65 107.81Z" />
+                                            <path class="entry__ch-seg entry__ch-seg--3" d="M64 64L110.65 107.81A64 64 0 0 1 14.69 104.8Z" />
+                                            <path class="entry__ch-seg entry__ch-seg--4" d="M64 64L14.69 104.8A64 64 0 0 1 0.13 59.98Z" />
+                                            <path class="entry__ch-seg entry__ch-seg--5" d="M64 64L0.13 59.98A64 64 0 0 1 64 0Z" />
+                                        </svg>
+                                        <div class="entry__ch-keys-wrap">
+                                            <ul class="entry__ch-keys">
+                                                <li><span class="entry__ch-key entry__ch-seg--1"></span>E-mail</li>
+                                                <li><span class="entry__ch-key entry__ch-seg--2"></span>Social media</li>
+                                                <li><span class="entry__ch-key entry__ch-seg--3"></span>Wyszukiwarka</li>
+                                                <li><span class="entry__ch-key entry__ch-seg--4"></span>Polecenia</li>
+                                                <li><span class="entry__ch-key entry__ch-seg--5"></span>Reklamy płatne</li>
+                                            </ul>
+                                            <span class="entry__ck-pin entry__ch-pin entry__ch-pin--keys">3</span>
+                                        </div>
+                                    </div>
+                                    <span class="entry__ck-pin entry__ch-pin" style="left: 86px; top: 72px;">1</span>
+                                    <span class="entry__ck-pin entry__ch-pin" style="left: 36px; top: 186px;">2</span>
+                                </div>
+                                <ul class="entry__ck-legend">
+                                    <li><span class="entry__ck-pin" aria-hidden="true">1</span>Wyszukiwarka (27%) i reklamy płatne (24%) wyglądają prawie tak samo.</li>
+                                    <li><span class="entry__ck-pin" aria-hidden="true">2</span>Ranking kanałów trzeba ułożyć samemu, porównując kąty.</li>
+                                    <li><span class="entry__ck-pin" aria-hidden="true">3</span>Każdą kategorię odczytuje się przez kolor w legendzie.</li>
+                                </ul>
+                            </div>
+                            <div class="entry__ck-col entry__ck-col--good">
+                                <p class="entry__ck-head">Słupki poziome – posortowane</p>
+                                <div class="entry__ck-screen entry__ch-screen" aria-hidden="true">
+                                    <p class="entry__ch-title">Przychód wg kanału</p>
+                                    <p class="entry__ch-sub">Wrzesień 2026 · 412 tys. zł</p>
+                                    <ul class="entry__ch-bars">
+                                        <li><span class="entry__ch-bar-label">Wyszukiwarka</span><span class="entry__ch-bar" style="--v: 1"></span><strong>27%</strong></li>
+                                        <li><span class="entry__ch-bar-label">Reklamy płatne</span><span class="entry__ch-bar" style="--v: 0.889"></span><strong>24%</strong></li>
+                                        <li><span class="entry__ch-bar-label">E-mail</span><span class="entry__ch-bar" style="--v: 0.778"></span><strong>21%</strong></li>
+                                        <li><span class="entry__ch-bar-label">Social media</span><span class="entry__ch-bar" style="--v: 0.593"></span><strong>16%</strong></li>
+                                        <li><span class="entry__ch-bar-label">Polecenia</span><span class="entry__ch-bar" style="--v: 0.444"></span><strong>12%</strong></li>
+                                    </ul>
+                                </div>
+                                <ul class="entry__ck-legend">
+                                    <li><span class="entry__ck-pin" aria-hidden="true"><svg width="10" height="10" viewBox="0 0 12 12" fill="none" aria-hidden="true"><path d="M2.5 6.3L5 8.7L9.5 3.6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" /></svg></span>Kolejność od największej daje ranking bez porównywania kątów.</li>
+                                    <li><span class="entry__ck-pin" aria-hidden="true"><svg width="10" height="10" viewBox="0 0 12 12" fill="none" aria-hidden="true"><path d="M2.5 6.3L5 8.7L9.5 3.6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" /></svg></span>Różnica 3 punktów jest widoczna jako różnica długości.</li>
+                                    <li><span class="entry__ck-pin" aria-hidden="true"><svg width="10" height="10" viewBox="0 0 12 12" fill="none" aria-hidden="true"><path d="M2.5 6.3L5 8.7L9.5 3.6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" /></svg></span>Etykiety i wartości stoją przy słupkach, legenda nie jest potrzebna.</li>
+                                </ul>
+                            </div>
+                        </div>
+                        <p class="entry__fig-caption">FIG. 2 – TE SAME DANE W DWÓCH WIDGETACH</p>
+                        <p class="entry__illustration-desc">Oba widgety pokazują ten sam podział przychodu na pięć
+                            kanałów. Na kole dwa największe wycinki wyglądają prawie tak samo, a kategorię trzeba
+                            odczytać z legendy. Na słupkach kolejność i różnice widać od razu, a wartości są tam, gdzie
+                            patrzy użytkownik.</p>
+
+                        <div class="entry__ck-clicks">
+                            <div class="entry__ck-row">
+                                <p class="entry__ck-row-label">Która kategoria jest największa?</p>
+                                <div class="entry__ck-chips">
+                                    <span class="entry__ck-chip entry__ck-chip--green">Słupki poziome, posortowane</span>
+                                </div>
+                            </div>
+                            <div class="entry__ck-row">
+                                <p class="entry__ck-row-label">Jak to się zmieniało w czasie?</p>
+                                <div class="entry__ck-chips">
+                                    <span class="entry__ck-chip entry__ck-chip--green">Wykres liniowy</span>
+                                    <span class="entry__ck-chip">Słupki pionowe (do ok. 12 okresów)</span>
+                                </div>
+                            </div>
+                            <div class="entry__ck-row">
+                                <p class="entry__ck-row-label">Jak wypadamy względem celu?</p>
+                                <div class="entry__ck-chips">
+                                    <span class="entry__ck-chip entry__ck-chip--green">Bullet chart</span>
+                                    <span class="entry__ck-chip">Pasek postępu z celem</span>
+                                </div>
+                            </div>
+                            <div class="entry__ck-row">
+                                <p class="entry__ck-row-label">Jaka część całości? (2–3 kategorie)</p>
+                                <div class="entry__ck-chips">
+                                    <span class="entry__ck-chip entry__ck-chip--green">Pierścień z wartością w środku</span>
+                                    <span class="entry__ck-chip">Koło</span>
+                                </div>
+                            </div>
+                            <div class="entry__ck-row">
+                                <p class="entry__ck-row-label">Ile wynosi wskaźnik teraz?</p>
+                                <div class="entry__ck-chips">
+                                    <span class="entry__ck-chip entry__ck-chip--green">Liczba + zmiana do poprzedniego okresu</span>
+                                </div>
+                            </div>
+                        </div>
+                        <p class="entry__fig-caption">FIG. 3 – KTÓRY WIDGET DO KTÓREGO PYTANIA</p>
+                        <p class="entry__illustration-desc">Typ wykresu wynika z pytania, na które widget odpowiada, a
+                            nie z tego, ile miejsca zostało w siatce. Ten sam typ pytania powinien mieć w całym
+                            dashboardzie ten sam typ wykresu. Zielone pola to wybór domyślny, pozostałe – dopuszczalna
+                            alternatywa.</p>
+                    </div>
+
+                    <div class="entry__note">
+                        <div class="entry__note-col">
+                            <p class="entry__note-label">NOTATKI</p>
+                            <ul class="entry__note-list">
+                                <li class="entry__note-item">
+                                    <a href="https://www.jstor.org/stable/2288400" target="_blank" rel="noopener noreferrer"
+                                        class="entry__note-link">Cleveland i McGill – Graphical Perception</a> (Journal of the American Statistical Association, 1984) – eksperymenty, w których uczestnicy porównywali wartości zakodowane na różne sposoby. Najdokładniej oceniali położenie na wspólnej skali i długość, wyraźnie gorzej kąt i pole, a najsłabiej nasycenie koloru. Słupki korzystają z pierwszych pozycji tej listy, koło i pierścień z dalszych.
+                                </li>
+                                <li class="entry__note-item">
+                                    <a href="https://doi.org/10.1002/acp.2350050106" target="_blank" rel="noopener noreferrer"
+                                        class="entry__note-link">Spence i Lewandowsky – Displaying proportions and percentages</a> (Applied Cognitive Psychology, 1991) – przy ocenie, jaką część całości stanowi dany element, wykresy kołowe były co najmniej tak dokładne jak słupkowe. Badanie jest głównym argumentem za kołem w zadaniach typu „część całości”.
+                                </li>
+                                <li class="entry__note-item">
+                                    <a href="https://doi.org/10.2312/eurovisshort.20161167" target="_blank" rel="noopener noreferrer"
+                                        class="entry__note-link">Kosara i Skau – Judgment Error in Pie Chart Variations</a> (EuroVis, 2016) – porównanie koła, pierścienia i innych wariantów. Ludzie odczytują koło głównie z pola i długości łuku, a nie z kąta, a pierścień daje podobną dokładność jak pełne koło.
+                                </li>
+                                <li class="entry__note-item">
+                                    <a href="https://www.perceptualedge.com/articles/visual_business_intelligence/save_the_pies_for_dessert.pdf" target="_blank" rel="noopener noreferrer"
+                                        class="entry__note-link">Stephen Few – Save the Pies for Dessert</a> (Perceptual Edge, 2007) – argumentacja przeciw wykresom kołowym w raportach i dashboardach biznesowych. Te same dane pokazane na słupkach pozwalają szybciej uporządkować i porównać wartości.
+                                </li>
+                                <li class="entry__note-item">
+                                    <a href="https://www.perceptualedge.com/articles/misc/Bullet_Graph_Design_Spec.pdf" target="_blank" rel="noopener noreferrer"
+                                        class="entry__note-link">Stephen Few – Bullet Graph Design Specification</a> – specyfikacja wykresu bullet: kompaktowego paska, który w jednym wierszu pokazuje wynik, cel i progi oceny. Pomyślany jako zamiennik wskaźników zegarowych na dashboardach.
+                                </li>
+                                <li class="entry__note-item">
+                                    <a href="https://www.nngroup.com/articles/choosing-chart-types/" target="_blank" rel="noopener noreferrer"
+                                        class="entry__note-link">NN/g – Choosing Chart Types: Consider Context</a> (2022) – typ wykresu dobiera się do zadania użytkownika. Koło nadaje się do pokazania części całości przy niewielu kategoriach, słupki do porównań i rankingów.
+                                </li>
+                                <li class="entry__note-item">
+                                    <a href="https://www.nngroup.com/articles/dashboards-preattentive/" target="_blank" rel="noopener noreferrer"
+                                        class="entry__note-link">NN/g – Dashboards: Making Charts and Graphs Easier to Understand</a> (2017) – długość i położenie odczytujemy przeduwagowo, bez świadomego wysiłku, dlatego słupki pozwalają porównać wartości jednym spojrzeniem.
+                                </li>
+                                <li class="entry__note-item">
+                                    <a href="https://www.w3.org/WAI/WCAG22/Understanding/use-of-color.html" target="_blank" rel="noopener noreferrer"
+                                        class="entry__note-link">WCAG 2.2 – kryteria 1.4.1 i 1.4.11</a> – kolor nie może być jedynym nośnikiem informacji, a elementy graficzne potrzebne do zrozumienia wykresu muszą mieć kontrast co najmniej 3:1 z sąsiednimi kolorami. Dotyczy to segmentów koła i pierścienia, które często różnią się tylko odcieniem.
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <h2 class="entry__heading">Powiązane hasła</h2>
+                    <div class="entry__related">
+                        <a href="#" class="entry__related-link">Bullet chart</a>
+                        <a href="#" class="entry__related-link">Wykres liniowy</a>
+                        <a href="#" class="entry__related-link">Kafelek KPI</a>
+                        <a href="#" class="entry__related-link">Hierarchia wizualna</a>
+                        <a href="#" class="entry__related-link">Dostępność kolorów</a>
+                    </div>
+
+                    <div class="divider"></div>
+
+                    <div class="entry__footer-meta">
+                        <p>Źródła: Cleveland i McGill, Kosara i Skau, Few, NN/g, WCAG</p>
+                        <p>Opublikowane · paź 2026</p>
+                    </div>
+                </article>
+            </main>
+
+            <div class="divider"></div>
+            <footer class="footer__bottom">
+                <p class="footer__copyright">© 2026 Heuristika – Osobista Biblioteka Projektanta</p>
+                <nav class="footer__links">
+                    <a href="katalog.html" class="footer__link">Katalog</a>
+                    <a href="o-projekcie.html" class="footer__link">O projekcie</a>
+                </nav>
+            </footer>
+        </div>
+    </div>
+
+    <script src="dots-pattern.js"></script>
+
+    <script src="nav.js"></script>
+
+    <script>
+        (function () {
+            const btn = document.getElementById('themeToggle');
+            if (!btn) return;
+            const root = document.documentElement;
+
+            function sync() {
+                btn.setAttribute('aria-pressed', String(root.getAttribute('data-theme') === 'light'));
+            }
+            sync();
+
+            btn.addEventListener('click', () => {
+                const next = root.getAttribute('data-theme') === 'light' ? 'dark' : 'light';
+                root.setAttribute('data-theme', next);
+                try { localStorage.setItem('heuristika-theme', next); } catch (e) { }
+                sync();
+            });
+        })();
+    </script>
+</body>
+</html>

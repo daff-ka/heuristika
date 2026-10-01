@@ -239,6 +239,49 @@
                     <a href="katalog.html" class="featured__all">Zobacz wszystkie →</a>
                 </div>
                 <div class="featured__grid">
+                    <a href="wpis-wykresy-kpi.html" class="featured__card">
+                        <div class="featured__card-icon">
+                            <img class="featured__card-icon-img featured__card-icon-img--dark"
+                                src="assets/icons/entries/entry-bars.svg" alt="" />
+                            <img class="featured__card-icon-img featured__card-icon-img--light"
+                                src="assets/icons/entries/entry-bars-light.svg" alt="" />
+                        </div>
+                        <div class="featured__card-content">
+                            <div class="featured__card-text">
+                                <h3 class="featured__card-title">Wykres słupkowy, kołowy czy pierścieniowy na dashboardzie KPI</h3>
+                                <p class="featured__card-desc">Który wykres lepiej pokazuje KPI na dashboardzie
+                                    i kiedy koło lub pierścień mają jeszcze sens?</p>
+                            </div>
+                            <div class="featured__tags">
+                                <span class="about__badge about__badge--blue">
+                                    <svg width="6" height="6" viewBox="0 0 6 6" aria-hidden="true">
+                                        <circle cx="3" cy="3" r="3" fill="currentColor" />
+                                    </svg>
+                                    UI Design
+                                </span>
+                                <span class="about__badge about__badge--violet">
+                                    <svg width="6" height="6" viewBox="0 0 6 6" aria-hidden="true">
+                                        <circle cx="3" cy="3" r="3" fill="currentColor" />
+                                    </svg>
+                                    Wzorzec
+                                </span>
+                                <span class="about__badge about__badge--green">
+                                    <svg width="6" height="6" viewBox="0 0 6 6" aria-hidden="true">
+                                        <circle cx="3" cy="3" r="3" fill="currentColor" />
+                                    </svg>
+                                    Desktop
+                                </span>
+                                <span class="about__badge about__badge--amber about__badge--meter">
+                                    <svg width="21" height="5" viewBox="0 0 21 5" aria-hidden="true">
+                                        <circle cx="2.5" cy="2.5" r="2.5" fill="currentColor" />
+                                        <circle cx="10.5" cy="2.5" r="2.5" fill="currentColor" />
+                                        <circle cx="18.5" cy="2.5" r="2.5" fill="var(--badge-amber-border)" />
+                                    </svg>
+                                    Średni
+                                </span>
+                            </div>
+                        </div>
+                    </a>
                     <a href="wpis-baner-cookies.html" class="featured__card">
                         <div class="featured__card-icon">
                             <img class="featured__card-icon-img featured__card-icon-img--dark"
@@ -313,49 +356,6 @@
                                         <circle cx="3" cy="3" r="3" fill="currentColor" />
                                     </svg>
                                     Web
-                                </span>
-                                <span class="about__badge about__badge--amber about__badge--meter">
-                                    <svg width="21" height="5" viewBox="0 0 21 5" aria-hidden="true">
-                                        <circle cx="2.5" cy="2.5" r="2.5" fill="currentColor" />
-                                        <circle cx="10.5" cy="2.5" r="2.5" fill="currentColor" />
-                                        <circle cx="18.5" cy="2.5" r="2.5" fill="var(--badge-amber-border)" />
-                                    </svg>
-                                    Średni
-                                </span>
-                            </div>
-                        </div>
-                    </a>
-                    <a href="wpis-preloader.html" class="featured__card">
-                        <div class="featured__card-icon">
-                            <img class="featured__card-icon-img featured__card-icon-img--dark"
-                                src="assets/icons/entries/entry-hourglass.svg" alt="" />
-                            <img class="featured__card-icon-img featured__card-icon-img--light"
-                                src="assets/icons/entries/entry-hourglass-light.svg" alt="" />
-                        </div>
-                        <div class="featured__card-content">
-                            <div class="featured__card-text">
-                                <h3 class="featured__card-title">Preloader: pokazywać czy nie?</h3>
-                                <p class="featured__card-desc">Pełnoekranowy ekran ładowania – dobra praktyka
-                                    czy zasłona na wolną stronę?</p>
-                            </div>
-                            <div class="featured__tags">
-                                <span class="about__badge about__badge--blue">
-                                    <svg width="6" height="6" viewBox="0 0 6 6" aria-hidden="true">
-                                        <circle cx="3" cy="3" r="3" fill="currentColor" />
-                                    </svg>
-                                    UX Design
-                                </span>
-                                <span class="about__badge about__badge--violet">
-                                    <svg width="6" height="6" viewBox="0 0 6 6" aria-hidden="true">
-                                        <circle cx="3" cy="3" r="3" fill="currentColor" />
-                                    </svg>
-                                    Wzorzec
-                                </span>
-                                <span class="about__badge about__badge--green">
-                                    <svg width="6" height="6" viewBox="0 0 6 6" aria-hidden="true">
-                                        <circle cx="3" cy="3" r="3" fill="currentColor" />
-                                    </svg>
-                                    Web + Mobile
                                 </span>
                                 <span class="about__badge about__badge--amber about__badge--meter">
                                     <svg width="21" height="5" viewBox="0 0 21 5" aria-hidden="true">
@@ -1722,6 +1722,12 @@
             // podstronę (te same co karty w "Ostatnio dodane"). Dodanie kolejnego
             // wpisu to po prostu kolejny obiekt w tej tablicy.
             const SEARCH_INDEX = [
+                {
+                    title: 'Wykres słupkowy, kołowy czy pierścieniowy na dashboardzie KPI',
+                    excerpt: 'Który wykres lepiej pokazuje KPI na dashboardzie i kiedy koło lub pierścień mają jeszcze sens?',
+                    tags: ['UI Design', 'Wzorzec', 'Desktop', 'Średni'],
+                    url: 'wpis-wykresy-kpi.html'
+                },
                 {
                     title: 'Baner cookies zgodny z wytycznymi EROD',
                     excerpt: 'Co EROD mówi o banerach cookies i dlaczego „Odrzuć” musi być tuż obok „Akceptuj”?',

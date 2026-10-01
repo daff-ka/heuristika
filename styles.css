@@ -40,6 +40,13 @@
 
   --danger-fg: #ff6166;
 
+  /* Kolory serii w ilustracjach wykresów (wpis o wykresach KPI). */
+  --chart-1: #3291ff;
+  --chart-2: #a78bfa;
+  --chart-3: #4cd98a;
+  --chart-4: #ffb224;
+  --chart-5: #ff6166;
+
   --pill-hover-bg: #fafafa;
 
   --nav-glow: var(--ink);
@@ -85,6 +92,12 @@
   --badge-green-fg: #12805c;
 
   --danger-fg: #c4351d;
+
+  --chart-1: #0a72ef;
+  --chart-2: #8e4ec6;
+  --chart-3: #29a36a;
+  --chart-4: #f5a524;
+  --chart-5: #e5484d;
 
   --pill-hover-bg: #1a1a1a;
 
@@ -2923,6 +2936,176 @@ body {
   .entry__ck-screen {
     min-height: 280px;
   }
+
+  .entry__ch-row {
+    gap: 14px;
+  }
+}
+
+/* ---------- Wpis: wykresy KPI – widgety z kołem, pierścieniem i słupkami ---------- */
+
+.entry__ch-screen {
+  gap: 4px;
+  min-height: 0;
+}
+
+.entry__ch-title {
+  margin: 0;
+  color: var(--ink);
+  font-family: "Geist", sans-serif;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.entry__ch-sub {
+  margin: 0 0 10px;
+  color: var(--ink-secondary);
+  font-family: "Geist", sans-serif;
+  font-size: 11px;
+}
+
+.entry__ch-row {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  padding: 6px 0;
+}
+
+.entry__ch-chart {
+  display: block;
+  flex-shrink: 0;
+  width: 128px;
+  height: 128px;
+}
+
+/* Kontur w kolorze tła rozdziela segmenty tak jak w Figmie. */
+.entry__ch-seg {
+  stroke: var(--bg);
+  stroke-width: 1.5;
+}
+
+path.entry__ch-seg--1 { fill: var(--chart-1); }
+path.entry__ch-seg--2 { fill: var(--chart-2); }
+path.entry__ch-seg--3 { fill: var(--chart-3); }
+path.entry__ch-seg--4 { fill: var(--chart-4); }
+path.entry__ch-seg--5 { fill: var(--chart-5); }
+path.entry__ch-seg--rest { fill: var(--border-strong); }
+
+.entry__ch-donut {
+  position: relative;
+  flex-shrink: 0;
+}
+
+.entry__ch-center {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  margin: 0;
+  color: var(--ink-secondary);
+  font-family: "Geist", sans-serif;
+  font-size: 10px;
+}
+
+.entry__ch-center strong {
+  color: var(--ink);
+  font-size: 22px;
+  font-weight: 600;
+  line-height: 1.2;
+}
+
+.entry__ch-keys {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.entry__ch-keys li {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--ink-secondary);
+  font-family: "Geist", sans-serif;
+  font-size: 11px;
+  white-space: nowrap;
+}
+
+.entry__ch-keys strong {
+  color: var(--ink);
+  font-weight: 500;
+}
+
+.entry__ch-key {
+  flex-shrink: 0;
+  width: 8px;
+  height: 8px;
+  border-radius: 2px;
+}
+
+span.entry__ch-seg--1 { background: var(--chart-1); }
+span.entry__ch-seg--2 { background: var(--chart-2); }
+span.entry__ch-seg--3 { background: var(--chart-3); }
+span.entry__ch-seg--4 { background: var(--chart-4); }
+span.entry__ch-seg--5 { background: var(--chart-5); }
+span.entry__ch-seg--rest { background: var(--border-strong); }
+
+/* Pinezki leżą na wykresie i nie zmieniają układu widgetu. */
+.entry__ch-pin {
+  position: absolute;
+}
+
+.entry__ch-keys-wrap {
+  position: relative;
+  min-width: 0;
+}
+
+/* Pinezka legendy siedzi w jej rogu, żeby na wąskim ekranie nie wyjść
+   poza widget. */
+.entry__ch-pin--keys {
+  top: -14px;
+  left: -14px;
+}
+
+.entry__ch-bars {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin: 0;
+  padding: 10px 0;
+  list-style: none;
+}
+
+.entry__ch-bars li {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--ink);
+  font-family: "Geist", sans-serif;
+  font-size: 11px;
+}
+
+.entry__ch-bars strong {
+  font-weight: 500;
+}
+
+.entry__ch-bar-label {
+  flex: 0 0 86px;
+  color: var(--ink-secondary);
+}
+
+/* Szerokość liczona względem miejsca na słupek; najdłuższy zostawia
+   miejsce na wartość. */
+.entry__ch-bar {
+  width: calc((100% - 136px) * var(--v));
+  height: 14px;
+  border-radius: 3px;
+  background: var(--chart-1);
 }
 
 /* Bez ruchu: zamrażamy ilustrację w najbardziej wymownym momencie
