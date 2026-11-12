@@ -14,7 +14,7 @@
     </script>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Wykres słupkowy, kołowy czy pierścieniowy na dashboardzie KPI – Heuristika</title>
+    <title>Wykres słupkowy, kołowy czy pierścieniowy w dashboardzie KPI – Heuristika</title>
     <link rel="icon" type="image/svg+xml" href="assets/favicon.svg" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -101,7 +101,7 @@
                 <article class="entry-card">
                     <div class="entry__heading-group">
                         <p class="entry__eyebrow">Bar, pie i donut chart · dashboard KPI</p>
-                        <h1 class="entry__title">Wykres słupkowy, kołowy czy pierścieniowy na dashboardzie KPI</h1>
+                        <h1 class="entry__title">Wykres słupkowy, kołowy czy pierścieniowy w dashboardzie KPI</h1>
                     </div>
                     <p class="entry__lead">Dashboard z kilkunastoma widgetami czyta się w kilka sekund. W tym czasie
                         użytkownik ma porównać wartości, zauważyć odstępstwo od celu i ocenić trend. Od wyboru między
@@ -144,13 +144,13 @@
                         <div class="entry__tldr-col">
                             <p class="entry__tldr-label">TL;DR</p>
                             <p class="entry__tldr-text">Ludzie oceniają długość i położenie na wspólnej osi znacznie
-                                dokładniej niż kąt i pole – pokazali to Cleveland i McGill w badaniach z 1984 r. Na
+                                dokładniej niż kąt i pole – pokazali to Cleveland i McGill w badaniach z 1984 r. W
                                 dashboardzie KPI większość pytań brzmi „co jest większe?”, „jak wypadamy względem
                                 celu?” albo „jak zmieniło się to od zeszłego miesiąca?”, więc domyślnym wyborem jest
                                 wykres słupkowy: poziomy, posortowany, z osią od zera i wartością przy słupku. Wykres
                                 kołowy i pierścieniowy mają sens w jednej sytuacji: gdy pokazują udział części w
-                                całości, kategorie są dwie lub trzy, a ich suma to 100%. Z tych dwóch na dashboardzie
-                                lepiej sprawdza się pierścień: jest prawie tak samo czytelny jak koło, a w środku
+                                całości, kategorie są dwie lub trzy, a ich suma to 100%. Z tych dwóch w dashboardzie
+                                lepiej sprawdza się wykres pierścieniowy: jest prawie tak samo czytelny jak kołowy, a w środku
                                 mieści łączną wartość albo główny wynik. Sam wskaźnik często nie potrzebuje wykresu
                                 wcale – wystarczy duża liczba z porównaniem do poprzedniego okresu lub celu.</p>
                         </div>
@@ -159,16 +159,15 @@
                     <h2 class="entry__heading">Kiedy stosować</h2>
                     <p class="entry__copy">Wykres słupkowy sprawdza się wszędzie tam, gdzie widget ma pomóc porównać
                         wartości: przychód w kanałach sprzedaży, liczbę zgłoszeń w zespołach, czas obsługi w regionach
-                        albo wynik względem celu. Słupki poziome mieszczą długie etykiety kategorii i dobrze znoszą
+                        albo wynik względem celu. Wykres słupkowy poziomy mieści długie etykiety kategorii i dobrze znoszą
                         zmianę szerokości widgetu w siatce dashboardu, a sortowanie od największej wartości daje
                         ranking bez dodatkowej pracy. Wykres kołowy lub pierścieniowy wybierz tylko wtedy, gdy pytanie
                         brzmi „jaka część całości?”: udział zamówień z aplikacji, odsetek zgłoszeń zamkniętych w
                         terminie, podział budżetu na dwie pozycje. Zrezygnuj z niego, gdy kategorii jest więcej niż
                         trzy, wartości są do siebie zbliżone, chcesz porównać dwa okresy albo wartości nie sumują się
                         do 100% – na przykład współczynnik konwersji w kanałach. Na desktopie dochodzi jeszcze miejsce:
-                        koło zajmuje kwadrat i zwykle potrzebuje legendy obok, więc w widgecie o szerokości jednej
-                        trzeciej ekranu sam wykres robi się mały, a legenda zabiera resztę. Pierścień ma tu przewagę
-                        nad pełnym kołem, bo wolny środek zastępuje osobny nagłówek z wartością.</p>
+                        wykres kołowy zajmuje kwadrat i zwykle potrzebuje legendy obok, więc w widgecie o szerokości jednej
+                        trzeciej ekranu sam wykres robi się mały, a legenda zabiera resztę. Wykres pierścieniowy ma tu przewagę nad kołowym, bo wolny środek zastępuje osobny nagłówek z wartością.</p>
 
                     <h2 class="entry__heading">Best practices</h2>
                     <div class="entry__dodont">
@@ -180,7 +179,7 @@
                                 </svg>
                                 <p class="entry__dodont-label entry__dodont-label--do">Rób</p>
                             </div>
-                            <p class="entry__dodont-text">Porównanie kategorii pokazuj na poziomych słupkach posortowanych malejąco, z etykietą kategorii po lewej i wartością na końcu słupka. Legenda nie jest wtedy potrzebna.</p>
+                            <p class="entry__dodont-text">Do porównania kategorii używaj poziomego wykresu słupkowego posortowanego malejąco, z etykietą kategorii po lewej i wartością na końcu słupka. Legenda nie jest wtedy potrzebna.</p>
                         </div>
                         <div class="entry__dodont-card">
                             <div class="entry__dodont-row">
@@ -190,7 +189,7 @@
                                 </svg>
                                 <p class="entry__dodont-label entry__dodont-label--dont">Nie rób</p>
                             </div>
-                            <p class="entry__dodont-text">Nie pokazuj na kole ani na pierścieniu pięciu i więcej kategorii o zbliżonych wartościach. Różnicy między 21% a 24% nie widać w kątach, więc użytkownik i tak szuka liczb w legendzie.</p>
+                            <p class="entry__dodont-text">Nie pokazuj na wykresie kołowym ani pierścieniowym pięciu lub więcej kategorii o zbliżonych wartościach. Różnicy między 21% a 24% nie widać w kątach, więc użytkownik i tak szuka liczb w legendzie.</p>
                         </div>
                     </div>
                     <div class="entry__dodont">
@@ -212,7 +211,7 @@
                                 </svg>
                                 <p class="entry__dodont-label entry__dodont-label--dont">Nie rób</p>
                             </div>
-                            <p class="entry__dodont-text">Nie stawiaj dwóch kół obok siebie, żeby porównać okresy, i nie używaj efektu 3D ani wysuniętych wycinków. Perspektywa zmienia pozorną wielkość segmentów.</p>
+                            <p class="entry__dodont-text">Nie stawiaj obok siebie dwóch wykresów kołowych, żeby porównać okresy, i nie używaj efektu 3D ani wysuniętych wycinków. Perspektywa zmienia pozorną wielkość segmentów.</p>
                         </div>
                     </div>
                     <div class="entry__dodont">
@@ -224,7 +223,7 @@
                                 </svg>
                                 <p class="entry__dodont-label entry__dodont-label--do">Rób</p>
                             </div>
-                            <p class="entry__dodont-text">Jeśli pokazujesz udział w całości, wybierz pierścień z łączną wartością lub głównym wynikiem w środku, najwyżej trzy segmenty i podpisy bezpośrednio przy nich. Segmenty ułóż od największego, zaczynając od godziny dwunastej.</p>
+                            <p class="entry__dodont-text">Jeśli pokazujesz udział w całości, wybierz wykres pierścieniowy z łączną wartością lub głównym wynikiem w środku, najwyżej trzy segmenty i podpisy bezpośrednio przy nich. Segmenty ułóż od największego, zaczynając od godziny dwunastej.</p>
                         </div>
                         <div class="entry__dodont-card">
                             <div class="entry__dodont-row">
@@ -237,18 +236,15 @@
                             <p class="entry__dodont-text">Nie rozróżniaj kategorii wyłącznie kolorem. Przy kilku odcieniach trudno je dopasować do legendy, a osoby z zaburzeniami widzenia barw mogą ich nie odróżnić (WCAG 1.4.1).</p>
                         </div>
                     </div>
-                    <h2 class="entry__heading">Wykres pierścieniowy: kiedy koło się broni</h2>
+                    <h2 class="entry__heading">Kiedy wybrać wykres kołowy lub pierścieniowy</h2>
                     <p class="entry__copy">Krytyka wykresów kołowych nie oznacza, że nigdy nie działają. W badaniu
-                        Spence’a i Lewandowsky’ego z 1991 r. uczestnicy oceniali na kole, jaką część całości stanowi
-                        segment, co najmniej tak dokładnie jak na słupkach. Łatwo też rozpoznać charakterystyczne
+                        Spence’a i Lewandowsky’ego z 1991 r. uczestnicy oceniali na wykresie kołowym, jaką część całości stanowi segment, co najmniej tak dokładnie jak na słupkowym. Łatwo też rozpoznać charakterystyczne
                         proporcje: połowę, ćwierć, trzy czwarte. Problem zaczyna się przy porównywaniu segmentów między
-                        sobą i przy większej liczbie kategorii. Wykres pierścieniowy to koło z wyciętym środkiem.
-                        Kosara i Skau w 2016 r. pokazali, że ludzie odczytują koło raczej z pola i długości łuku niż z
-                        kąta, dlatego pierścień jest prawie tak samo czytelny jak pełne koło. Na dashboardzie ma jedną
+                        sobą i przy większej liczbie kategorii. Wykres pierścieniowy to wykres kołowy z wyciętym środkiem.
+                        Kosara i Skau w 2016 r. pokazali, że ludzie odczytują wykres kołowy raczej z pola i długości łuku niż z
+                        kąta, dlatego wykres pierścieniowy jest prawie tak samo czytelny jak kołowy. W dashboardzie ma jedną
                         realną przewagę: w środku mieści łączną wartość albo główny wynik, więc widget nie potrzebuje
-                        osobnej liczby nad wykresem. Nie rozwiązuje jednak problemów koła. Pierścień z pięcioma
-                        segmentami jest tak samo trudny do odczytania jak koło z pięcioma wycinkami, a bardzo cienki
-                        pierścień zostawia do oceny już tylko długość łuku. Praktyczna granica to dwa lub trzy
+                        osobnej liczby nad wykresem. Nie rozwiązuje jednak problemów wykresu kołowego. Wykres pierścieniowy z pięcioma segmentami jest tak samo trudny do odczytania jak kołowy z pięcioma wycinkami, a gdy jest bardzo cienki, do oceny zostaje już tylko długość łuku. Praktyczna granica to dwa lub trzy
                         segmenty, z których jeden wyraźnie dominuje albo przekracza ważny próg. Jeśli widget pokazuje
                         wynik względem celu, a nie udział w całości, lepszy będzie pasek postępu z zaznaczonym
                         celem.</p>
@@ -256,7 +252,7 @@
                     <div class="entry__illustration">
                         <div class="entry__ck-pair">
                             <div class="entry__ck-col">
-                                <p class="entry__ck-head">Pierścień z pięcioma segmentami</p>
+                                <p class="entry__ck-head">Wykres pierścieniowy – pięć segmentów</p>
                                 <div class="entry__ck-screen entry__ch-screen" aria-hidden="true">
                                     <p class="entry__ch-title">Zgłoszenia wg kategorii</p>
                                     <p class="entry__ch-sub">Wrzesień 2026 · 1 240 zgłoszeń</p>
@@ -285,11 +281,11 @@
                                 <ul class="entry__ck-legend">
                                     <li><span class="entry__ck-pin" aria-hidden="true">1</span>Wolny środek nie pomaga porównać segmentów: 24% i 22% wyglądają tak samo.</li>
                                     <li><span class="entry__ck-pin" aria-hidden="true">2</span>Kategorię trzeba odczytać z legendy, dopasowując pięć kolorów.</li>
-                                    <li><span class="entry__ck-pin" aria-hidden="true">3</span>Cienki pierścień zostawia do oceny już tylko długość łuku.</li>
+                                    <li><span class="entry__ck-pin" aria-hidden="true">3</span>Gdy wykres jest cienki, do oceny zostaje już tylko długość łuku.</li>
                                 </ul>
                             </div>
                             <div class="entry__ck-col entry__ck-col--good">
-                                <p class="entry__ck-head">Pierścień z dwoma segmentami</p>
+                                <p class="entry__ck-head">Wykres pierścieniowy – dwa segmenty</p>
                                 <div class="entry__ck-screen entry__ch-screen" aria-hidden="true">
                                     <p class="entry__ch-title">Zgłoszenia zamknięte w terminie</p>
                                     <p class="entry__ch-sub">Wrzesień 2026 · cel 80%</p>
@@ -315,9 +311,9 @@
                             </div>
                         </div>
                         <p class="entry__fig-caption">FIG. 1 – WYKRES PIERŚCIENIOWY: PIĘĆ SEGMENTÓW CZY DWA</p>
-                        <p class="entry__illustration-desc">Po lewej pierścień z pięcioma kategoriami o zbliżonych
+                        <p class="entry__illustration-desc">Po lewej wykres pierścieniowy z pięcioma kategoriami o zbliżonych
                             wartościach: wolny środek nie pomaga, a kolejność segmentów trzeba odczytać z legendy. Po
-                            prawej pierścień odpowiada na jedno pytanie – jaka część zgłoszeń została zamknięta w
+                            prawej wykres odpowiada na jedno pytanie – jaka część zgłoszeń została zamknięta w
                             terminie – a wynik stoi w środku.</p>
                     </div>
 
@@ -358,7 +354,7 @@
                                 </ul>
                             </div>
                             <div class="entry__ck-col entry__ck-col--good">
-                                <p class="entry__ck-head">Słupki poziome – posortowane</p>
+                                <p class="entry__ck-head">Wykres słupkowy poziomy – posortowany</p>
                                 <div class="entry__ck-screen entry__ch-screen" aria-hidden="true">
                                     <p class="entry__ch-title">Przychód wg kanału</p>
                                     <p class="entry__ch-sub">Wrzesień 2026 · 412 tys. zł</p>
@@ -379,36 +375,36 @@
                         </div>
                         <p class="entry__fig-caption">FIG. 2 – TE SAME DANE W DWÓCH WIDGETACH</p>
                         <p class="entry__illustration-desc">Oba widgety pokazują ten sam podział przychodu na pięć
-                            kanałów. Na kole dwa największe wycinki wyglądają prawie tak samo, a kategorię trzeba
-                            odczytać z legendy. Na słupkach kolejność i różnice widać od razu, a wartości są tam, gdzie
+                            kanałów. Na wykresie kołowym dwa największe wycinki wyglądają prawie tak samo, a kategorię trzeba
+                            odczytać z legendy. Na wykresie słupkowym kolejność i różnice widać od razu, a wartości są tam, gdzie
                             patrzy użytkownik.</p>
 
                         <div class="entry__ck-clicks">
                             <div class="entry__ck-row">
                                 <p class="entry__ck-row-label">Która kategoria jest największa?</p>
                                 <div class="entry__ck-chips">
-                                    <span class="entry__ck-chip entry__ck-chip--green">Słupki poziome, posortowane</span>
+                                    <span class="entry__ck-chip entry__ck-chip--green">Wykres słupkowy poziomy, posortowany</span>
                                 </div>
                             </div>
                             <div class="entry__ck-row">
                                 <p class="entry__ck-row-label">Jak to się zmieniało w czasie?</p>
                                 <div class="entry__ck-chips">
                                     <span class="entry__ck-chip entry__ck-chip--green">Wykres liniowy</span>
-                                    <span class="entry__ck-chip">Słupki pionowe (do ok. 12 okresów)</span>
+                                    <span class="entry__ck-chip">Wykres słupkowy pionowy (do ok. 12 okresów)</span>
                                 </div>
                             </div>
                             <div class="entry__ck-row">
                                 <p class="entry__ck-row-label">Jak wypadamy względem celu?</p>
                                 <div class="entry__ck-chips">
-                                    <span class="entry__ck-chip entry__ck-chip--green">Bullet chart</span>
+                                    <span class="entry__ck-chip entry__ck-chip--green">Wykres pociskowy</span>
                                     <span class="entry__ck-chip">Pasek postępu z celem</span>
                                 </div>
                             </div>
                             <div class="entry__ck-row">
                                 <p class="entry__ck-row-label">Jaka część całości? (2–3 kategorie)</p>
                                 <div class="entry__ck-chips">
-                                    <span class="entry__ck-chip entry__ck-chip--green">Pierścień z wartością w środku</span>
-                                    <span class="entry__ck-chip">Koło</span>
+                                    <span class="entry__ck-chip entry__ck-chip--green">Wykres pierścieniowy z wartością w środku</span>
+                                    <span class="entry__ck-chip">Wykres kołowy</span>
                                 </div>
                             </div>
                             <div class="entry__ck-row">
@@ -431,35 +427,35 @@
                             <ul class="entry__note-list">
                                 <li class="entry__note-item">
                                     <a href="https://www.jstor.org/stable/2288400" target="_blank" rel="noopener noreferrer"
-                                        class="entry__note-link">Cleveland i McGill – Graphical Perception</a> (Journal of the American Statistical Association, 1984) – eksperymenty, w których uczestnicy porównywali wartości zakodowane na różne sposoby. Najdokładniej oceniali położenie na wspólnej skali i długość, wyraźnie gorzej kąt i pole, a najsłabiej nasycenie koloru. Słupki korzystają z pierwszych pozycji tej listy, koło i pierścień z dalszych.
+                                        class="entry__note-link">Cleveland i McGill – Graphical Perception</a> (Journal of the American Statistical Association, 1984) – eksperymenty, w których uczestnicy porównywali wartości zakodowane na różne sposoby. Najdokładniej oceniali położenie na wspólnej skali i długość, wyraźnie gorzej kąt i pole, a najsłabiej nasycenie koloru. Wykres słupkowy korzysta z pierwszych pozycji tej listy, kołowy i pierścieniowy – z dalszych.
                                 </li>
                                 <li class="entry__note-item">
                                     <a href="https://doi.org/10.1002/acp.2350050106" target="_blank" rel="noopener noreferrer"
-                                        class="entry__note-link">Spence i Lewandowsky – Displaying proportions and percentages</a> (Applied Cognitive Psychology, 1991) – przy ocenie, jaką część całości stanowi dany element, wykresy kołowe były co najmniej tak dokładne jak słupkowe. Badanie jest głównym argumentem za kołem w zadaniach typu „część całości”.
+                                        class="entry__note-link">Spence i Lewandowsky – Displaying proportions and percentages</a> (Applied Cognitive Psychology, 1991) – przy ocenie, jaką część całości stanowi dany element, wykresy kołowe były co najmniej tak dokładne jak słupkowe. Badanie jest głównym argumentem za wykresem kołowym w zadaniach typu „część całości”.
                                 </li>
                                 <li class="entry__note-item">
                                     <a href="https://doi.org/10.2312/eurovisshort.20161167" target="_blank" rel="noopener noreferrer"
-                                        class="entry__note-link">Kosara i Skau – Judgment Error in Pie Chart Variations</a> (EuroVis, 2016) – porównanie koła, pierścienia i innych wariantów. Ludzie odczytują koło głównie z pola i długości łuku, a nie z kąta, a pierścień daje podobną dokładność jak pełne koło.
+                                        class="entry__note-link">Kosara i Skau – Judgment Error in Pie Chart Variations</a> (EuroVis, 2016) – porównanie wykresu kołowego, pierścieniowego i innych wariantów. Ludzie odczytują wykres kołowy głównie z pola i długości łuku, a nie z kąta, a pierścieniowy daje podobną dokładność.
                                 </li>
                                 <li class="entry__note-item">
                                     <a href="https://www.perceptualedge.com/articles/visual_business_intelligence/save_the_pies_for_dessert.pdf" target="_blank" rel="noopener noreferrer"
-                                        class="entry__note-link">Stephen Few – Save the Pies for Dessert</a> (Perceptual Edge, 2007) – argumentacja przeciw wykresom kołowym w raportach i dashboardach biznesowych. Te same dane pokazane na słupkach pozwalają szybciej uporządkować i porównać wartości.
+                                        class="entry__note-link">Stephen Few – Save the Pies for Dessert</a> (Perceptual Edge, 2007) – argumentacja przeciw wykresom kołowym w raportach i dashboardach biznesowych. Te same dane pokazane na wykresie słupkowym pozwalają szybciej uporządkować i porównać wartości.
                                 </li>
                                 <li class="entry__note-item">
                                     <a href="https://www.perceptualedge.com/articles/misc/Bullet_Graph_Design_Spec.pdf" target="_blank" rel="noopener noreferrer"
-                                        class="entry__note-link">Stephen Few – Bullet Graph Design Specification</a> – specyfikacja wykresu bullet: kompaktowego paska, który w jednym wierszu pokazuje wynik, cel i progi oceny. Pomyślany jako zamiennik wskaźników zegarowych na dashboardach.
+                                        class="entry__note-link">Stephen Few – Bullet Graph Design Specification</a> – specyfikacja wykresu pociskowego (bullet chart): kompaktowego paska, który w jednym wierszu pokazuje wynik, cel i progi oceny. Pomyślany jako zamiennik wskaźników zegarowych na dashboardach.
                                 </li>
                                 <li class="entry__note-item">
                                     <a href="https://www.nngroup.com/articles/choosing-chart-types/" target="_blank" rel="noopener noreferrer"
-                                        class="entry__note-link">NN/g – Choosing Chart Types: Consider Context</a> (2022) – typ wykresu dobiera się do zadania użytkownika. Koło nadaje się do pokazania części całości przy niewielu kategoriach, słupki do porównań i rankingów.
+                                        class="entry__note-link">NN/g – Choosing Chart Types: Consider Context</a> (2022) – typ wykresu dobiera się do zadania użytkownika. Wykres kołowy nadaje się do pokazania części całości przy niewielu kategoriach, słupkowy – do porównań i rankingów.
                                 </li>
                                 <li class="entry__note-item">
                                     <a href="https://www.nngroup.com/articles/dashboards-preattentive/" target="_blank" rel="noopener noreferrer"
-                                        class="entry__note-link">NN/g – Dashboards: Making Charts and Graphs Easier to Understand</a> (2017) – długość i położenie odczytujemy przeduwagowo, bez świadomego wysiłku, dlatego słupki pozwalają porównać wartości jednym spojrzeniem.
+                                        class="entry__note-link">NN/g – Dashboards: Making Charts and Graphs Easier to Understand</a> (2017) – długość i położenie odczytujemy przeduwagowo, bez świadomego wysiłku, dlatego wykres słupkowy pozwala porównać wartości jednym spojrzeniem.
                                 </li>
                                 <li class="entry__note-item">
                                     <a href="https://www.w3.org/WAI/WCAG22/Understanding/use-of-color.html" target="_blank" rel="noopener noreferrer"
-                                        class="entry__note-link">WCAG 2.2 – kryteria 1.4.1 i 1.4.11</a> – kolor nie może być jedynym nośnikiem informacji, a elementy graficzne potrzebne do zrozumienia wykresu muszą mieć kontrast co najmniej 3:1 z sąsiednimi kolorami. Dotyczy to segmentów koła i pierścienia, które często różnią się tylko odcieniem.
+                                        class="entry__note-link">WCAG 2.2 – kryteria 1.4.1 i 1.4.11</a> – kolor nie może być jedynym nośnikiem informacji, a elementy graficzne potrzebne do zrozumienia wykresu muszą mieć kontrast co najmniej 3:1 z sąsiednimi kolorami. Dotyczy to segmentów wykresów kołowych i pierścieniowych, które często różnią się tylko odcieniem.
                                 </li>
                             </ul>
                         </div>
@@ -467,7 +463,7 @@
 
                     <h2 class="entry__heading">Powiązane hasła</h2>
                     <div class="entry__related">
-                        <a href="#" class="entry__related-link">Bullet chart</a>
+                        <a href="#" class="entry__related-link">Wykres pociskowy</a>
                         <a href="#" class="entry__related-link">Wykres liniowy</a>
                         <a href="#" class="entry__related-link">Kafelek KPI</a>
                         <a href="#" class="entry__related-link">Hierarchia wizualna</a>
