@@ -459,10 +459,10 @@
         }
     </script>
     <script>
-        // Obietnica „preloader skończył”. Ciężka inicjalizacja brył (pole
-        // odległości ikon, konteksty WebGL, kompilacja shaderów) czeka na nią,
-        // żeby nie blokować wątku w trakcie animacji preloadera — inaczej ten
-        // gubił klatki, zwłaszcza na telefonie. Awaryjnie po 2,5 s i tak rusza.
+        // Obietnica „preloader skończył”. Bryły poniżej zgięcia (taksonomia,
+        // CTA) inicjalizują się dopiero chwilę po niej, żeby ich ciężka praca
+        // (pole odległości ikon, konteksty WebGL, shadery) nie zacinała
+        // wyłaniania się tekstu w hero. Awaryjnie po 2,5 s i tak rusza.
         window.__introDone = new Promise((resolve) => {
             window.__resolveIntroDone = resolve;
             setTimeout(resolve, 2500);
@@ -1576,26 +1576,33 @@
         // (glass-icon.js), a ?hero=keycap wraca do metalowych keycapów — np.
         // do testów A/B. Gdy WebGL dla szkła nie ruszy, wracamy do keycapa.
         const useGlass = new URLSearchParams(window.location.search).get('hero') !== 'keycap';
-        // Szklane bryły startują dopiero po preloaderze (window.__introDone)
-        // i po kolei, w kolejności wywołań (hero pierwsze), z oddechem jednej
-        // klatki między nimi — inicjalizacja każdej to kilkadziesiąt ms pracy
-        // wątku, a dziewięć naraz zacinało animacje.
+        // Bryła w hero startuje od razu (priority) — preloader liczy kompozytor,
+        // więc praca JS w tle go nie zacina, a bryła jest gotowa, gdy strona
+        // się odsłania. Pozostałe (poniżej zgięcia) czekają, aż hero się
+        // wyłoni, i ruszają po kolei, z oddechem jednej klatki między nimi —
+        // inicjalizacja każdej to kilkadziesiąt ms pracy wątku.
+        const GLASS_QUEUE_DELAY_MS = 1200;
         const glassQueue = [];
         let glassQueueRunning = false;
         async function runGlassQueue() {
             if (glassQueueRunning) return;
             glassQueueRunning = true;
             await window.__introDone;
+            await new Promise((resolve) => setTimeout(resolve, GLASS_QUEUE_DELAY_MS));
             while (glassQueue.length) {
                 await glassQueue.shift()();
                 await new Promise((resolve) => requestAnimationFrame(() => setTimeout(resolve, 0)));
             }
             glassQueueRunning = false;
         }
-        function initGlassOrKeycap(containerId, glassOptions, initKeycap) {
+        function initGlassOrKeycap(containerId, glassOptions, initKeycap, { priority = false } = {}) {
             const el = document.getElementById(containerId);
             if (!useGlass || !el) {
                 initKeycap();
+                return;
+            }
+            if (priority) {
+                initGlassIcon(el, glassOptions).then((ok) => { if (!ok) initKeycap(); });
                 return;
             }
             glassQueue.push(() => initGlassIcon(el, glassOptions).then((ok) => { if (!ok) initKeycap(); }));
@@ -1633,7 +1640,7 @@
         }, () => {
             heroContainer.classList.remove('hero__icon--glass');
             initHeroKeycap();
-        });
+        }, { priority: true });
         // Cztery bryły taksonomii: w kafelkach „Przeglądaj według taksonomii”
         // i jako bryły w tle CTA w stopce. Jedna definicja na kategorię, żeby
         // oba miejsca zawsze pokazywały to samo. W domyślnym wariancie to
