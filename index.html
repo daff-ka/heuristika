@@ -845,26 +845,48 @@
                     computeTextCenter();
                     window.addEventListener('resize', computeTextCenter);
 
-                    ctaGraphics.forEach((el, i) => {
-                        gsap.set(el, { xPercent: -50, yPercent: -50, rotate: cachedCenter.config[i].rotate });
+                    const finalX = (i) => cachedCenter.x + cachedCenter.config[i].dx * cachedCenter.scale;
+                    const finalY = (i) => cachedCenter.y + cachedCenter.config[i].dy * cachedCenter.scale;
 
-                        gsap.fromTo(el,
-                            { x: () => cachedCenter.x, y: () => cachedCenter.y, scale: 0.3, opacity: 0 },
-                            {
-                                x: () => cachedCenter.x + cachedCenter.config[i].dx * cachedCenter.scale,
-                                y: () => cachedCenter.y + cachedCenter.config[i].dy * cachedCenter.scale,
-                                scale: 1,
-                                opacity: 1,
-                                ease: 'none',
-                                scrollTrigger: {
-                                    trigger: '.footer',
-                                    start: 'top bottom',
-                                    end: 'top 30%',
-                                    scrub: true,
-                                    invalidateOnRefresh: true,
-                                },
+                    // Desktop: bryły wyjeżdżają zza tytułu razem ze scrollem.
+                    // Telefon: bez animacji — od razu stoją na swoich miejscach.
+                    // Na iPhonie przesuwanie i skalowanie czterech brył WebGL
+                    // co klatkę przewijania rwało scroll, zwłaszcza w górę.
+                    gsap.matchMedia().add({
+                        desktop: '(min-width: 761px)',
+                        mobile: '(max-width: 760px)',
+                    }, (context) => {
+                        ctaGraphics.forEach((el, i) => {
+                            gsap.set(el, { xPercent: -50, yPercent: -50, rotate: cachedCenter.config[i].rotate });
+                            if (context.conditions.mobile) {
+                                gsap.set(el, { x: finalX(i), y: finalY(i), scale: 1, opacity: 1 });
+                                return;
                             }
-                        );
+                            gsap.fromTo(el,
+                                { x: () => cachedCenter.x, y: () => cachedCenter.y, scale: 0.3, opacity: 0 },
+                                {
+                                    x: () => finalX(i),
+                                    y: () => finalY(i),
+                                    scale: 1,
+                                    opacity: 1,
+                                    ease: 'none',
+                                    scrollTrigger: {
+                                        trigger: '.footer',
+                                        start: 'top bottom',
+                                        end: 'top 30%',
+                                        scrub: true,
+                                        invalidateOnRefresh: true,
+                                    },
+                                }
+                            );
+                        });
+                    });
+
+                    // Na telefonie pozycje liczone są raz (gsap.set), więc po
+                    // zmianie rozmiaru (np. obrót ekranu) ustawiamy je od nowa.
+                    window.addEventListener('resize', () => {
+                        if (!window.matchMedia('(max-width: 760px)').matches) return;
+                        ctaGraphics.forEach((el, i) => gsap.set(el, { x: finalX(i), y: finalY(i) }));
                     });
                 })();
             }
