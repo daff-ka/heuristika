@@ -33,7 +33,6 @@
 </head>
 
 <body>
-    <canvas id="dots"></canvas>
     <div class="page">
         <div class="shell">
             <nav class="nav" aria-label="Top navigation">
@@ -142,22 +141,14 @@
                             <p class="entry__tldr-label">TL;DR</p>
                             <p class="entry__tldr-text">Etykieta obok ikony ma swoją cenę – zajmuje miejsce i
                                 zwiększa szum wizualny (<a href="#"
-                                    class="entry__inline-link">visual clutter</a>), ale daje większą pewność
-                                rozpoznania. Na desktopie, gdzie sidebar często ma ok. 200–280 px, ten koszt jest
-                                relatywnie niewielki, więc zwykle warto go ponieść. Na mobile decyzja zależy
-                                natomiast od tego, czy sama ikona jest jednoznaczna i zrozumiała bez dodatkowego
+                                    class="entry__inline-link">visual clutter</a>), ale sprawia, że ikonę łatwiej rozpoznać. Na desktopie, gdzie sidebar często ma ok. 200–280 px, ten koszt jest stosunkowo niewielki, więc zwykle warto go ponieść. Na urządzeniach mobilnych decyzja zależy od tego, czy sama ikona jest jednoznaczna i zrozumiała bez dodatkowego
                                 opisu.</p>
                         </div>
                     </div>
 
                     <h2 class="entry__heading">Kiedy stosować</h2>
-                    <p class="entry__copy">Stosuj etykiety, gdy ikona nie ma czytelnej, ugruntowanej semantyki,
-                        gdy użytkownik jest nowy lub gdy element pojawia się rzadko – wtedy wybieraj
-                        <a href="#" class="entry__inline-link">recognition over recall</a> (pewność rozpoznania
-                        zamiast polegania na zapamiętywaniu). Pomijaj etykiety, gdy ikony są już wyuczone (np.
-                        lupa, ustawienia/zębatka, dzwonek), gdy użytkownik wraca do nich codziennie lub gdy
-                        przestrzeń jest krytyczna – szczególnie na mobile, np. w bottom nav, gdzie liczy się
-                        szybkość trafienia w cel (<a href="#" class="entry__inline-link">Fitts’s Law</a>).</p>
+                    <p class="entry__copy">Stosuj etykiety, gdy znaczenie ikony nie jest oczywiste,
+                        gdy użytkownik jest nowy lub gdy element pojawia się rzadko – wtedy łatwiej coś rozpoznać, niż przypomnieć sobie (<a href="#" class="entry__inline-link">recognition over recall</a>). Pomijaj etykiety, gdy ikony są powszechnie znane (np. lupa, zębatka ustawień, dzwonek), gdy użytkownik wraca do nich codziennie lub gdy brakuje miejsca – szczególnie na urządzeniach mobilnych, np. w dolnym pasku nawigacji, gdzie liczy się szybkie trafienie w cel (<a href="#" class="entry__inline-link">prawo Fittsa</a>).</p>
 
                     <h2 class="entry__heading">Best practices</h2>
                     <div class="entry__dodont">
@@ -169,8 +160,7 @@
                                 </svg>
                                 <p class="entry__dodont-label entry__dodont-label--do">Rób</p>
                             </div>
-                            <p class="entry__dodont-text">Na desktopie w rozwiniętym sidebarze zawsze pokazuj
-                                label, nawet przy bardzo znanych ikonach.</p>
+                            <p class="entry__dodont-text">Na desktopie w rozwiniętym sidebarze zawsze pokazuj etykiety, nawet przy powszechnie znanych ikonach.</p>
                         </div>
                         <div class="entry__dodont-card">
                             <div class="entry__dodont-row">
@@ -180,9 +170,7 @@
                                 </svg>
                                 <p class="entry__dodont-label entry__dodont-label--dont">Nie rób</p>
                             </div>
-                            <p class="entry__dodont-text">Nie chowaj etykiet pod ikonami niestandardowymi bez
-                                alternatywnego sposobu wyjaśnienia <a href="#"
-                                    class="entry__inline-link">tooltip</a>.</p>
+                            <p class="entry__dodont-text">Nie pokazuj nietypowych ikon bez etykiety. Jeśli brakuje na nią miejsca, wyjaśnij znaczenie ikony przynajmniej w <a href="#" class="entry__inline-link">tooltipie</a>.</p>
                         </div>
                     </div>
 
@@ -365,7 +353,7 @@
                         </div>
                         <p class="entry__fig-caption">FIG. 1 – SIDEBAR DESKTOP VS BOTTOM NAV MOBILE</p>
                         <p class="entry__illustration-desc">Po lewej: rozwinięty sidebar z etykietą przy każdej
-                            ikonie. Po prawej: mobilny bottom nav – same ikony, stan aktywny oznaczony kropką.</p>
+                            ikonie. Po prawej: dolny pasek nawigacji na urządzeniu mobilnym – same ikony, aktywną pozycję oznacza kropka.</p>
                     </div>
 
                     <div class="entry__note">
@@ -375,30 +363,21 @@
                                 <li class="entry__note-item">
                                     <a href="https://www.nngroup.com/articles/icon-usability/" target="_blank"
                                         rel="noopener noreferrer" class="entry__note-link">Nielsen Norman Group</a>
-                                    – "Icon Usability" – badanie NN/G pokazujące, że ikona bez etykiety bywa
-                                    całkowicie niezrozumiała nawet jeśli sama grafika jest łatwo rozpoznawalna – w
-                                    jednym z testów uczestnicy w ogóle nie klikali w ikonę, bo nie rozumieli jej
-                                    funkcji w danym kontekście. NN/G rekomenduje, by etykiety tekstowe
-                                    towarzyszyły ikonom i były widoczne stale, bez potrzeby interakcji
-                                    użytkownika.
+                                    – „Icon Usability” – badanie NN/g pokazujące, że ikona bez etykiety bywa całkowicie niezrozumiała, nawet jeśli sama grafika jest łatwo rozpoznawalna – w
+                                    jednym z testów uczestnicy w ogóle nie klikali ikony, bo nie rozumieli jej
+                                    funkcji w danym kontekście. NN/g zaleca, by etykiety tekstowe towarzyszyły ikonom i były zawsze widoczne, a nie dopiero po interakcji.
                                 </li>
                                 <li class="entry__note-item">
                                     <a href="https://www.checklyhq.com/blog/inside-the-sidebar-redesign/"
                                         target="_blank" rel="noopener noreferrer" class="entry__note-link">Case
                                         study Checkly</a>
-                                    (realny produkt B2B, redesign sidebara) – opisują wprost, że w stanie
-                                    collapsed etykiety pojawiały się tylko po hoverze, a "ikony bez kontekstu nie
-                                    działają – bardziej mylą niż pomagają", co skłoniło ich do zmiany podejścia
-                                    na stałe pokazywanie ikon+etykiet.
+                                    (produkt B2B, przeprojektowanie sidebara) – w zwiniętym sidebarze etykiety pojawiały się dopiero po najechaniu kursorem. Zespół przyznaje, że ikony bez kontekstu bardziej dezorientują, niż pomagają, dlatego zaczął stale pokazywać je razem z etykietami.
                                 </li>
                                 <li class="entry__note-item">
                                     <a href="https://www.alfdesigngroup.com/post/improve-your-sidebar-design-for-web-apps"
                                         target="_blank" rel="noopener noreferrer" class="entry__note-link">Praktyka
                                         branżowa</a>
-                                    / dobre praktyki 2026 – nowsze przewodniki po projektowaniu sidebarów
-                                    podkreślają, że tryb tylko-ikony jest akceptowalny wyłącznie w stanie
-                                    collapsed i tylko z tooltipami w hoverze – czyli sam branżowy standard
-                                    zakłada, że bez etykiet/tooltipów to błąd projektowy.
+                                    / dobre praktyki 2026 – aktualne przewodniki po projektowaniu sidebarów podkreślają, że same ikony są dopuszczalne tylko w zwiniętym sidebarze i tylko z tooltipami widocznymi po najechaniu kursorem. Brak zarówno etykiet, jak i tooltipów branża uznaje więc za błąd projektowy.
                                 </li>
                             </ul>
                         </div>
@@ -433,7 +412,7 @@
         </div>
     </div>
 
-    <script src="dots-pattern.js"></script>
+    <script src="cursor-trail.js"></script>
 
     <script src="nav.js"></script>
 

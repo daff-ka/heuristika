@@ -33,7 +33,6 @@
 </head>
 
 <body>
-    <canvas id="dots"></canvas>
     <div id="preloader" aria-hidden="true">
         <svg id="preloader-svg" width="100%" height="100%">
             <rect x="0" y="0" width="100%" height="100%" />
@@ -372,7 +371,6 @@
             <div class="divider"></div>
 
             <footer class="footer">
-                <canvas id="footerDots" aria-hidden="true"></canvas>
                 <div class="footer__inner">
                     <div class="footer__cta">
                         <div class="footer__cta-graphics" aria-hidden="true">
@@ -419,8 +417,7 @@
         </div>
     </div>
 
-    <script src="dots-pattern.js"></script>
-    <script src="footer-pattern.js"></script>
+    <script src="cursor-trail.js"></script>
 
     <script src="nav.js"></script>
     <script src="card-glow.js"></script>
@@ -594,14 +591,20 @@
                 // już z CSS position:relative + z-index:1 (stacking context),
                 // więc tekst (bez z-index, statyczny) automatycznie renderuje
                 // się POD nią przy nachodzeniu — bez dodatkowych zmian CSS.
+                // Domyślnie szklane bryły; ?hero=keycap wraca do metalowych keycapów.
+                const heroIsGlass = new URLSearchParams(window.location.search).get('hero') !== 'keycap';
                 let heroTextParallaxTween = null;
                 function createHeroTextParallaxTween() {
                     if (heroTextParallaxTween) {
                         if (heroTextParallaxTween.scrollTrigger) heroTextParallaxTween.scrollTrigger.kill();
                         heroTextParallaxTween.kill();
                     }
+                    // Szklany wariant bryły (domyślny) nie ma własnej
+                    // paralaksy — jedzie razem z tekstem.
                     const textEls = document.querySelectorAll(
-                        '.hero__eyebrow, .hero__title, .hero__copy, .hero__search'
+                        heroIsGlass
+                            ? '#heroIcon3d, .hero__eyebrow, .hero__title, .hero__copy, .hero__search'
+                            : '.hero__eyebrow, .hero__title, .hero__copy, .hero__search'
                     );
                     if (!textEls.length) return;
                     heroTextParallaxTween = gsap.fromTo(textEls,
@@ -632,7 +635,7 @@
                         heroIconParallaxTween.kill();
                     }
                     const iconEl = document.getElementById('heroIcon3d');
-                    if (!iconEl) return;
+                    if (!iconEl || heroIsGlass) return;
                     heroIconParallaxTween = gsap.fromTo(iconEl,
                         { y: 0, scale: 1 },
                         {
@@ -861,6 +864,76 @@
         import * as THREE from 'three';
         import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
         import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
+        import { initGlassIcon } from './glass-icon.js';
+
+        // Klik/tap → nawigacja do losowego hasła i tooltip "zaskocz mnie".
+        // Dotyczy tylko hero (patrz tekst tooltipa w markupie). Wspólne dla
+        // obu wariantów bryły: hitEl to canvas danego wariantu, press to jego
+        // animacja wciśnięcia.
+        function attachRandomEntryClick(container, hitEl, press) {
+            // Listener na canvasie (nie na małym base-container 87x89), bo canvas
+            // jest wyrenderowany w rzeczywistym, powiększonym (SAFETY_SCALE)
+            // rozmiarze wizualnym modelu — dopiero to daje hit-area pokrywającą
+            // się z tym, co użytkownik faktycznie widzi (łącznie z krawędziami).
+            hitEl.addEventListener('mousedown', press);
+            hitEl.addEventListener('touchstart', press, { passive: true });
+
+            const navigateToRandomEntry = () => {
+                const entries = window.__heuristikaEntries || [];
+                if (!entries.length) return;
+                const entry = entries[Math.floor(Math.random() * entries.length)];
+                // Małe opóźnienie, żeby zdążyła się pokazać animacja
+                // "wciśnięcia" zanim strona zmieni się pod użytkownikiem.
+                setTimeout(() => { window.location.href = entry.url; }, 180);
+            };
+
+            // Na myszy (:hover realnie działa) tooltip pokazuje się sam przy
+            // najechaniu, więc klik od razu nawiguje. Na dotyku nie ma
+            // najechania — pierwszy tap tylko odsłania tooltip (żeby było
+            // wiadomo, co się kliknie), dopiero DRUGI tap faktycznie
+            // nawiguje. Tooltip sam się chowa po chwili bezczynności albo
+            // po dotknięciu gdzieś indziej.
+            const canHover = window.matchMedia('(hover: hover) and (pointer: fine)').matches;
+            let tooltipArmed = false;
+            let tooltipHideTimer = null;
+
+            const armMobileTooltip = () => {
+                tooltipArmed = true;
+                container.classList.add('hero__icon--3d--tapped');
+                clearTimeout(tooltipHideTimer);
+                tooltipHideTimer = setTimeout(disarmMobileTooltip, 5000);
+            };
+
+            const disarmMobileTooltip = () => {
+                tooltipArmed = false;
+                clearTimeout(tooltipHideTimer);
+                container.classList.remove('hero__icon--3d--tapped');
+            };
+
+            if (!canHover) {
+                document.addEventListener('click', (e) => {
+                    if (!container.contains(e.target)) disarmMobileTooltip();
+                });
+            }
+
+            // Klik/tap na model → losowe hasło z biblioteki (patrz
+            // navigateToRandomEntry). Czyta z window.__heuristikaEntries —
+            // tej samej listy co wyszukiwarka (patrz skrypt niżej, setup
+            // search), więc obie rzeczy zawsze widzą te same, realnie
+            // istniejące wpisy.
+            hitEl.addEventListener('click', () => {
+                if (canHover) {
+                    navigateToRandomEntry();
+                    return;
+                }
+                if (!tooltipArmed) {
+                    armMobileTooltip();
+                    return;
+                }
+                disarmMobileTooltip();
+                navigateToRandomEntry();
+            });
+        }
 
         function initKeycap3D(containerId, textureUrl, bodyColor, options = {}) {
             const {
@@ -1373,74 +1446,8 @@
                 pressPhase = 'down';
                 pressPhaseStart = performance.now();
             }
-            // Klik/tap → nawigacja do losowego hasła i tooltip "zaskocz mnie"
-            // dotyczą tylko hero (patrz tekst tooltipa w markupie) — w innych
-            // miejscach (np. mniejsza bryła w przeglądzie taksonomii) bryła
-            // jest czysto dekoracyjna, więc to zachowanie jest wyłączone.
-            if (interactive) {
-                // Listener na canvasie (nie na małym base-container 87x89), bo canvas
-                // jest wyrenderowany w rzeczywistym, powiększonym (SAFETY_SCALE)
-                // rozmiarze wizualnym modelu — dopiero to daje hit-area pokrywającą
-                // się z tym, co użytkownik faktycznie widzi (łącznie z krawędziami).
-                renderer.domElement.addEventListener('mousedown', press);
-                renderer.domElement.addEventListener('touchstart', press, { passive: true });
-
-                const navigateToRandomEntry = () => {
-                    const entries = window.__heuristikaEntries || [];
-                    if (!entries.length) return;
-                    const entry = entries[Math.floor(Math.random() * entries.length)];
-                    // Małe opóźnienie, żeby zdążyła się pokazać animacja
-                    // "wciśnięcia" zanim strona zmieni się pod użytkownikiem.
-                    setTimeout(() => { window.location.href = entry.url; }, 180);
-                };
-
-                // Na myszy (:hover realnie działa) tooltip pokazuje się sam przy
-                // najechaniu, więc klik od razu nawiguje. Na dotyku nie ma
-                // najechania — pierwszy tap tylko odsłania tooltip (żeby było
-                // wiadomo, co się kliknie), dopiero DRUGI tap faktycznie
-                // nawiguje. Tooltip sam się chowa po chwili bezczynności albo
-                // po dotknięciu gdzieś indziej.
-                const canHover = window.matchMedia('(hover: hover) and (pointer: fine)').matches;
-                let tooltipArmed = false;
-                let tooltipHideTimer = null;
-
-                const armMobileTooltip = () => {
-                    tooltipArmed = true;
-                    container.classList.add('hero__icon--3d--tapped');
-                    clearTimeout(tooltipHideTimer);
-                    tooltipHideTimer = setTimeout(disarmMobileTooltip, 5000);
-                };
-
-                const disarmMobileTooltip = () => {
-                    tooltipArmed = false;
-                    clearTimeout(tooltipHideTimer);
-                    container.classList.remove('hero__icon--3d--tapped');
-                };
-
-                if (!canHover) {
-                    document.addEventListener('click', (e) => {
-                        if (!container.contains(e.target)) disarmMobileTooltip();
-                    });
-                }
-
-                // Klik/tap na model → losowe hasło z biblioteki (patrz
-                // navigateToRandomEntry). Czyta z window.__heuristikaEntries —
-                // tej samej listy co wyszukiwarka (patrz skrypt niżej, setup
-                // search), więc obie rzeczy zawsze widzą te same, realnie
-                // istniejące wpisy.
-                renderer.domElement.addEventListener('click', () => {
-                    if (canHover) {
-                        navigateToRandomEntry();
-                        return;
-                    }
-                    if (!tooltipArmed) {
-                        armMobileTooltip();
-                        return;
-                    }
-                    disarmMobileTooltip();
-                    navigateToRandomEntry();
-                });
-            }
+            // Klik/tap → losowe hasło tylko w hero; w innych miejscach bryła jest dekoracyjna.
+            if (interactive) attachRandomEntryClick(container, renderer.domElement, press);
 
             // Losowy offset fazy — bez tego wszystkie instancje na stronie
             // (te same stałe 1.1 i amplituda) unosiłyby się idealnie w takt.
@@ -1504,7 +1511,21 @@
             animate();
         }
 
-        initKeycap3D('heroIcon3d', 'assets/hero-icon-texture.png', '#0937ff', {
+        // Dwa warianty brył (hero, kafelki taksonomii, CTA): domyślnie szkło
+        // (glass-icon.js), a ?hero=keycap wraca do metalowych keycapów — np.
+        // do testów A/B. Gdy WebGL dla szkła nie ruszy, wracamy do keycapa.
+        const useGlass = new URLSearchParams(window.location.search).get('hero') !== 'keycap';
+        function initGlassOrKeycap(containerId, glassOptions, initKeycap) {
+            const el = document.getElementById(containerId);
+            if (!useGlass || !el) {
+                initKeycap();
+                return;
+            }
+            initGlassIcon(el, glassOptions).then((ok) => { if (!ok) initKeycap(); });
+        }
+
+        const heroContainer = document.getElementById('heroIcon3d');
+        const initHeroKeycap = () => initKeycap3D('heroIcon3d', 'assets/hero-icon-texture.png', '#0937ff', {
             mobileSizeBoost: 1.5,
             scrollSpin: true,
             materialOverrides: {
@@ -1521,120 +1542,106 @@
                 envMapIntensityHover: 3,
             },
         });
-        initKeycap3D('taxonomyIcon3d', 'assets/taxonomy-dyscyplina-tile-icon.png', '#429efa', {
-            interactive: false,
-            localTilt: true,
-            materialOverrides: {
-                color: 0x5675ff,
-                metalness: 1,
-                roughness: 0.35,
-                transmission: 0,
-                clearcoat: 0,
-                envMapIntensity: 2.2,
-            },
+        if (useGlass) heroContainer.classList.add('hero__icon--glass');
+        initGlassOrKeycap('heroIcon3d', {
+            textureUrl: 'assets/hero-icon-texture.png',
+            bgVar: '--bg',
+            // 140% rozmiaru keycapa.
+            sizeBoost: 2.66,
+            // Na telefonie trochę mniejsze, żeby zmieściło się pod nawigacją.
+            mobileSizeBoost: 2.0,
+            onPressTarget: (canvas, press) => attachRandomEntryClick(heroContainer, canvas, press),
+        }, () => {
+            heroContainer.classList.remove('hero__icon--glass');
+            initHeroKeycap();
         });
-        initKeycap3D('taxonomyTypIcon3d', 'assets/taxonomy-typ-tile-icon.png', '#c60aff', {
-            interactive: false,
-            localTilt: true,
-            materialOverrides: {
-                color: 0xc60aff,
-                metalness: 1,
-                roughness: 0.06,
-                transmission: 0,
-                clearcoat: 0,
-                envMapIntensity: 3,
+        // Cztery bryły taksonomii: w kafelkach „Przeglądaj według taksonomii”
+        // i jako bryły w tle CTA w stopce. Jedna definicja na kategorię, żeby
+        // oba miejsca zawsze pokazywały to samo. W domyślnym wariancie to
+        // szkło z ikoną w kolorze etykiety kategorii, domyślnie metalowy keycap.
+        const TAXONOMY_SHAPES = [
+            {
+                texture: 'assets/taxonomy-dyscyplina-tile-icon.png',
+                tintVar: '--badge-blue-fg',
+                // Kształt szklanej bryły (glass-icon.js): koło.
+                glass: { round: true },
+                keycapColor: '#429efa',
+                material: { color: 0x5675ff, roughness: 0.35, envMapIntensity: 2.2 },
             },
-        });
-        initKeycap3D('taxonomyPlatformaIcon3d', 'assets/taxonomy-platforma-3d-texture.png', '#33f2a7', {
-            interactive: false,
-            localTilt: true,
-            materialOverrides: {
-                color: 0x4cd98a,
-                metalness: 1,
-                roughness: 0.06,
-                transmission: 0,
-                clearcoat: 0,
-                envMapIntensity: 3,
+            {
+                texture: 'assets/taxonomy-typ-tile-icon.png',
+                tintVar: '--badge-violet-fg',
+                // Piramida (trójkąt); w trójkącie jest mniej miejsca, więc ikona mniejsza.
+                glass: { polygon: 'triangle', iconScale: 0.62 },
+                keycapColor: '#c60aff',
+                material: { color: 0xc60aff, roughness: 0.06, envMapIntensity: 3 },
             },
-        });
-        initKeycap3D('taxonomyPoziomIcon3d', 'assets/taxonomy-poziom-tile-icon.png', '#ffd60a', {
-            interactive: false,
-            localTilt: true,
-            materialOverrides: {
-                color: 0xb87333,
-                metalness: 1,
-                roughness: 0.4,
-                transmission: 0,
-                clearcoat: 0,
-                envMapIntensity: 2.2,
+            {
+                texture: 'assets/taxonomy-platforma-3d-texture.png',
+                tintVar: '--badge-green-fg',
+                // Squircle (domyślny kształt).
+                glass: {},
+                keycapColor: '#33f2a7',
+                material: { color: 0x4cd98a, roughness: 0.06, envMapIntensity: 3 },
             },
-        });
+            {
+                texture: 'assets/taxonomy-poziom-tile-icon.png',
+                tintVar: '--badge-amber-fg',
+                // Ośmiokąt.
+                glass: { polygon: 'octagon' },
+                keycapColor: '#ffd60a',
+                material: { color: 0xb87333, roughness: 0.4, envMapIntensity: 2.2 },
+            },
+        ];
+        function initTaxonomyShape(containerId, shape, { bgVar, tintVar, floatPx, idleFloatAmplitude, rimFlowScale, sizeBoost, mobileSizeBoost }) {
+            initGlassOrKeycap(containerId, {
+                textureUrl: shape.texture,
+                bgVar,
+                tintVar: tintVar || shape.tintVar,
+                localTilt: true,
+                iconScale: 0.8,
+                rimFlowScale,
+                sizeBoost,
+                mobileSizeBoost,
+                ...shape.glass,
+                floatPx,
+            }, () => initKeycap3D(containerId, shape.texture, shape.keycapColor, {
+                interactive: false,
+                localTilt: true,
+                ...(idleFloatAmplitude ? { idleFloatAmplitude } : {}),
+                materialOverrides: {
+                    metalness: 1,
+                    transmission: 0,
+                    clearcoat: 0,
+                    ...shape.material,
+                },
+            }));
+        }
 
-        // Te same modele/tekstury/kolory co w kafelkach taksonomii wyżej —
-        // podmienia płaskie SVG w tle sekcji "Nowe hasła pojawiają się
-        // regularnie" (pozycja/skala/obrót/opacity nadal sterowane przez
-        // istniejącą animację scrollową GSAP na .footer__cta-graphic, patrz
-        // setupFooterCtaGraphics — bez zmian).
-        initKeycap3D('footerCtaIcon3d1', 'assets/heart.png', '#429efa', {
-            interactive: false,
-            localTilt: true,
-            idleFloatAmplitude: 40,
-            materialOverrides: {
-                color: 0x5675ff,
-                metalness: 1,
-                roughness: 0.35,
-                transmission: 0,
-                clearcoat: 0,
-                envMapIntensity: 2.2,
-            },
-        });
-        initKeycap3D('footerCtaIcon3d2', 'assets/taxonomy-typ-3d-texture.png', '#c60aff', {
-            interactive: false,
-            localTilt: true,
-            // pyramid.glb wyłączony na razie (nie widać było bevel-glow) —
-            // wraca helix.glb. Konfiguracja pyramid.glb (skipAutoScaleNormalize,
-            // edgeGlow) zostawiona w historii/pamięci, do niej wrócimy.
-            modelUrl: 'assets/helix.glb',
-            showIcon: false,
-            idleFloatAmplitude: 40,
-            modelRotation: { x: Math.PI / 2, y: 0, z: 0 },
-            materialOverrides: {
-                color: 0xd4af37,
-                metalness: 1,
-                roughness: 0.2,
-                transmission: 0,
-                clearcoat: 0,
-                envMapIntensity: 3,
-            },
-        });
-        initKeycap3D('footerCtaIcon3d3', 'assets/taxonomy-platforma-3d-texture.png', '#33f2a7', {
-            interactive: false,
-            localTilt: true,
-            modelUrl: 'assets/spinner.glb',
-            showIcon: false,
-            modelScale: 1.6,
-            idleFloatAmplitude: 40,
-            materialOverrides: {
-                metalness: 1,
-                roughness: 0.06,
-                transmission: 0,
-                clearcoat: 0,
-                envMapIntensity: 3,
-            },
-        });
-        initKeycap3D('footerCtaIcon3d4', 'assets/taxonomy-poziom-3d-texture.png', '#ffd60a', {
-            interactive: false,
-            localTilt: true,
-            idleFloatAmplitude: 40,
-            materialOverrides: {
-                color: 0xb87333,
-                metalness: 1,
-                roughness: 0.4,
-                transmission: 0,
-                clearcoat: 0,
-                envMapIntensity: 2.2,
-            },
-        });
+        // Kafelki taksonomii: szkło ma tło kafelka (--surface).
+        ['taxonomyIcon3d', 'taxonomyTypIcon3d', 'taxonomyPlatformaIcon3d', 'taxonomyPoziomIcon3d']
+            .forEach((id, i) => initTaxonomyShape(id, TAXONOMY_SHAPES[i], {
+                bgVar: '--surface',
+                floatPx: 3,
+                // 120% domyślnego rozmiaru szklanej bryły (1.9).
+                sizeBoost: 1.9 * 1.2,
+                // Na telefonie kafelki są węższe, więc tam bez powiększenia.
+                mobileSizeBoost: 1.9,
+            }));
+
+        // CTA w stopce („Nowe hasła pojawiają się regularnie”): te same cztery
+        // bryły. Pozycja/skala/obrót/opacity nadal sterowane przez animację
+        // scrollową GSAP na .footer__cta-graphic (setupFooterCtaGraphics) —
+        // bez zmian. Tło stopki to prawie tło strony, stąd --bg. Ikony o ćwierć
+        // słabiej „wpływają” w ramkę szkła niż w kafelkach, żeby bryły nie
+        // odciągały uwagi od CTA.
+        ['footerCtaIcon3d1', 'footerCtaIcon3d2', 'footerCtaIcon3d3', 'footerCtaIcon3d4']
+            .forEach((id, i) => initTaxonomyShape(id, TAXONOMY_SHAPES[i], {
+                bgVar: '--bg',
+                floatPx: 6,
+                idleFloatAmplitude: 40,
+                rimFlowScale: 0.75,
+            }));
     </script>
 
     <script>

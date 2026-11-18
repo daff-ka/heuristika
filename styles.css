@@ -368,14 +368,17 @@ body {
   padding-top: 160px;
 }
 
-#dots {
+/* Pikselowy ślad kursora (cursor-trail.js). Rysuje na biało, a difference
+   odwraca to względem tła: biały ślad na ciemnym motywie, czarny na
+   jasnym. Nad wszystkim, ale bez przechwytywania kliknięć. */
+.cursor-trail {
   position: fixed;
   inset: 0;
-  width: 100%;
-  height: 100%;
-  display: block;
-  z-index: -1;
+  width: 100vw;
+  height: 100vh;
   pointer-events: none;
+  z-index: 99999;
+  mix-blend-mode: difference;
 }
 
 .hero__video {
@@ -433,6 +436,18 @@ body {
   position: relative;
   z-index: 1;
   display: block;
+}
+
+/* Szklany wariant bryły (glass-icon.js, domyślny; ?hero=keycap wyłącza) jest o 40% większy
+   od keycapa: trochę więcej miejsca nad eyebrow i canvas podniesiony
+   wyżej niż przy keycapie. Szerokość zostaje 87px, bo od niej
+   glass-icon.js liczy rozmiar canvasa. */
+.hero__icon--glass {
+  height: 105px;
+}
+
+.hero .hero__icon--3d.hero__icon--glass canvas {
+  transform: translate(-50%, calc(-50% - 80px));
 }
 
 .hero .hero__icon--3d canvas {
@@ -1260,16 +1275,6 @@ body {
   background: var(--footer-overlay-bg);
   backdrop-filter: blur(4px);
   -webkit-backdrop-filter: blur(4px);
-}
-
-#footerDots {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  display: block;
-  z-index: 0;
-  pointer-events: none;
 }
 
 .footer__inner {
@@ -3213,6 +3218,16 @@ span.entry__ch-seg--rest { background: var(--border-strong); }
 
   .hero .hero__icon--3d canvas {
     transform: translate(-50%, calc(-50% - 40px));
+  }
+
+  /* Na telefonie szkło jest niżej niż na desktopie, żeby nie wchodziło
+     pod nawigację; większa wysokość kontenera robi mu miejsce nad eyebrow. */
+  .hero__icon--glass {
+    height: 152px;
+  }
+
+  .hero .hero__icon--3d.hero__icon--glass canvas {
+    transform: translate(-50%, calc(-50% - 8px));
   }
 
   .hero__title-break {
