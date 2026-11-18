@@ -121,20 +121,33 @@ body,
   inset: 0;
   z-index: 999;
   pointer-events: none;
+  overflow: hidden;
+  background: var(--border);
 }
 
-#preloader-svg {
-  display: block;
-  width: 100%;
-  height: 100%;
-}
-
-#preloader-svg rect {
-  fill: var(--border);
-}
-
+/* Trójkąt równoboczny wierzchołkiem do góry, wycięty clip-path z kwadratu
+   o boku 2R, wyśrodkowany w oknie. R to promień okręgu opisanego, przy
+   którym trójkąt na pewno zakrywa cały ekran (ta sama formuła co dawniej
+   w JS: 1.05 × max(vh, vh/2 + √3/2 × vw)). Rośnie przez transform: scale,
+   który liczy kompozytor — animacja nie zacina się, gdy główny wątek
+   parsuje skrypty. Koniec animacji odsłania stronę (patrz index.html). */
 #preloader-triangle {
-  fill: var(--bg);
+  --preloader-r: calc(1.05 * max(100vh, 50vh + 86.6025vw));
+  position: absolute;
+  left: calc(50vw - var(--preloader-r));
+  top: calc(50vh - var(--preloader-r));
+  width: calc(2 * var(--preloader-r));
+  height: calc(2 * var(--preloader-r));
+  background: var(--bg);
+  clip-path: polygon(50% 0%, 93.3013% 75%, 6.6987% 75%);
+  transform: scale(0);
+  will-change: transform;
+  animation: preloader-grow 0.8s cubic-bezier(0.45, 0, 0.55, 1) forwards;
+}
+
+@keyframes preloader-grow {
+  from { transform: scale(0); }
+  to { transform: scale(1); }
 }
 
 /* Bez gumowego odbicia przy krawędziach strony (iOS Safari 16+, Chrome):

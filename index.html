@@ -34,10 +34,7 @@
 
 <body>
     <div id="preloader" aria-hidden="true">
-        <svg id="preloader-svg" width="100%" height="100%">
-            <rect x="0" y="0" width="100%" height="100%" />
-            <polygon id="preloader-triangle" />
-        </svg>
+        <div id="preloader-triangle"></div>
     </div>
     <div class="page">
         <div class="shell">
@@ -462,6 +459,14 @@
         }
     </script>
     <script>
+        // Obietnica „preloader skończył”. Ciężka inicjalizacja brył (pole
+        // odległości ikon, konteksty WebGL, kompilacja shaderów) czeka na nią,
+        // żeby nie blokować wątku w trakcie animacji preloadera — inaczej ten
+        // gubił klatki, zwłaszcza na telefonie. Awaryjnie po 2,5 s i tak rusza.
+        window.__introDone = new Promise((resolve) => {
+            window.__resolveIntroDone = resolve;
+            setTimeout(resolve, 2500);
+        });
         (function () {
             const introItems = document.querySelectorAll('.js-intro');
             const preloader = document.getElementById('preloader');
@@ -488,42 +493,29 @@
             if (typeof gsap === 'undefined') {
                 introItems.forEach(el => el.style.opacity = 1);
                 if (preloader) preloader.remove();
+                window.__resolveIntroDone();
             } else {
-                const triangle = document.getElementById('preloader-triangle');
-                const vw = window.innerWidth;
-                const vh = window.innerHeight;
-                const cx = vw / 2;
-                const cy = vh / 2;
-
-                const R = 1.05 * Math.max(vh, vh / 2 + (Math.sqrt(3) / 2) * vw);
-                const angles = [-90, 30, 150].map((deg) => deg * Math.PI / 180);
-
-                function setTriangleAt(rNow) {
-                    const points = angles.map((rad) => `${cx + rNow * Math.cos(rad)},${cy + rNow * Math.sin(rad)}`).join(' ');
-                    triangle.setAttribute('points', points);
-                }
-                setTriangleAt(0);
-
-                const fullCoverageR = R / 1.05;
+                // Trójkąt preloadera rośnie animacją CSS (styles.css,
+                // #preloader-triangle) — transform liczy kompozytor, więc
+                // animacja jest płynna nawet wtedy, gdy główny wątek parsuje
+                // skrypty. Wcześniej punkty trójkąta przestawiał co klatkę JS
+                // i każde zajęcie wątku zatrzymywało animację. Tutaj tylko
+                // czekamy na jej koniec. finished działa także wtedy, gdy
+                // animacja skończyła się, zanim ten skrypt w ogóle ruszył.
                 let revealed = false;
                 function revealOnce() {
                     if (revealed) return;
                     revealed = true;
-                    preloader.remove();
+                    if (preloader) preloader.remove();
                     revealHeroIntro();
+                    window.__resolveIntroDone();
                 }
-
-                const state = { r: 0 };
-                gsap.to(state, {
-                    r: R,
-                    duration: 0.8,
-                    ease: 'power2.inOut',
-                    onUpdate: () => {
-                        setTriangleAt(state.r);
-                        if (state.r >= fullCoverageR) revealOnce();
-                    },
-                    onComplete: revealOnce
-                });
+                const triangle = document.getElementById('preloader-triangle');
+                const growth = triangle && triangle.getAnimations ? triangle.getAnimations()[0] : null;
+                if (growth) growth.finished.then(revealOnce, revealOnce);
+                else if (triangle) triangle.addEventListener('animationend', revealOnce);
+                // Awaryjnie (np. brak animacji w przeglądarce).
+                setTimeout(revealOnce, 1500);
             }
 
             if (typeof ScrollTrigger !== 'undefined') {
@@ -914,10 +906,25 @@
         }
     </script>
     <script type="module">
-        import * as THREE from 'three';
-        import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
-        import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
         import { initGlassIcon } from './glass-icon.js';
+
+        // three.js (ok. 1,2 MB) jest potrzebny tylko keycapom — wariantowi
+        // ?hero=keycap albo awaryjnie, gdy WebGL dla szkła nie ruszy. Ładowany
+        // dopiero wtedy: statyczny import kompilował go przy każdym wejściu na
+        // stronę, w trakcie preloadera, który przez to gubił klatki.
+        let threePromise = null;
+        function loadThree() {
+            threePromise ??= Promise.all([
+                import('three'),
+                import('three/addons/loaders/GLTFLoader.js'),
+                import('three/addons/environments/RoomEnvironment.js'),
+            ]).then(([THREE, gltf, room]) => ({
+                THREE,
+                GLTFLoader: gltf.GLTFLoader,
+                RoomEnvironment: room.RoomEnvironment,
+            }));
+            return threePromise;
+        }
 
         // Klik/tap → nawigacja do losowego hasła i tooltip "zaskocz mnie".
         // Dotyczy tylko hero (patrz tekst tooltipa w markupie). Wspólne dla
@@ -988,7 +995,8 @@
             });
         }
 
-        function initKeycap3D(containerId, textureUrl, bodyColor, options = {}) {
+        async function initKeycap3D(containerId, textureUrl, bodyColor, options = {}) {
+            const { THREE, GLTFLoader, RoomEnvironment } = await loadThree();
             const {
                 interactive = true,
                 sizeBoost = 1.8,
@@ -1568,13 +1576,30 @@
         // (glass-icon.js), a ?hero=keycap wraca do metalowych keycapów — np.
         // do testów A/B. Gdy WebGL dla szkła nie ruszy, wracamy do keycapa.
         const useGlass = new URLSearchParams(window.location.search).get('hero') !== 'keycap';
+        // Szklane bryły startują dopiero po preloaderze (window.__introDone)
+        // i po kolei, w kolejności wywołań (hero pierwsze), z oddechem jednej
+        // klatki między nimi — inicjalizacja każdej to kilkadziesiąt ms pracy
+        // wątku, a dziewięć naraz zacinało animacje.
+        const glassQueue = [];
+        let glassQueueRunning = false;
+        async function runGlassQueue() {
+            if (glassQueueRunning) return;
+            glassQueueRunning = true;
+            await window.__introDone;
+            while (glassQueue.length) {
+                await glassQueue.shift()();
+                await new Promise((resolve) => requestAnimationFrame(() => setTimeout(resolve, 0)));
+            }
+            glassQueueRunning = false;
+        }
         function initGlassOrKeycap(containerId, glassOptions, initKeycap) {
             const el = document.getElementById(containerId);
             if (!useGlass || !el) {
                 initKeycap();
                 return;
             }
-            initGlassIcon(el, glassOptions).then((ok) => { if (!ok) initKeycap(); });
+            glassQueue.push(() => initGlassIcon(el, glassOptions).then((ok) => { if (!ok) initKeycap(); }));
+            runGlassQueue();
         }
 
         const heroContainer = document.getElementById('heroIcon3d');
