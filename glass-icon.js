@@ -169,6 +169,28 @@ function listenPointer() {
     }
 }
 
+// Telefony i tablety: do dziewięciu szklanych brył naraz na słabszym GPU
+// rwało przewijanie (zwłaszcza w górę, gdy wracają hero i taksonomia).
+// Dlatego na dotyku: połowa próbek tęczy w shaderze, niższa rozdzielczość
+// canvasa i odświeżanie 30 razy na sekundę (falowanie szkła jest powolne,
+// więc różnicy nie widać, a GPU ma o połowę mniej pracy).
+const IS_TOUCH = window.matchMedia('(hover: none), (pointer: coarse)').matches;
+const MAX_DPR = IS_TOUCH ? 1.5 : 2;
+const FRAME_MS = IS_TOUCH ? 1000 / 30 : 0;
+// Na dotyku w trakcie przewijania bryły w ogóle się nie przerysowują —
+// zostaje ostatnia klatka (szkło i tak stoi w miejscu, a animacje CTA to
+// transformacje rodzica, które robi kompozytor). GPU zajmuje się wtedy
+// tylko przewijaniem. Rysowanie wraca chwilę po zatrzymaniu.
+let touchScrolling = false;
+if (IS_TOUCH) {
+    let scrollIdleTimer = null;
+    window.addEventListener('scroll', () => {
+        touchScrolling = true;
+        clearTimeout(scrollIdleTimer);
+        scrollIdleTimer = setTimeout(() => { touchScrolling = false; }, 180);
+    }, { passive: true });
+}
+
 // Tilt lokalny (kafelki taksonomii): jak localTilt w initKeycap3D — pełne
 // wychylenie już przy niewielkim przesunięciu kursora od środka bryły,
 // wygaszane do zera, gdy kursor jest daleko.
@@ -208,7 +230,7 @@ export async function initGlassIcon(container, {
     const canvas = document.createElement('canvas');
     let renderer;
     try {
-        renderer = new GlassRenderer(canvas);
+        renderer = new GlassRenderer(canvas, { taps: IS_TOUCH ? 16 : 32 });
     } catch (e) {
         console.warn('[glass-icon] WebGL niedostępny, zostaje zwykła bryła.', e);
         return false;
@@ -236,7 +258,7 @@ export async function initGlassIcon(container, {
         const cssSize = Math.round((container.clientWidth || 87) * boost / ICON_SCALE);
         canvas.style.width = `${cssSize}px`;
         canvas.style.height = `${cssSize}px`;
-        const dpr = Math.min(window.devicePixelRatio || 1, 2);
+        const dpr = Math.min(window.devicePixelRatio || 1, MAX_DPR);
         // Górny limit, bo shader z 32 próbkami na piksel przy dużym
         // canvasie robi się kosztowny.
         renderer.setSize(Math.min(1400, Math.round(cssSize * dpr * extraRenderScale)));
@@ -286,6 +308,9 @@ export async function initGlassIcon(container, {
     let tiltX = 0, tiltY = 0;
     function tiltGoal() {
         if (!localTilt || pointer.gyro) return [pointer.x, pointer.y];
+        // Bez myszy (dotyk bez żyroskopu) nie ma czego liczyć — i nie
+        // wymuszamy co klatkę przeliczenia layoutu przez getBoundingClientRect.
+        if (pointer.clientX < -1e5) return [0, 0];
         const rect = container.getBoundingClientRect();
         const dx = pointer.clientX - (rect.left + rect.width / 2);
         const dy = pointer.clientY - (rect.top + rect.height / 2);
@@ -315,9 +340,18 @@ export async function initGlassIcon(container, {
 
     const start = performance.now();
     const floatPhase = Math.random() * Math.PI * 2;
+    // Pierwsza klatka rysuje się zawsze, także poza ekranem: przeglądarka
+    // kompiluje shader dopiero przy pierwszym rysowaniu, więc bez tego
+    // zrobiłaby to w środku scrolla, gdy bryła wjeżdża na ekran (zacięcie).
+    let drawn = false;
+    let lastDraw = 0;
     function frame(now) {
         requestAnimationFrame(frame);
-        if (!visible) return;
+        if (drawn && !visible) return;
+        if (drawn && touchScrolling) return;
+        if (drawn && FRAME_MS && now - lastDraw < FRAME_MS - 2) return;
+        drawn = true;
+        lastDraw = now;
         const [gx, gy] = tiltGoal();
         tiltX += (gx - tiltX) * 0.08;
         tiltY += (gy - tiltY) * 0.08;

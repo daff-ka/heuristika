@@ -37,8 +37,15 @@
         canvas.height = window.innerHeight * dpr;
     }
 
+    // Pusta kanwa z mix-blend-mode na cały ekran i tak zmusza przeglądarkę do
+    // mieszania jej z całą stroną przy każdym przewinięciu — więc gdy nie ma
+    // śladu, jest ukryta.
+    canvas.style.display = 'none';
     function wake() {
-        if (raf === null) raf = requestAnimationFrame(tick);
+        if (raf === null) {
+            canvas.style.display = '';
+            raf = requestAnimationFrame(tick);
+        }
     }
 
     function onMove(e) {
@@ -113,6 +120,7 @@
         } else {
             raf = null;
             last = null;
+            canvas.style.display = 'none';
         }
     }
 

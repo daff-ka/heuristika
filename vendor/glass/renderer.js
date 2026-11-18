@@ -1,5 +1,7 @@
 // From https://github.com/phileeppov/glass (MIT, see LICENSE in this folder).
 // Heuristika changes:
+// - performance: no preserveDrawingBuffer (nothing is exported, a fresh buffer each frame is cheaper),
+//   and an optional lower sample count for the rim fringe (new GlassRenderer(canvas, { taps })) on phones;
 // - the u_clear uniform (params.clear) keeps the outside transparent;
 // - polygon mode (params.polygon): a rounded regular polygon (triangle, octagon…) instead of the
 //   superellipse. Its norm is a p-norm of the edge distances, so like the superellipse its level
@@ -61,7 +63,7 @@ void main() {
   gl_Position = vec4(a_pos, 0.0, 1.0);
 }`;
 
-const frag = (derivatives) => `
+const frag = (derivatives, taps = 32) => `
 ${derivatives ? "#extension GL_OES_standard_derivatives : enable" : ""}
 #ifdef GL_FRAGMENT_PRECISION_HIGH
 precision highp float;
@@ -107,7 +109,7 @@ uniform float u_polyStart;  // angle of the first edge normal (rad)
 uniform float u_polyR;      // inradius in frame units
 uniform float u_polyShift;  // the polygon's incenter sits this far below the frame center
 
-const int TAPS = 32;
+const int TAPS = ${taps};
 const float TAU = 6.2831853;
 
 // Spectrum from red (0) to violet (1).
@@ -494,13 +496,13 @@ export class GlassRenderer {
   texSize = 1;
   loc = {};
 
-  constructor(canvas) {
+  constructor(canvas, { taps = 32 } = {}) {
     this.canvas = canvas;
-    const gl = canvas.getContext("webgl", { premultipliedAlpha: true, preserveDrawingBuffer: true, antialias: false });
+    const gl = canvas.getContext("webgl", { premultipliedAlpha: true, preserveDrawingBuffer: false, antialias: false });
     if (!gl) throw new Error("webgl");
     this.gl = gl;
     const derivatives = !!gl.getExtension("OES_standard_derivatives");
-    this.program = this.link(frag(derivatives));
+    this.program = this.link(frag(derivatives, taps));
     gl.useProgram(this.program);
 
     const buf = gl.createBuffer();
