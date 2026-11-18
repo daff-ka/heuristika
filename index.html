@@ -668,12 +668,31 @@
                 // więc tam działa bez żadnych ograniczeń, tak jak zawsze. Ta sama
                 // ostrożność dotyczy paralaksy tekstu (ten sam typ scroll-linked
                 // tweena), więc leci w tym samym warunku.
-                if (!window.matchMedia('(max-width: 760px)').matches) {
+                // gsap.matchMedia zamiast jednorazowego sprawdzenia przy starcie:
+                // gdy okno przejdzie przez breakpoint (obrót telefonu, zwężenie
+                // okna), efekty włączają się albo wyłączają na bieżąco. Wcześniej
+                // strona otwarta szeroko i potem zwężona zostawała z kręcącą się
+                // kartą hero także w widoku mobilnym.
+                gsap.matchMedia().add('(min-width: 761px)', () => {
                     createHeroShrinkTween();
                     createHeroTextParallaxTween();
                     createHeroIconParallaxTween();
                     window.addEventListener('heuristika:themechange', createHeroShrinkTween);
-                }
+                    return () => {
+                        window.removeEventListener('heuristika:themechange', createHeroShrinkTween);
+                        [heroShrinkTween, heroTextParallaxTween, heroIconParallaxTween].forEach((tween) => {
+                            if (!tween) return;
+                            if (tween.scrollTrigger) tween.scrollTrigger.kill();
+                            tween.kill();
+                        });
+                        heroShrinkTween = heroTextParallaxTween = heroIconParallaxTween = null;
+                        // Powrót do stanu bez efektów: zdejmujemy wszystko, co
+                        // tweeny wpisały inline (obrót/skala karty, przesunięcia).
+                        gsap.set('.hero', { clearProps: 'transform,borderRadius,borderColor,backgroundColor,backdropFilter' });
+                        gsap.set('#heroIcon3d, .hero__eyebrow, .hero__title, .hero__copy, .hero__search', { clearProps: 'transform' });
+                        document.getElementById('heroIcon3d')?.__setRenderScale?.(1);
+                    };
+                });
 
                 // Na samej górze strony wszystko, co jest spięte ze scrollem
                 // hero (.hero__marker: zmniejszanie hero, paralaksa tekstu
@@ -1548,8 +1567,9 @@
             bgVar: '--bg',
             // 140% rozmiaru keycapa.
             sizeBoost: 2.66,
-            // Na telefonie trochę mniejsze, żeby zmieściło się pod nawigacją.
-            mobileSizeBoost: 2.0,
+            // Na telefonie mniejsze, żeby pole wyszukiwania zmieściło się nad
+            // zgięciem (wysokość kontenera w styles.css jest z tym zgrana).
+            mobileSizeBoost: 1.7,
             onPressTarget: (canvas, press) => attachRandomEntryClick(heroContainer, canvas, press),
         }, () => {
             heroContainer.classList.remove('hero__icon--glass');

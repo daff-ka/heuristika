@@ -226,10 +226,13 @@ export async function initGlassIcon(container, {
 
     // Rozmiar canvasa w CSS liczony od szerokości kontenera, tak jak przy
     // keycapach; ten sam breakpoint co CSS.
-    const isMobileViewport = window.matchMedia('(max-width: 760px)').matches;
-    const boost = isMobileViewport ? mobileSizeBoost : sizeBoost;
+    // Sprawdzane przy każdym resize, nie raz przy starcie — po przejściu
+    // przez breakpoint (obrót telefonu, zwężenie okna) bryła dostaje rozmiar
+    // zgodny z aktualnym layoutem.
+    const mobileQuery = window.matchMedia('(max-width: 760px)');
     let extraRenderScale = 1;
     function resize() {
+        const boost = mobileQuery.matches ? mobileSizeBoost : sizeBoost;
         const cssSize = Math.round((container.clientWidth || 87) * boost / ICON_SCALE);
         canvas.style.width = `${cssSize}px`;
         canvas.style.height = `${cssSize}px`;

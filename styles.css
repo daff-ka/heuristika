@@ -3220,14 +3220,21 @@ span.entry__ch-seg--rest { background: var(--border-strong); }
     transform: translate(-50%, calc(-50% - 40px));
   }
 
-  /* Na telefonie szkło jest niżej niż na desktopie, żeby nie wchodziło
-     pod nawigację; większa wysokość kontenera robi mu miejsce nad eyebrow. */
+  /* Na telefonie kontener szkła ma dokładnie wysokość bryły (148px =
+     87px × mobileSizeBoost 1.7 w index.html) i canvas jest w nim
+     wyśrodkowany, bez przesunięcia w górę — odstęp od nawigacji ustawia
+     samo padding-top hero. Mniejsze niż przy keycapie (135px), żeby pole
+     wyszukiwania zmieściło się nad zgięciem także na niskich telefonach. */
+  .hero:has(.hero__icon--glass) {
+    padding-top: 74px;
+  }
+
   .hero__icon--glass {
-    height: 152px;
+    height: 148px;
   }
 
   .hero .hero__icon--3d.hero__icon--glass canvas {
-    transform: translate(-50%, calc(-50% - 8px));
+    transform: translate(-50%, -50%);
   }
 
   .hero__title-break {
