@@ -177,19 +177,6 @@ function listenPointer() {
 const IS_TOUCH = window.matchMedia('(hover: none), (pointer: coarse)').matches;
 const MAX_DPR = IS_TOUCH ? 1.5 : 2;
 const FRAME_MS = IS_TOUCH ? 1000 / 30 : 0;
-// Na dotyku w trakcie przewijania bryły w ogóle się nie przerysowują —
-// zostaje ostatnia klatka (szkło i tak stoi w miejscu, a animacje CTA to
-// transformacje rodzica, które robi kompozytor). GPU zajmuje się wtedy
-// tylko przewijaniem. Rysowanie wraca chwilę po zatrzymaniu.
-let touchScrolling = false;
-if (IS_TOUCH) {
-    let scrollIdleTimer = null;
-    window.addEventListener('scroll', () => {
-        touchScrolling = true;
-        clearTimeout(scrollIdleTimer);
-        scrollIdleTimer = setTimeout(() => { touchScrolling = false; }, 180);
-    }, { passive: true });
-}
 
 // Tilt lokalny (kafelki taksonomii): jak localTilt w initKeycap3D — pełne
 // wychylenie już przy niewielkim przesunięciu kursora od środka bryły,
@@ -348,7 +335,6 @@ export async function initGlassIcon(container, {
     function frame(now) {
         requestAnimationFrame(frame);
         if (drawn && !visible) return;
-        if (drawn && touchScrolling) return;
         if (drawn && FRAME_MS && now - lastDraw < FRAME_MS - 2) return;
         drawn = true;
         lastDraw = now;
@@ -369,8 +355,8 @@ export async function initGlassIcon(container, {
         const seconds = (now - start) / 1000;
         const phase = reducedMotion ? 0 : (seconds / LOOP_S) % 1;
         // Delikatne unoszenie, jak idleFloat keycapów.
-        // Na dotyku bez unoszenia: rysowanie stoi w trakcie przewijania, więc
-        // po zatrzymaniu bryła przeskakiwała do bieżącej pozycji unoszenia.
+        // Na dotyku bez unoszenia: przy 30 klatkach na sekundę ruch całej
+        // bryły szarpie (falowanie wewnątrz szkła jest wolne, więc tam nie).
         const float = reducedMotion || IS_TOUCH ? 0 : Math.sin(seconds * 1.1 + floatPhase) * floatPx;
         canvas.style.translate = `0 ${float.toFixed(2)}px`;
 
