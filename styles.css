@@ -137,6 +137,13 @@ body,
   fill: var(--bg);
 }
 
+/* Bez gumowego odbicia przy krawędziach strony (iOS Safari 16+, Chrome):
+   przy odbiciu od dolnej krawędzi wysuwał się pasek Safari i treść stopki
+   przeskakiwała. */
+html {
+  overscroll-behavior-y: none;
+}
+
 body {
   margin: 0;
   min-height: 100svh;

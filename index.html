@@ -447,7 +447,13 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
     <script src="https://unpkg.com/lenis@1.3.18/dist/lenis.min.js"></script>
     <script>
-        if (typeof Lenis !== 'undefined' && typeof gsap !== 'undefined') {
+        // Lenis tylko przy myszy/trackpadzie. Na dotyku i tak nie wygładza
+        // (telefon przewija natywnie), a na iPhonie przy gumowym odbiciu od
+        // dolnej krawędzi strony przeliczał granice przewijania i korygował
+        // pozycję — tekst w CTA w stopce przeskakiwał w pionie. Reszta kodu
+        // sprawdza window.lenis, więc bez niego działa na zwykłym scrollu.
+        if (typeof Lenis !== 'undefined' && typeof gsap !== 'undefined'
+            && window.matchMedia('(hover: hover) and (pointer: fine)').matches) {
             const lenis = new Lenis();
             window.lenis = lenis;
             lenis.on('scroll', () => { if (typeof ScrollTrigger !== 'undefined') ScrollTrigger.update(); });
