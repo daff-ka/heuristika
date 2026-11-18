@@ -884,7 +884,13 @@
 
                     // Na telefonie pozycje liczone są raz (gsap.set), więc po
                     // zmianie rozmiaru (np. obrót ekranu) ustawiamy je od nowa.
+                    // Tylko przy zmianie szerokości — iOS wysyła resize także przy
+                    // chowaniu paska adresu w trakcie przewijania, a wtedy nic
+                    // nie trzeba przestawiać.
+                    let ctaLastWidth = window.innerWidth;
                     window.addEventListener('resize', () => {
+                        if (window.innerWidth === ctaLastWidth) return;
+                        ctaLastWidth = window.innerWidth;
                         if (!window.matchMedia('(max-width: 760px)').matches) return;
                         ctaGraphics.forEach((el, i) => gsap.set(el, { x: finalX(i), y: finalY(i) }));
                     });
@@ -1683,6 +1689,8 @@
                 floatPx: 6,
                 idleFloatAmplitude: 40,
                 rimFlowScale: 0.75,
+                // Na telefonie 90% domyślnego rozmiaru (1.9).
+                mobileSizeBoost: 1.9 * 0.9,
             }));
     </script>
 

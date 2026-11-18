@@ -369,7 +369,9 @@ export async function initGlassIcon(container, {
         const seconds = (now - start) / 1000;
         const phase = reducedMotion ? 0 : (seconds / LOOP_S) % 1;
         // Delikatne unoszenie, jak idleFloat keycapów.
-        const float = reducedMotion ? 0 : Math.sin(seconds * 1.1 + floatPhase) * floatPx;
+        // Na dotyku bez unoszenia: rysowanie stoi w trakcie przewijania, więc
+        // po zatrzymaniu bryła przeskakiwała do bieżącej pozycji unoszenia.
+        const float = reducedMotion || IS_TOUCH ? 0 : Math.sin(seconds * 1.1 + floatPhase) * floatPx;
         canvas.style.translate = `0 ${float.toFixed(2)}px`;
 
         renderer.render({
