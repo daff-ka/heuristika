@@ -31,6 +31,12 @@
   --badge-amber-bg: #2b1d06;
   --badge-amber-border: #4a3210;
   --badge-amber-fg: #ffb224;
+  /* Ikony w szklanych bryłach „Platforma” i „Poziom” (taksonomia i CTA):
+     jaśniejsze niż --badge-green-fg i --badge-amber-fg jasnego motywu, które
+     są ciemne, żeby tekst etykiet był czytelny. Żółty jest ten sam w obu
+     motywach, zielony w jasnym jest trochę ciemniejszy (patrz niżej). */
+  --glass-green-icon: #4cd98a;
+  --glass-amber-icon: #ffb224;
   --badge-violet-bg: #211129;
   --badge-violet-border: #3b1e52;
   --badge-violet-fg: #b98cff;
@@ -90,6 +96,8 @@
   --badge-green-bg: #e3f9ee;
   --badge-green-border: #beeed7;
   --badge-green-fg: #12805c;
+  /* Zielony z ciemnego motywu był na jasnym tle za jasny — tu ciemniejszy. */
+  --glass-green-icon: #1fa862;
 
   --danger-fg: #c4351d;
 
